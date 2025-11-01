@@ -11,7 +11,7 @@ from ChronoVisitor import ChronoVisitor
 class ChronoErrorListener(ErrorListener):
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
         # 抛出一个 Python 异常，这将立即停止脚本
-        raise Exception(f"❌ ANTLR Parse Error at Line {line}:{column} - {msg}")
+        raise Exception(f"NO OK! ANTLR Parse Error at Line {line}:{column} - {msg}")
 
 def translate(input_file, output_file):
     try:

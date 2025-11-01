@@ -1,4 +1,4 @@
-﻿# src/ChronoVisitor.py
+# src/ChronoVisitor.py
 
 from antlr4 import *
 from parser.ChronoParser import ChronoParser

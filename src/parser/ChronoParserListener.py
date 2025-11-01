@@ -17,6 +17,24 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#classDefinition.
+    def enterClassDefinition(self, ctx:ChronoParser.ClassDefinitionContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#classDefinition.
+    def exitClassDefinition(self, ctx:ChronoParser.ClassDefinitionContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#deinitBlock.
+    def enterDeinitBlock(self, ctx:ChronoParser.DeinitBlockContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#deinitBlock.
+    def exitDeinitBlock(self, ctx:ChronoParser.DeinitBlockContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#globalStatement.
     def enterGlobalStatement(self, ctx:ChronoParser.GlobalStatementContext):
         pass
@@ -44,21 +62,30 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#parameters.
+    def enterParameters(self, ctx:ChronoParser.ParametersContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#parameters.
+    def exitParameters(self, ctx:ChronoParser.ParametersContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#parameter.
+    def enterParameter(self, ctx:ChronoParser.ParameterContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#parameter.
+    def exitParameter(self, ctx:ChronoParser.ParameterContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#declaration.
     def enterDeclaration(self, ctx:ChronoParser.DeclarationContext):
         pass
 
     # Exit a parse tree produced by ChronoParser#declaration.
     def exitDeclaration(self, ctx:ChronoParser.DeclarationContext):
-        pass
-
-
-    # Enter a parse tree produced by ChronoParser#methodCall.
-    def enterMethodCall(self, ctx:ChronoParser.MethodCallContext):
-        pass
-
-    # Exit a parse tree produced by ChronoParser#methodCall.
-    def exitMethodCall(self, ctx:ChronoParser.MethodCallContext):
         pass
 
 
@@ -89,12 +116,12 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ChronoParser#functionCall.
-    def enterFunctionCall(self, ctx:ChronoParser.FunctionCallContext):
+    # Enter a parse tree produced by ChronoParser#assignment.
+    def enterAssignment(self, ctx:ChronoParser.AssignmentContext):
         pass
 
-    # Exit a parse tree produced by ChronoParser#functionCall.
-    def exitFunctionCall(self, ctx:ChronoParser.FunctionCallContext):
+    # Exit a parse tree produced by ChronoParser#assignment.
+    def exitAssignment(self, ctx:ChronoParser.AssignmentContext):
         pass
 
 

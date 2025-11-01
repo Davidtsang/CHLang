@@ -10,7 +10,9 @@ FUNC    : 'func' ;
 LET     : 'let' ;
 RETURN  : 'return' ;
 //PRINT   : 'print' ;
-
+CLASS   : 'class' ;  // [ 新增 ]
+DEINIT  : 'deinit' ; // [ 新增 ]
+THIS    : 'this' ;   // [ 新增 ]
 // 关键：遇到 @cpp 时，切换到 INSIDE_CPP_BLOCK 模式
 // (INSIDE_CPP_BLOCK 在文件末尾定义)
 AT_CPP  : '@cpp' -> pushMode(INSIDE_CPP_BLOCK);
