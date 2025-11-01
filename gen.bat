@@ -1,0 +1,6 @@
+@echo off
+echo Generating Chrono Lexer...
+java -jar antlr-4.13.2-complete.jar -Dlanguage=Python3 grammar/ChronoLexer.g4 -visitor -o src/parser
+
+echo Generating Chrono Parser...
+java -jar antlr-4.13.2-complete.jar -Dlanguage=Python3 grammar/ChronoParser.g4 -visitor -o src/parser

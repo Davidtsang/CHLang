@@ -1,0 +1,147 @@
+# Generated from grammar/ChronoParser.g4 by ANTLR 4.13.2
+from antlr4 import *
+if "." in __name__:
+    from .ChronoParser import ChronoParser
+else:
+    from ChronoParser import ChronoParser
+
+# This class defines a complete listener for a parse tree produced by ChronoParser.
+class ChronoParserListener(ParseTreeListener):
+
+    # Enter a parse tree produced by ChronoParser#program.
+    def enterProgram(self, ctx:ChronoParser.ProgramContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#program.
+    def exitProgram(self, ctx:ChronoParser.ProgramContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#globalStatement.
+    def enterGlobalStatement(self, ctx:ChronoParser.GlobalStatementContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#globalStatement.
+    def exitGlobalStatement(self, ctx:ChronoParser.GlobalStatementContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#importDirective.
+    def enterImportDirective(self, ctx:ChronoParser.ImportDirectiveContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#importDirective.
+    def exitImportDirective(self, ctx:ChronoParser.ImportDirectiveContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#functionDefinition.
+    def enterFunctionDefinition(self, ctx:ChronoParser.FunctionDefinitionContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#functionDefinition.
+    def exitFunctionDefinition(self, ctx:ChronoParser.FunctionDefinitionContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#declaration.
+    def enterDeclaration(self, ctx:ChronoParser.DeclarationContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#declaration.
+    def exitDeclaration(self, ctx:ChronoParser.DeclarationContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#methodCall.
+    def enterMethodCall(self, ctx:ChronoParser.MethodCallContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#methodCall.
+    def exitMethodCall(self, ctx:ChronoParser.MethodCallContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#cppBlock.
+    def enterCppBlock(self, ctx:ChronoParser.CppBlockContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#cppBlock.
+    def exitCppBlock(self, ctx:ChronoParser.CppBlockContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#returnStatement.
+    def enterReturnStatement(self, ctx:ChronoParser.ReturnStatementContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#returnStatement.
+    def exitReturnStatement(self, ctx:ChronoParser.ReturnStatementContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#functionCallExpression.
+    def enterFunctionCallExpression(self, ctx:ChronoParser.FunctionCallExpressionContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#functionCallExpression.
+    def exitFunctionCallExpression(self, ctx:ChronoParser.FunctionCallExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#functionCall.
+    def enterFunctionCall(self, ctx:ChronoParser.FunctionCallContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#functionCall.
+    def exitFunctionCall(self, ctx:ChronoParser.FunctionCallContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#statement.
+    def enterStatement(self, ctx:ChronoParser.StatementContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#statement.
+    def exitStatement(self, ctx:ChronoParser.StatementContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#expression.
+    def enterExpression(self, ctx:ChronoParser.ExpressionContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#expression.
+    def exitExpression(self, ctx:ChronoParser.ExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#methodCallExpression.
+    def enterMethodCallExpression(self, ctx:ChronoParser.MethodCallExpressionContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#methodCallExpression.
+    def exitMethodCallExpression(self, ctx:ChronoParser.MethodCallExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#expressionList.
+    def enterExpressionList(self, ctx:ChronoParser.ExpressionListContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#expressionList.
+    def exitExpressionList(self, ctx:ChronoParser.ExpressionListContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#literal.
+    def enterLiteral(self, ctx:ChronoParser.LiteralContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#literal.
+    def exitLiteral(self, ctx:ChronoParser.LiteralContext):
+        pass
+
+
+
+del ChronoParser

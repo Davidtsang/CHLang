@@ -1,0 +1,4 @@
+Chrono Statement 1
+C++ Block 1
+Chrono Statement 2
+C++ Block 2 (Accessing: Global C++ Variable)
