@@ -1,20 +1,20 @@
-// runtime/ChronoString.cpp
+О╩©// runtime/ChronoString.cpp
 
-// ╟Э╨╛кЭвт╪╨╣дм╥нд╪Ч
+// О©╫О©╫О©╫О©╫О©╫О©╫О©╫т╪О©╫О©╫О©╫м╥О©╫д╪О©╫
 #include "ChronoString.h" 
 
-// ╧ь╪Эё╨ожтзнрцгтзуБюО╟Э╨╛ ChronoInt.h
-// уБн╙нрцглА╧╘ак ChronoInt::create() ╣дмЙуШ╤╗рЕ
+// О©╫ь╪О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫ ChronoInt.h
+// О©╫О©╫н╙О©╫О©╫О©╫О©╫О©╫А╧╘О©╫О©╫ ChronoInt::create() О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
 #include "ChronoInt.h" 
 
-// (╟Э╨╛ C++ ©Б)
+// (О©╫О©╫О©╫О©╫ C++ О©╫О©╫)
 #include <string>
 #include <algorithm> // for ::toupper
 
-// --- ╥╫╥╗й╣ож ---
+// --- О©╫О©╫О©╫О©╫й╣О©╫О©╫ ---
 
 ChronoInt* ChronoString::length() const {
-    // ожтзнрцг©ирт╟╡х╚╣ь╣Всц ChronoInt::create()
+    // О©╫О©╫О©╫О©╫О©╫О©╫О©╫г©О©╫О©╫т╟О©╫х╚О©╫ь╣О©╫О©╫О©╫ ChronoInt::create()
     return ChronoInt::create(static_cast<int32_t>(m_value.length()));
 }
 

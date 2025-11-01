@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿//ChronoInt.h
+#pragma once
 #include "ChronoObject.h"
 
 // (ChronoInt 不需要包含 ChronoString，所以它更简单)

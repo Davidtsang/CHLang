@@ -14,6 +14,11 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#topLevelStatement.
+    def visitTopLevelStatement(self, ctx:ChronoParser.TopLevelStatementContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#classDefinition.
     def visitClassDefinition(self, ctx:ChronoParser.ClassDefinitionContext):
         return self.visitChildren(ctx)
@@ -21,11 +26,6 @@ class ChronoParserVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by ChronoParser#deinitBlock.
     def visitDeinitBlock(self, ctx:ChronoParser.DeinitBlockContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ChronoParser#globalStatement.
-    def visitGlobalStatement(self, ctx:ChronoParser.GlobalStatementContext):
         return self.visitChildren(ctx)
 
 
@@ -74,6 +74,11 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#assignableExpression.
+    def visitAssignableExpression(self, ctx:ChronoParser.AssignableExpressionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#statement.
     def visitStatement(self, ctx:ChronoParser.StatementContext):
         return self.visitChildren(ctx)
@@ -84,8 +89,8 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ChronoParser#methodCallExpression.
-    def visitMethodCallExpression(self, ctx:ChronoParser.MethodCallExpressionContext):
+    # Visit a parse tree produced by ChronoParser#primary.
+    def visitPrimary(self, ctx:ChronoParser.PrimaryContext):
         return self.visitChildren(ctx)
 
 

@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿//ChronoObject.h
+#pragma once
 
 #include <string>
 #include <iostream>

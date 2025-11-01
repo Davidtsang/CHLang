@@ -10,70 +10,77 @@ else:
 
 def serializedATN():
     return [
-        4,1,26,191,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
+        4,1,27,206,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
         6,2,7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,
-        2,14,7,14,2,15,7,15,2,16,7,16,2,17,7,17,1,0,5,0,38,8,0,10,0,12,0,
-        41,9,0,1,0,1,0,4,0,45,8,0,11,0,12,0,46,1,0,1,0,1,1,1,1,1,1,1,1,1,
-        1,1,1,1,1,1,1,5,1,59,8,1,10,1,12,1,62,9,1,1,1,1,1,1,2,1,2,1,2,5,
-        2,69,8,2,10,2,12,2,72,9,2,1,2,1,2,1,3,1,3,3,3,78,8,3,1,4,1,4,1,4,
-        1,4,1,5,1,5,1,5,1,5,1,5,1,5,1,5,1,5,1,5,5,5,93,8,5,10,5,12,5,96,
-        9,5,1,5,1,5,1,6,1,6,1,6,5,6,103,8,6,10,6,12,6,106,9,6,3,6,108,8,
-        6,1,7,1,7,1,7,1,7,1,8,1,8,1,8,1,8,1,8,1,8,3,8,120,8,8,1,8,1,8,1,
-        9,1,9,5,9,126,8,9,10,9,12,9,129,9,9,1,9,1,9,1,10,1,10,1,10,1,10,
-        1,11,1,11,1,11,3,11,140,8,11,1,11,1,11,1,12,1,12,1,12,1,12,3,12,
-        148,8,12,1,12,1,12,1,12,1,12,1,13,1,13,1,13,1,13,1,13,1,13,1,13,
-        3,13,161,8,13,1,14,1,14,1,14,1,14,1,14,1,14,1,14,3,14,170,8,14,1,
-        15,1,15,1,15,1,15,1,15,3,15,177,8,15,1,15,1,15,1,16,1,16,1,16,5,
-        16,184,8,16,10,16,12,16,187,9,16,1,17,1,17,1,17,0,0,18,0,2,4,6,8,
-        10,12,14,16,18,20,22,24,26,28,30,32,34,0,3,2,0,20,20,22,22,2,0,7,
-        7,19,19,1,0,21,22,197,0,39,1,0,0,0,2,50,1,0,0,0,4,65,1,0,0,0,6,77,
-        1,0,0,0,8,79,1,0,0,0,10,83,1,0,0,0,12,107,1,0,0,0,14,109,1,0,0,0,
-        16,113,1,0,0,0,18,123,1,0,0,0,20,132,1,0,0,0,22,136,1,0,0,0,24,147,
-        1,0,0,0,26,160,1,0,0,0,28,169,1,0,0,0,30,171,1,0,0,0,32,180,1,0,
-        0,0,34,188,1,0,0,0,36,38,3,6,3,0,37,36,1,0,0,0,38,41,1,0,0,0,39,
-        37,1,0,0,0,39,40,1,0,0,0,40,44,1,0,0,0,41,39,1,0,0,0,42,45,3,2,1,
-        0,43,45,3,10,5,0,44,42,1,0,0,0,44,43,1,0,0,0,45,46,1,0,0,0,46,44,
-        1,0,0,0,46,47,1,0,0,0,47,48,1,0,0,0,48,49,5,0,0,1,49,1,1,0,0,0,50,
-        51,5,5,0,0,51,52,5,19,0,0,52,53,5,14,0,0,53,54,5,19,0,0,54,60,5,
-        12,0,0,55,59,3,16,8,0,56,59,3,10,5,0,57,59,3,4,2,0,58,55,1,0,0,0,
-        58,56,1,0,0,0,58,57,1,0,0,0,59,62,1,0,0,0,60,58,1,0,0,0,60,61,1,
-        0,0,0,61,63,1,0,0,0,62,60,1,0,0,0,63,64,5,13,0,0,64,3,1,0,0,0,65,
-        66,5,6,0,0,66,70,5,12,0,0,67,69,3,26,13,0,68,67,1,0,0,0,69,72,1,
-        0,0,0,70,68,1,0,0,0,70,71,1,0,0,0,71,73,1,0,0,0,72,70,1,0,0,0,73,
-        74,5,13,0,0,74,5,1,0,0,0,75,78,3,8,4,0,76,78,3,18,9,0,77,75,1,0,
-        0,0,77,76,1,0,0,0,78,7,1,0,0,0,79,80,5,1,0,0,80,81,7,0,0,0,81,82,
-        5,9,0,0,82,9,1,0,0,0,83,84,5,2,0,0,84,85,5,19,0,0,85,86,5,10,0,0,
-        86,87,3,12,6,0,87,88,5,11,0,0,88,89,5,16,0,0,89,90,5,19,0,0,90,94,
-        5,12,0,0,91,93,3,26,13,0,92,91,1,0,0,0,93,96,1,0,0,0,94,92,1,0,0,
-        0,94,95,1,0,0,0,95,97,1,0,0,0,96,94,1,0,0,0,97,98,5,13,0,0,98,11,
-        1,0,0,0,99,104,3,14,7,0,100,101,5,18,0,0,101,103,3,14,7,0,102,100,
-        1,0,0,0,103,106,1,0,0,0,104,102,1,0,0,0,104,105,1,0,0,0,105,108,
-        1,0,0,0,106,104,1,0,0,0,107,99,1,0,0,0,107,108,1,0,0,0,108,13,1,
-        0,0,0,109,110,5,19,0,0,110,111,5,14,0,0,111,112,5,19,0,0,112,15,
-        1,0,0,0,113,114,5,3,0,0,114,115,5,19,0,0,115,116,5,14,0,0,116,119,
-        5,19,0,0,117,118,5,15,0,0,118,120,3,28,14,0,119,117,1,0,0,0,119,
-        120,1,0,0,0,120,121,1,0,0,0,121,122,5,9,0,0,122,17,1,0,0,0,123,127,
-        5,8,0,0,124,126,5,26,0,0,125,124,1,0,0,0,126,129,1,0,0,0,127,125,
-        1,0,0,0,127,128,1,0,0,0,128,130,1,0,0,0,129,127,1,0,0,0,130,131,
-        5,25,0,0,131,19,1,0,0,0,132,133,5,4,0,0,133,134,3,28,14,0,134,135,
-        5,9,0,0,135,21,1,0,0,0,136,137,5,19,0,0,137,139,5,10,0,0,138,140,
-        3,32,16,0,139,138,1,0,0,0,139,140,1,0,0,0,140,141,1,0,0,0,141,142,
-        5,11,0,0,142,23,1,0,0,0,143,144,5,7,0,0,144,145,5,17,0,0,145,148,
-        5,19,0,0,146,148,5,19,0,0,147,143,1,0,0,0,147,146,1,0,0,0,148,149,
-        1,0,0,0,149,150,5,15,0,0,150,151,3,28,14,0,151,152,5,9,0,0,152,25,
-        1,0,0,0,153,161,3,16,8,0,154,161,3,24,12,0,155,161,3,20,10,0,156,
-        157,3,28,14,0,157,158,5,9,0,0,158,161,1,0,0,0,159,161,3,18,9,0,160,
-        153,1,0,0,0,160,154,1,0,0,0,160,155,1,0,0,0,160,156,1,0,0,0,160,
-        159,1,0,0,0,161,27,1,0,0,0,162,170,3,34,17,0,163,170,5,19,0,0,164,
-        170,3,30,15,0,165,170,3,22,11,0,166,167,5,7,0,0,167,168,5,17,0,0,
-        168,170,5,19,0,0,169,162,1,0,0,0,169,163,1,0,0,0,169,164,1,0,0,0,
-        169,165,1,0,0,0,169,166,1,0,0,0,170,29,1,0,0,0,171,172,7,1,0,0,172,
-        173,5,17,0,0,173,174,5,19,0,0,174,176,5,10,0,0,175,177,3,32,16,0,
-        176,175,1,0,0,0,176,177,1,0,0,0,177,178,1,0,0,0,178,179,5,11,0,0,
-        179,31,1,0,0,0,180,185,3,28,14,0,181,182,5,18,0,0,182,184,3,28,14,
-        0,183,181,1,0,0,0,184,187,1,0,0,0,185,183,1,0,0,0,185,186,1,0,0,
-        0,186,33,1,0,0,0,187,185,1,0,0,0,188,189,7,2,0,0,189,35,1,0,0,0,
-        18,39,44,46,58,60,70,77,94,104,107,119,127,139,147,160,169,176,185
+        2,14,7,14,2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,1,0,4,0,40,8,0,
+        11,0,12,0,41,1,0,1,0,1,1,1,1,1,1,1,1,3,1,50,8,1,1,2,1,2,1,2,1,2,
+        1,2,1,2,1,2,1,2,1,2,5,2,61,8,2,10,2,12,2,64,9,2,1,2,1,2,1,3,1,3,
+        1,3,5,3,71,8,3,10,3,12,3,74,9,3,1,3,1,3,1,4,1,4,1,4,1,4,1,5,3,5,
+        83,8,5,1,5,1,5,1,5,1,5,1,5,1,5,1,5,3,5,92,8,5,1,5,1,5,5,5,96,8,5,
+        10,5,12,5,99,9,5,1,5,1,5,1,6,1,6,1,6,5,6,106,8,6,10,6,12,6,109,9,
+        6,3,6,111,8,6,1,7,1,7,1,7,1,7,1,8,1,8,1,8,1,8,1,8,1,8,3,8,123,8,
+        8,1,8,1,8,1,9,1,9,5,9,129,8,9,10,9,12,9,132,9,9,1,9,1,9,1,10,1,10,
+        1,10,1,10,1,11,1,11,1,11,3,11,143,8,11,1,11,1,11,1,12,1,12,1,12,
+        1,12,1,12,1,13,1,13,1,13,5,13,155,8,13,10,13,12,13,158,9,13,1,14,
+        1,14,1,14,1,14,1,14,1,14,1,14,3,14,167,8,14,1,15,1,15,1,15,1,15,
+        1,15,3,15,174,8,15,1,15,3,15,177,8,15,5,15,179,8,15,10,15,12,15,
+        182,9,15,1,15,3,15,185,8,15,1,16,1,16,1,16,1,16,1,16,1,16,1,16,3,
+        16,194,8,16,1,17,1,17,1,17,5,17,199,8,17,10,17,12,17,202,9,17,1,
+        18,1,18,1,18,0,0,19,0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,
+        34,36,0,3,2,0,21,21,23,23,2,0,7,7,20,20,1,0,22,23,216,0,39,1,0,0,
+        0,2,49,1,0,0,0,4,51,1,0,0,0,6,67,1,0,0,0,8,77,1,0,0,0,10,82,1,0,
+        0,0,12,110,1,0,0,0,14,112,1,0,0,0,16,116,1,0,0,0,18,126,1,0,0,0,
+        20,135,1,0,0,0,22,139,1,0,0,0,24,146,1,0,0,0,26,151,1,0,0,0,28,166,
+        1,0,0,0,30,184,1,0,0,0,32,193,1,0,0,0,34,195,1,0,0,0,36,203,1,0,
+        0,0,38,40,3,2,1,0,39,38,1,0,0,0,40,41,1,0,0,0,41,39,1,0,0,0,41,42,
+        1,0,0,0,42,43,1,0,0,0,43,44,5,0,0,1,44,1,1,0,0,0,45,50,3,8,4,0,46,
+        50,3,18,9,0,47,50,3,4,2,0,48,50,3,10,5,0,49,45,1,0,0,0,49,46,1,0,
+        0,0,49,47,1,0,0,0,49,48,1,0,0,0,50,3,1,0,0,0,51,52,5,5,0,0,52,53,
+        5,20,0,0,53,54,5,15,0,0,54,55,5,20,0,0,55,62,5,13,0,0,56,61,3,16,
+        8,0,57,61,3,10,5,0,58,61,3,6,3,0,59,61,3,18,9,0,60,56,1,0,0,0,60,
+        57,1,0,0,0,60,58,1,0,0,0,60,59,1,0,0,0,61,64,1,0,0,0,62,60,1,0,0,
+        0,62,63,1,0,0,0,63,65,1,0,0,0,64,62,1,0,0,0,65,66,5,14,0,0,66,5,
+        1,0,0,0,67,68,5,6,0,0,68,72,5,13,0,0,69,71,3,28,14,0,70,69,1,0,0,
+        0,71,74,1,0,0,0,72,70,1,0,0,0,72,73,1,0,0,0,73,75,1,0,0,0,74,72,
+        1,0,0,0,75,76,5,14,0,0,76,7,1,0,0,0,77,78,5,1,0,0,78,79,7,0,0,0,
+        79,80,5,10,0,0,80,9,1,0,0,0,81,83,5,8,0,0,82,81,1,0,0,0,82,83,1,
+        0,0,0,83,84,1,0,0,0,84,85,5,2,0,0,85,86,5,20,0,0,86,87,5,11,0,0,
+        87,88,3,12,6,0,88,91,5,12,0,0,89,90,5,17,0,0,90,92,5,20,0,0,91,89,
+        1,0,0,0,91,92,1,0,0,0,92,93,1,0,0,0,93,97,5,13,0,0,94,96,3,28,14,
+        0,95,94,1,0,0,0,96,99,1,0,0,0,97,95,1,0,0,0,97,98,1,0,0,0,98,100,
+        1,0,0,0,99,97,1,0,0,0,100,101,5,14,0,0,101,11,1,0,0,0,102,107,3,
+        14,7,0,103,104,5,19,0,0,104,106,3,14,7,0,105,103,1,0,0,0,106,109,
+        1,0,0,0,107,105,1,0,0,0,107,108,1,0,0,0,108,111,1,0,0,0,109,107,
+        1,0,0,0,110,102,1,0,0,0,110,111,1,0,0,0,111,13,1,0,0,0,112,113,5,
+        20,0,0,113,114,5,15,0,0,114,115,5,20,0,0,115,15,1,0,0,0,116,117,
+        5,3,0,0,117,118,5,20,0,0,118,119,5,15,0,0,119,122,5,20,0,0,120,121,
+        5,16,0,0,121,123,3,30,15,0,122,120,1,0,0,0,122,123,1,0,0,0,123,124,
+        1,0,0,0,124,125,5,10,0,0,125,17,1,0,0,0,126,130,5,9,0,0,127,129,
+        5,27,0,0,128,127,1,0,0,0,129,132,1,0,0,0,130,128,1,0,0,0,130,131,
+        1,0,0,0,131,133,1,0,0,0,132,130,1,0,0,0,133,134,5,26,0,0,134,19,
+        1,0,0,0,135,136,5,4,0,0,136,137,3,30,15,0,137,138,5,10,0,0,138,21,
+        1,0,0,0,139,140,5,20,0,0,140,142,5,11,0,0,141,143,3,34,17,0,142,
+        141,1,0,0,0,142,143,1,0,0,0,143,144,1,0,0,0,144,145,5,12,0,0,145,
+        23,1,0,0,0,146,147,3,26,13,0,147,148,5,16,0,0,148,149,3,30,15,0,
+        149,150,5,10,0,0,150,25,1,0,0,0,151,156,7,1,0,0,152,153,5,18,0,0,
+        153,155,5,20,0,0,154,152,1,0,0,0,155,158,1,0,0,0,156,154,1,0,0,0,
+        156,157,1,0,0,0,157,27,1,0,0,0,158,156,1,0,0,0,159,167,3,16,8,0,
+        160,167,3,24,12,0,161,167,3,20,10,0,162,163,3,30,15,0,163,164,5,
+        10,0,0,164,167,1,0,0,0,165,167,3,18,9,0,166,159,1,0,0,0,166,160,
+        1,0,0,0,166,161,1,0,0,0,166,162,1,0,0,0,166,165,1,0,0,0,167,29,1,
+        0,0,0,168,180,3,32,16,0,169,170,5,18,0,0,170,176,5,20,0,0,171,173,
+        5,11,0,0,172,174,3,34,17,0,173,172,1,0,0,0,173,174,1,0,0,0,174,175,
+        1,0,0,0,175,177,5,12,0,0,176,171,1,0,0,0,176,177,1,0,0,0,177,179,
+        1,0,0,0,178,169,1,0,0,0,179,182,1,0,0,0,180,178,1,0,0,0,180,181,
+        1,0,0,0,181,185,1,0,0,0,182,180,1,0,0,0,183,185,3,22,11,0,184,168,
+        1,0,0,0,184,183,1,0,0,0,185,31,1,0,0,0,186,194,3,36,18,0,187,194,
+        5,20,0,0,188,194,5,7,0,0,189,190,5,11,0,0,190,191,3,30,15,0,191,
+        192,5,12,0,0,192,194,1,0,0,0,193,186,1,0,0,0,193,187,1,0,0,0,193,
+        188,1,0,0,0,193,189,1,0,0,0,194,33,1,0,0,0,195,200,3,30,15,0,196,
+        197,5,19,0,0,197,199,3,30,15,0,198,196,1,0,0,0,199,202,1,0,0,0,200,
+        198,1,0,0,0,200,201,1,0,0,0,201,35,1,0,0,0,202,200,1,0,0,0,203,204,
+        7,2,0,0,204,37,1,0,0,0,21,41,49,60,62,72,82,91,97,107,110,122,130,
+        142,156,166,173,176,180,184,193,200
     ]
 
 class ChronoParser ( Parser ):
@@ -87,22 +94,22 @@ class ChronoParser ( Parser ):
     sharedContextCache = PredictionContextCache()
 
     literalNames = [ "<INVALID>", "'import'", "'func'", "'let'", "'return'", 
-                     "'class'", "'deinit'", "'this'", "'@cpp'", "';'", "'('", 
-                     "')'", "'{'", "'}'", "':'", "'='", "'->'", "'.'", "','", 
-                     "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                     "<INVALID>", "<INVALID>", "'@end'" ]
+                     "'class'", "'deinit'", "'this'", "'static'", "'@cpp'", 
+                     "';'", "'('", "')'", "'{'", "'}'", "':'", "'='", "'->'", 
+                     "'.'", "','", "<INVALID>", "<INVALID>", "<INVALID>", 
+                     "<INVALID>", "<INVALID>", "<INVALID>", "'@end'" ]
 
     symbolicNames = [ "<INVALID>", "IMPORT", "FUNC", "LET", "RETURN", "CLASS", 
-                      "DEINIT", "THIS", "AT_CPP", "SEMIC_TOKEN", "LPAREN", 
-                      "RPAREN", "LBRACE", "RBRACE", "COLON", "ASSIGN", "ARROW", 
-                      "DOT", "COMMA", "IDENTIFIER", "INCLUDE_PATH", "INTEGER_LITERAL", 
-                      "STRING_LITERAL", "LINE_COMMENT", "WHITESPACE", "AT_END", 
-                      "CPP_BODY" ]
+                      "DEINIT", "THIS", "STATIC", "AT_CPP", "SEMIC_TOKEN", 
+                      "LPAREN", "RPAREN", "LBRACE", "RBRACE", "COLON", "ASSIGN", 
+                      "ARROW", "DOT", "COMMA", "IDENTIFIER", "INCLUDE_PATH", 
+                      "INTEGER_LITERAL", "STRING_LITERAL", "LINE_COMMENT", 
+                      "WHITESPACE", "AT_END", "CPP_BODY" ]
 
     RULE_program = 0
-    RULE_classDefinition = 1
-    RULE_deinitBlock = 2
-    RULE_globalStatement = 3
+    RULE_topLevelStatement = 1
+    RULE_classDefinition = 2
+    RULE_deinitBlock = 3
     RULE_importDirective = 4
     RULE_functionDefinition = 5
     RULE_parameters = 6
@@ -112,17 +119,18 @@ class ChronoParser ( Parser ):
     RULE_returnStatement = 10
     RULE_functionCallExpression = 11
     RULE_assignment = 12
-    RULE_statement = 13
-    RULE_expression = 14
-    RULE_methodCallExpression = 15
-    RULE_expressionList = 16
-    RULE_literal = 17
+    RULE_assignableExpression = 13
+    RULE_statement = 14
+    RULE_expression = 15
+    RULE_primary = 16
+    RULE_expressionList = 17
+    RULE_literal = 18
 
-    ruleNames =  [ "program", "classDefinition", "deinitBlock", "globalStatement", 
+    ruleNames =  [ "program", "topLevelStatement", "classDefinition", "deinitBlock", 
                    "importDirective", "functionDefinition", "parameters", 
                    "parameter", "declaration", "cppBlock", "returnStatement", 
-                   "functionCallExpression", "assignment", "statement", 
-                   "expression", "methodCallExpression", "expressionList", 
+                   "functionCallExpression", "assignment", "assignableExpression", 
+                   "statement", "expression", "primary", "expressionList", 
                    "literal" ]
 
     EOF = Token.EOF
@@ -133,25 +141,26 @@ class ChronoParser ( Parser ):
     CLASS=5
     DEINIT=6
     THIS=7
-    AT_CPP=8
-    SEMIC_TOKEN=9
-    LPAREN=10
-    RPAREN=11
-    LBRACE=12
-    RBRACE=13
-    COLON=14
-    ASSIGN=15
-    ARROW=16
-    DOT=17
-    COMMA=18
-    IDENTIFIER=19
-    INCLUDE_PATH=20
-    INTEGER_LITERAL=21
-    STRING_LITERAL=22
-    LINE_COMMENT=23
-    WHITESPACE=24
-    AT_END=25
-    CPP_BODY=26
+    STATIC=8
+    AT_CPP=9
+    SEMIC_TOKEN=10
+    LPAREN=11
+    RPAREN=12
+    LBRACE=13
+    RBRACE=14
+    COLON=15
+    ASSIGN=16
+    ARROW=17
+    DOT=18
+    COMMA=19
+    IDENTIFIER=20
+    INCLUDE_PATH=21
+    INTEGER_LITERAL=22
+    STRING_LITERAL=23
+    LINE_COMMENT=24
+    WHITESPACE=25
+    AT_END=26
+    CPP_BODY=27
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -172,25 +181,11 @@ class ChronoParser ( Parser ):
         def EOF(self):
             return self.getToken(ChronoParser.EOF, 0)
 
-        def globalStatement(self, i:int=None):
+        def topLevelStatement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.GlobalStatementContext)
+                return self.getTypedRuleContexts(ChronoParser.TopLevelStatementContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.GlobalStatementContext,i)
-
-
-        def classDefinition(self, i:int=None):
-            if i is None:
-                return self.getTypedRuleContexts(ChronoParser.ClassDefinitionContext)
-            else:
-                return self.getTypedRuleContext(ChronoParser.ClassDefinitionContext,i)
-
-
-        def functionDefinition(self, i:int=None):
-            if i is None:
-                return self.getTypedRuleContexts(ChronoParser.FunctionDefinitionContext)
-            else:
-                return self.getTypedRuleContext(ChronoParser.FunctionDefinitionContext,i)
+                return self.getTypedRuleContext(ChronoParser.TopLevelStatementContext,i)
 
 
         def getRuleIndex(self):
@@ -220,42 +215,103 @@ class ChronoParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 39
-            self._errHandler.sync(self)
-            _la = self._input.LA(1)
-            while _la==1 or _la==8:
-                self.state = 36
-                self.globalStatement()
-                self.state = 41
-                self._errHandler.sync(self)
-                _la = self._input.LA(1)
-
-            self.state = 44 
+            self.state = 39 
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while True:
-                self.state = 44
-                self._errHandler.sync(self)
-                token = self._input.LA(1)
-                if token in [5]:
-                    self.state = 42
-                    self.classDefinition()
-                    pass
-                elif token in [2]:
-                    self.state = 43
-                    self.functionDefinition()
-                    pass
-                else:
-                    raise NoViableAltException(self)
-
-                self.state = 46 
+                self.state = 38
+                self.topLevelStatement()
+                self.state = 41 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if not (_la==2 or _la==5):
+                if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & 806) != 0)):
                     break
 
-            self.state = 48
+            self.state = 43
             self.match(ChronoParser.EOF)
+        except RecognitionException as re:
+            localctx.exception = re
+            self._errHandler.reportError(self, re)
+            self._errHandler.recover(self, re)
+        finally:
+            self.exitRule()
+        return localctx
+
+
+    class TopLevelStatementContext(ParserRuleContext):
+        __slots__ = 'parser'
+
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
+            super().__init__(parent, invokingState)
+            self.parser = parser
+
+        def importDirective(self):
+            return self.getTypedRuleContext(ChronoParser.ImportDirectiveContext,0)
+
+
+        def cppBlock(self):
+            return self.getTypedRuleContext(ChronoParser.CppBlockContext,0)
+
+
+        def classDefinition(self):
+            return self.getTypedRuleContext(ChronoParser.ClassDefinitionContext,0)
+
+
+        def functionDefinition(self):
+            return self.getTypedRuleContext(ChronoParser.FunctionDefinitionContext,0)
+
+
+        def getRuleIndex(self):
+            return ChronoParser.RULE_topLevelStatement
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterTopLevelStatement" ):
+                listener.enterTopLevelStatement(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitTopLevelStatement" ):
+                listener.exitTopLevelStatement(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitTopLevelStatement" ):
+                return visitor.visitTopLevelStatement(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+
+
+    def topLevelStatement(self):
+
+        localctx = ChronoParser.TopLevelStatementContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 2, self.RULE_topLevelStatement)
+        try:
+            self.state = 49
+            self._errHandler.sync(self)
+            token = self._input.LA(1)
+            if token in [1]:
+                self.enterOuterAlt(localctx, 1)
+                self.state = 45
+                self.importDirective()
+                pass
+            elif token in [9]:
+                self.enterOuterAlt(localctx, 2)
+                self.state = 46
+                self.cppBlock()
+                pass
+            elif token in [5]:
+                self.enterOuterAlt(localctx, 3)
+                self.state = 47
+                self.classDefinition()
+                pass
+            elif token in [2, 8]:
+                self.enterOuterAlt(localctx, 4)
+                self.state = 48
+                self.functionDefinition()
+                pass
+            else:
+                raise NoViableAltException(self)
+
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -313,6 +369,13 @@ class ChronoParser ( Parser ):
                 return self.getTypedRuleContext(ChronoParser.DeinitBlockContext,i)
 
 
+        def cppBlock(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(ChronoParser.CppBlockContext)
+            else:
+                return self.getTypedRuleContext(ChronoParser.CppBlockContext,i)
+
+
         def getRuleIndex(self):
             return ChronoParser.RULE_classDefinition
 
@@ -336,47 +399,51 @@ class ChronoParser ( Parser ):
     def classDefinition(self):
 
         localctx = ChronoParser.ClassDefinitionContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 2, self.RULE_classDefinition)
+        self.enterRule(localctx, 4, self.RULE_classDefinition)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 50
-            self.match(ChronoParser.CLASS)
             self.state = 51
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            self.match(ChronoParser.CLASS)
             self.state = 52
-            self.match(ChronoParser.COLON)
+            localctx.name = self.match(ChronoParser.IDENTIFIER)
             self.state = 53
-            localctx.base = self.match(ChronoParser.IDENTIFIER)
+            self.match(ChronoParser.COLON)
             self.state = 54
+            localctx.base = self.match(ChronoParser.IDENTIFIER)
+            self.state = 55
             self.match(ChronoParser.LBRACE)
-            self.state = 60
+            self.state = 62
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 76) != 0):
-                self.state = 58
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 844) != 0):
+                self.state = 60
                 self._errHandler.sync(self)
                 token = self._input.LA(1)
                 if token in [3]:
-                    self.state = 55
+                    self.state = 56
                     self.declaration()
                     pass
-                elif token in [2]:
-                    self.state = 56
+                elif token in [2, 8]:
+                    self.state = 57
                     self.functionDefinition()
                     pass
                 elif token in [6]:
-                    self.state = 57
+                    self.state = 58
                     self.deinitBlock()
+                    pass
+                elif token in [9]:
+                    self.state = 59
+                    self.cppBlock()
                     pass
                 else:
                     raise NoViableAltException(self)
 
-                self.state = 62
+                self.state = 64
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
-            self.state = 63
+            self.state = 65
             self.match(ChronoParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
@@ -433,91 +500,26 @@ class ChronoParser ( Parser ):
     def deinitBlock(self):
 
         localctx = ChronoParser.DeinitBlockContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 4, self.RULE_deinitBlock)
+        self.enterRule(localctx, 6, self.RULE_deinitBlock)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 65
+            self.state = 67
             self.match(ChronoParser.DEINIT)
-            self.state = 66
+            self.state = 68
             self.match(ChronoParser.LBRACE)
-            self.state = 70
+            self.state = 72
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 6816152) != 0):
-                self.state = 67
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 13634200) != 0):
+                self.state = 69
                 self.statement()
-                self.state = 72
+                self.state = 74
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
-            self.state = 73
+            self.state = 75
             self.match(ChronoParser.RBRACE)
-        except RecognitionException as re:
-            localctx.exception = re
-            self._errHandler.reportError(self, re)
-            self._errHandler.recover(self, re)
-        finally:
-            self.exitRule()
-        return localctx
-
-
-    class GlobalStatementContext(ParserRuleContext):
-        __slots__ = 'parser'
-
-        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
-            super().__init__(parent, invokingState)
-            self.parser = parser
-
-        def importDirective(self):
-            return self.getTypedRuleContext(ChronoParser.ImportDirectiveContext,0)
-
-
-        def cppBlock(self):
-            return self.getTypedRuleContext(ChronoParser.CppBlockContext,0)
-
-
-        def getRuleIndex(self):
-            return ChronoParser.RULE_globalStatement
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterGlobalStatement" ):
-                listener.enterGlobalStatement(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitGlobalStatement" ):
-                listener.exitGlobalStatement(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitGlobalStatement" ):
-                return visitor.visitGlobalStatement(self)
-            else:
-                return visitor.visitChildren(self)
-
-
-
-
-    def globalStatement(self):
-
-        localctx = ChronoParser.GlobalStatementContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 6, self.RULE_globalStatement)
-        try:
-            self.state = 77
-            self._errHandler.sync(self)
-            token = self._input.LA(1)
-            if token in [1]:
-                self.enterOuterAlt(localctx, 1)
-                self.state = 75
-                self.importDirective()
-                pass
-            elif token in [8]:
-                self.enterOuterAlt(localctx, 2)
-                self.state = 76
-                self.cppBlock()
-                pass
-            else:
-                raise NoViableAltException(self)
-
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -574,17 +576,17 @@ class ChronoParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 79
+            self.state = 77
             self.match(ChronoParser.IMPORT)
-            self.state = 80
+            self.state = 78
             localctx.path = self._input.LT(1)
             _la = self._input.LA(1)
-            if not(_la==20 or _la==22):
+            if not(_la==21 or _la==23):
                 localctx.path = self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)
                 self.consume()
-            self.state = 81
+            self.state = 79
             self.match(ChronoParser.SEMIC_TOKEN)
         except RecognitionException as re:
             localctx.exception = re
@@ -617,9 +619,6 @@ class ChronoParser ( Parser ):
         def RPAREN(self):
             return self.getToken(ChronoParser.RPAREN, 0)
 
-        def ARROW(self):
-            return self.getToken(ChronoParser.ARROW, 0)
-
         def LBRACE(self):
             return self.getToken(ChronoParser.LBRACE, 0)
 
@@ -631,6 +630,12 @@ class ChronoParser ( Parser ):
                 return self.getTokens(ChronoParser.IDENTIFIER)
             else:
                 return self.getToken(ChronoParser.IDENTIFIER, i)
+
+        def STATIC(self):
+            return self.getToken(ChronoParser.STATIC, 0)
+
+        def ARROW(self):
+            return self.getToken(ChronoParser.ARROW, 0)
 
         def statement(self, i:int=None):
             if i is None:
@@ -666,33 +671,47 @@ class ChronoParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 83
-            self.match(ChronoParser.FUNC)
-            self.state = 84
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
-            self.state = 85
-            self.match(ChronoParser.LPAREN)
-            self.state = 86
-            self.parameters()
-            self.state = 87
-            self.match(ChronoParser.RPAREN)
-            self.state = 88
-            self.match(ChronoParser.ARROW)
-            self.state = 89
-            localctx.returnType = self.match(ChronoParser.IDENTIFIER)
-            self.state = 90
-            self.match(ChronoParser.LBRACE)
-            self.state = 94
+            self.state = 82
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 6816152) != 0):
-                self.state = 91
+            if _la==8:
+                self.state = 81
+                self.match(ChronoParser.STATIC)
+
+
+            self.state = 84
+            self.match(ChronoParser.FUNC)
+            self.state = 85
+            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            self.state = 86
+            self.match(ChronoParser.LPAREN)
+            self.state = 87
+            self.parameters()
+            self.state = 88
+            self.match(ChronoParser.RPAREN)
+            self.state = 91
+            self._errHandler.sync(self)
+            _la = self._input.LA(1)
+            if _la==17:
+                self.state = 89
+                self.match(ChronoParser.ARROW)
+                self.state = 90
+                localctx.returnType = self.match(ChronoParser.IDENTIFIER)
+
+
+            self.state = 93
+            self.match(ChronoParser.LBRACE)
+            self.state = 97
+            self._errHandler.sync(self)
+            _la = self._input.LA(1)
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 13634200) != 0):
+                self.state = 94
                 self.statement()
-                self.state = 96
+                self.state = 99
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
-            self.state = 97
+            self.state = 100
             self.match(ChronoParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
@@ -750,21 +769,21 @@ class ChronoParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 107
+            self.state = 110
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==19:
-                self.state = 99
+            if _la==20:
+                self.state = 102
                 self.parameter()
-                self.state = 104
+                self.state = 107
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while _la==18:
-                    self.state = 100
+                while _la==19:
+                    self.state = 103
                     self.match(ChronoParser.COMMA)
-                    self.state = 101
+                    self.state = 104
                     self.parameter()
-                    self.state = 106
+                    self.state = 109
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
 
@@ -823,11 +842,11 @@ class ChronoParser ( Parser ):
         self.enterRule(localctx, 14, self.RULE_parameter)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 109
+            self.state = 112
             localctx.name = self.match(ChronoParser.IDENTIFIER)
-            self.state = 110
+            self.state = 113
             self.match(ChronoParser.COLON)
-            self.state = 111
+            self.state = 114
             localctx.typeName = self.match(ChronoParser.IDENTIFIER)
         except RecognitionException as re:
             localctx.exception = re
@@ -896,25 +915,25 @@ class ChronoParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 113
-            self.match(ChronoParser.LET)
-            self.state = 114
-            localctx.variableName = self.match(ChronoParser.IDENTIFIER)
-            self.state = 115
-            self.match(ChronoParser.COLON)
             self.state = 116
-            localctx.typeName = self.match(ChronoParser.IDENTIFIER)
+            self.match(ChronoParser.LET)
+            self.state = 117
+            localctx.variableName = self.match(ChronoParser.IDENTIFIER)
+            self.state = 118
+            self.match(ChronoParser.COLON)
             self.state = 119
+            localctx.typeName = self.match(ChronoParser.IDENTIFIER)
+            self.state = 122
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==15:
-                self.state = 117
+            if _la==16:
+                self.state = 120
                 self.match(ChronoParser.ASSIGN)
-                self.state = 118
+                self.state = 121
                 self.expression()
 
 
-            self.state = 121
+            self.state = 124
             self.match(ChronoParser.SEMIC_TOKEN)
         except RecognitionException as re:
             localctx.exception = re
@@ -971,19 +990,19 @@ class ChronoParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 123
+            self.state = 126
             self.match(ChronoParser.AT_CPP)
-            self.state = 127
+            self.state = 130
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==26:
-                self.state = 124
+            while _la==27:
+                self.state = 127
                 self.match(ChronoParser.CPP_BODY)
-                self.state = 129
+                self.state = 132
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
-            self.state = 130
+            self.state = 133
             self.match(ChronoParser.AT_END)
         except RecognitionException as re:
             localctx.exception = re
@@ -1037,11 +1056,11 @@ class ChronoParser ( Parser ):
         self.enterRule(localctx, 20, self.RULE_returnStatement)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 132
+            self.state = 135
             self.match(ChronoParser.RETURN)
-            self.state = 133
+            self.state = 136
             self.expression()
-            self.state = 134
+            self.state = 137
             self.match(ChronoParser.SEMIC_TOKEN)
         except RecognitionException as re:
             localctx.exception = re
@@ -1100,19 +1119,19 @@ class ChronoParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 136
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
-            self.state = 137
-            self.match(ChronoParser.LPAREN)
             self.state = 139
+            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            self.state = 140
+            self.match(ChronoParser.LPAREN)
+            self.state = 142
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 6815872) != 0):
-                self.state = 138
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 13633664) != 0):
+                self.state = 141
                 self.expressionList()
 
 
-            self.state = 141
+            self.state = 144
             self.match(ChronoParser.RPAREN)
         except RecognitionException as re:
             localctx.exception = re
@@ -1130,6 +1149,10 @@ class ChronoParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
+        def assignableExpression(self):
+            return self.getTypedRuleContext(ChronoParser.AssignableExpressionContext,0)
+
+
         def ASSIGN(self):
             return self.getToken(ChronoParser.ASSIGN, 0)
 
@@ -1139,15 +1162,6 @@ class ChronoParser ( Parser ):
 
         def SEMIC_TOKEN(self):
             return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
-
-        def THIS(self):
-            return self.getToken(ChronoParser.THIS, 0)
-
-        def DOT(self):
-            return self.getToken(ChronoParser.DOT, 0)
-
-        def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
 
         def getRuleIndex(self):
             return ChronoParser.RULE_assignment
@@ -1175,30 +1189,91 @@ class ChronoParser ( Parser ):
         self.enterRule(localctx, 24, self.RULE_assignment)
         try:
             self.enterOuterAlt(localctx, 1)
+            self.state = 146
+            self.assignableExpression()
             self.state = 147
-            self._errHandler.sync(self)
-            token = self._input.LA(1)
-            if token in [7]:
-                self.state = 143
-                self.match(ChronoParser.THIS)
-                self.state = 144
-                self.match(ChronoParser.DOT)
-                self.state = 145
-                self.match(ChronoParser.IDENTIFIER)
-                pass
-            elif token in [19]:
-                self.state = 146
-                self.match(ChronoParser.IDENTIFIER)
-                pass
-            else:
-                raise NoViableAltException(self)
-
-            self.state = 149
             self.match(ChronoParser.ASSIGN)
-            self.state = 150
+            self.state = 148
             self.expression()
-            self.state = 151
+            self.state = 149
             self.match(ChronoParser.SEMIC_TOKEN)
+        except RecognitionException as re:
+            localctx.exception = re
+            self._errHandler.reportError(self, re)
+            self._errHandler.recover(self, re)
+        finally:
+            self.exitRule()
+        return localctx
+
+
+    class AssignableExpressionContext(ParserRuleContext):
+        __slots__ = 'parser'
+
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
+            super().__init__(parent, invokingState)
+            self.parser = parser
+
+        def IDENTIFIER(self, i:int=None):
+            if i is None:
+                return self.getTokens(ChronoParser.IDENTIFIER)
+            else:
+                return self.getToken(ChronoParser.IDENTIFIER, i)
+
+        def THIS(self):
+            return self.getToken(ChronoParser.THIS, 0)
+
+        def DOT(self, i:int=None):
+            if i is None:
+                return self.getTokens(ChronoParser.DOT)
+            else:
+                return self.getToken(ChronoParser.DOT, i)
+
+        def getRuleIndex(self):
+            return ChronoParser.RULE_assignableExpression
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterAssignableExpression" ):
+                listener.enterAssignableExpression(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitAssignableExpression" ):
+                listener.exitAssignableExpression(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAssignableExpression" ):
+                return visitor.visitAssignableExpression(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+
+
+    def assignableExpression(self):
+
+        localctx = ChronoParser.AssignableExpressionContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 26, self.RULE_assignableExpression)
+        self._la = 0 # Token type
+        try:
+            self.enterOuterAlt(localctx, 1)
+            self.state = 151
+            _la = self._input.LA(1)
+            if not(_la==7 or _la==20):
+                self._errHandler.recoverInline(self)
+            else:
+                self._errHandler.reportMatch(self)
+                self.consume()
+            self.state = 156
+            self._errHandler.sync(self)
+            _la = self._input.LA(1)
+            while _la==18:
+                self.state = 152
+                self.match(ChronoParser.DOT)
+                self.state = 153
+                self.match(ChronoParser.IDENTIFIER)
+                self.state = 158
+                self._errHandler.sync(self)
+                _la = self._input.LA(1)
+
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1261,40 +1336,40 @@ class ChronoParser ( Parser ):
     def statement(self):
 
         localctx = ChronoParser.StatementContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 26, self.RULE_statement)
+        self.enterRule(localctx, 28, self.RULE_statement)
         try:
-            self.state = 160
+            self.state = 166
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,14,self._ctx)
             if la_ == 1:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 153
+                self.state = 159
                 self.declaration()
                 pass
 
             elif la_ == 2:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 154
+                self.state = 160
                 self.assignment()
                 pass
 
             elif la_ == 3:
                 self.enterOuterAlt(localctx, 3)
-                self.state = 155
+                self.state = 161
                 self.returnStatement()
                 pass
 
             elif la_ == 4:
                 self.enterOuterAlt(localctx, 4)
-                self.state = 156
+                self.state = 162
                 self.expression()
-                self.state = 157
+                self.state = 163
                 self.match(ChronoParser.SEMIC_TOKEN)
                 pass
 
             elif la_ == 5:
                 self.enterOuterAlt(localctx, 5)
-                self.state = 159
+                self.state = 165
                 self.cppBlock()
                 pass
 
@@ -1315,26 +1390,44 @@ class ChronoParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def literal(self):
-            return self.getTypedRuleContext(ChronoParser.LiteralContext,0)
+        def primary(self):
+            return self.getTypedRuleContext(ChronoParser.PrimaryContext,0)
 
 
-        def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+        def DOT(self, i:int=None):
+            if i is None:
+                return self.getTokens(ChronoParser.DOT)
+            else:
+                return self.getToken(ChronoParser.DOT, i)
 
-        def methodCallExpression(self):
-            return self.getTypedRuleContext(ChronoParser.MethodCallExpressionContext,0)
+        def IDENTIFIER(self, i:int=None):
+            if i is None:
+                return self.getTokens(ChronoParser.IDENTIFIER)
+            else:
+                return self.getToken(ChronoParser.IDENTIFIER, i)
+
+        def LPAREN(self, i:int=None):
+            if i is None:
+                return self.getTokens(ChronoParser.LPAREN)
+            else:
+                return self.getToken(ChronoParser.LPAREN, i)
+
+        def RPAREN(self, i:int=None):
+            if i is None:
+                return self.getTokens(ChronoParser.RPAREN)
+            else:
+                return self.getToken(ChronoParser.RPAREN, i)
+
+        def expressionList(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(ChronoParser.ExpressionListContext)
+            else:
+                return self.getTypedRuleContext(ChronoParser.ExpressionListContext,i)
 
 
         def functionCallExpression(self):
             return self.getTypedRuleContext(ChronoParser.FunctionCallExpressionContext,0)
 
-
-        def THIS(self):
-            return self.getToken(ChronoParser.THIS, 0)
-
-        def DOT(self):
-            return self.getToken(ChronoParser.DOT, 0)
 
         def getRuleIndex(self):
             return ChronoParser.RULE_expression
@@ -1359,43 +1452,52 @@ class ChronoParser ( Parser ):
     def expression(self):
 
         localctx = ChronoParser.ExpressionContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 28, self.RULE_expression)
+        self.enterRule(localctx, 30, self.RULE_expression)
+        self._la = 0 # Token type
         try:
-            self.state = 169
+            self.state = 184
             self._errHandler.sync(self)
-            la_ = self._interp.adaptivePredict(self._input,15,self._ctx)
+            la_ = self._interp.adaptivePredict(self._input,18,self._ctx)
             if la_ == 1:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 162
-                self.literal()
+                self.state = 168
+                self.primary()
+                self.state = 180
+                self._errHandler.sync(self)
+                _la = self._input.LA(1)
+                while _la==18:
+                    self.state = 169
+                    self.match(ChronoParser.DOT)
+                    self.state = 170
+                    self.match(ChronoParser.IDENTIFIER)
+                    self.state = 176
+                    self._errHandler.sync(self)
+                    _la = self._input.LA(1)
+                    if _la==11:
+                        self.state = 171
+                        self.match(ChronoParser.LPAREN)
+                        self.state = 173
+                        self._errHandler.sync(self)
+                        _la = self._input.LA(1)
+                        if (((_la) & ~0x3f) == 0 and ((1 << _la) & 13633664) != 0):
+                            self.state = 172
+                            self.expressionList()
+
+
+                        self.state = 175
+                        self.match(ChronoParser.RPAREN)
+
+
+                    self.state = 182
+                    self._errHandler.sync(self)
+                    _la = self._input.LA(1)
+
                 pass
 
             elif la_ == 2:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 163
-                self.match(ChronoParser.IDENTIFIER)
-                pass
-
-            elif la_ == 3:
-                self.enterOuterAlt(localctx, 3)
-                self.state = 164
-                self.methodCallExpression()
-                pass
-
-            elif la_ == 4:
-                self.enterOuterAlt(localctx, 4)
-                self.state = 165
+                self.state = 183
                 self.functionCallExpression()
-                pass
-
-            elif la_ == 5:
-                self.enterOuterAlt(localctx, 5)
-                self.state = 166
-                self.match(ChronoParser.THIS)
-                self.state = 167
-                self.match(ChronoParser.DOT)
-                self.state = 168
-                self.match(ChronoParser.IDENTIFIER)
                 pass
 
 
@@ -1408,88 +1510,88 @@ class ChronoParser ( Parser ):
         return localctx
 
 
-    class MethodCallExpressionContext(ParserRuleContext):
+    class PrimaryContext(ParserRuleContext):
         __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.receiver = None # Token
-            self.methodName = None # Token
 
-        def DOT(self):
-            return self.getToken(ChronoParser.DOT, 0)
+        def literal(self):
+            return self.getTypedRuleContext(ChronoParser.LiteralContext,0)
 
-        def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
 
-        def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
-
-        def IDENTIFIER(self, i:int=None):
-            if i is None:
-                return self.getTokens(ChronoParser.IDENTIFIER)
-            else:
-                return self.getToken(ChronoParser.IDENTIFIER, i)
+        def IDENTIFIER(self):
+            return self.getToken(ChronoParser.IDENTIFIER, 0)
 
         def THIS(self):
             return self.getToken(ChronoParser.THIS, 0)
 
-        def expressionList(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionListContext,0)
+        def LPAREN(self):
+            return self.getToken(ChronoParser.LPAREN, 0)
 
+        def expression(self):
+            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+
+
+        def RPAREN(self):
+            return self.getToken(ChronoParser.RPAREN, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_methodCallExpression
+            return ChronoParser.RULE_primary
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMethodCallExpression" ):
-                listener.enterMethodCallExpression(self)
+            if hasattr( listener, "enterPrimary" ):
+                listener.enterPrimary(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMethodCallExpression" ):
-                listener.exitMethodCallExpression(self)
+            if hasattr( listener, "exitPrimary" ):
+                listener.exitPrimary(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitMethodCallExpression" ):
-                return visitor.visitMethodCallExpression(self)
+            if hasattr( visitor, "visitPrimary" ):
+                return visitor.visitPrimary(self)
             else:
                 return visitor.visitChildren(self)
 
 
 
 
-    def methodCallExpression(self):
+    def primary(self):
 
-        localctx = ChronoParser.MethodCallExpressionContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 30, self.RULE_methodCallExpression)
-        self._la = 0 # Token type
+        localctx = ChronoParser.PrimaryContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 32, self.RULE_primary)
         try:
-            self.enterOuterAlt(localctx, 1)
-            self.state = 171
-            localctx.receiver = self._input.LT(1)
-            _la = self._input.LA(1)
-            if not(_la==7 or _la==19):
-                localctx.receiver = self._errHandler.recoverInline(self)
-            else:
-                self._errHandler.reportMatch(self)
-                self.consume()
-            self.state = 172
-            self.match(ChronoParser.DOT)
-            self.state = 173
-            localctx.methodName = self.match(ChronoParser.IDENTIFIER)
-            self.state = 174
-            self.match(ChronoParser.LPAREN)
-            self.state = 176
+            self.state = 193
             self._errHandler.sync(self)
-            _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 6815872) != 0):
-                self.state = 175
-                self.expressionList()
+            token = self._input.LA(1)
+            if token in [22, 23]:
+                self.enterOuterAlt(localctx, 1)
+                self.state = 186
+                self.literal()
+                pass
+            elif token in [20]:
+                self.enterOuterAlt(localctx, 2)
+                self.state = 187
+                self.match(ChronoParser.IDENTIFIER)
+                pass
+            elif token in [7]:
+                self.enterOuterAlt(localctx, 3)
+                self.state = 188
+                self.match(ChronoParser.THIS)
+                pass
+            elif token in [11]:
+                self.enterOuterAlt(localctx, 4)
+                self.state = 189
+                self.match(ChronoParser.LPAREN)
+                self.state = 190
+                self.expression()
+                self.state = 191
+                self.match(ChronoParser.RPAREN)
+                pass
+            else:
+                raise NoViableAltException(self)
 
-
-            self.state = 178
-            self.match(ChronoParser.RPAREN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1542,21 +1644,21 @@ class ChronoParser ( Parser ):
     def expressionList(self):
 
         localctx = ChronoParser.ExpressionListContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 32, self.RULE_expressionList)
+        self.enterRule(localctx, 34, self.RULE_expressionList)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 180
+            self.state = 195
             self.expression()
-            self.state = 185
+            self.state = 200
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==18:
-                self.state = 181
+            while _la==19:
+                self.state = 196
                 self.match(ChronoParser.COMMA)
-                self.state = 182
+                self.state = 197
                 self.expression()
-                self.state = 187
+                self.state = 202
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
@@ -1605,13 +1707,13 @@ class ChronoParser ( Parser ):
     def literal(self):
 
         localctx = ChronoParser.LiteralContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 34, self.RULE_literal)
+        self.enterRule(localctx, 36, self.RULE_literal)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 188
+            self.state = 203
             _la = self._input.LA(1)
-            if not(_la==21 or _la==22):
+            if not(_la==22 or _la==23):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)

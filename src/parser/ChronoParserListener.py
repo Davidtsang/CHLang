@@ -17,6 +17,15 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#topLevelStatement.
+    def enterTopLevelStatement(self, ctx:ChronoParser.TopLevelStatementContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#topLevelStatement.
+    def exitTopLevelStatement(self, ctx:ChronoParser.TopLevelStatementContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#classDefinition.
     def enterClassDefinition(self, ctx:ChronoParser.ClassDefinitionContext):
         pass
@@ -32,15 +41,6 @@ class ChronoParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by ChronoParser#deinitBlock.
     def exitDeinitBlock(self, ctx:ChronoParser.DeinitBlockContext):
-        pass
-
-
-    # Enter a parse tree produced by ChronoParser#globalStatement.
-    def enterGlobalStatement(self, ctx:ChronoParser.GlobalStatementContext):
-        pass
-
-    # Exit a parse tree produced by ChronoParser#globalStatement.
-    def exitGlobalStatement(self, ctx:ChronoParser.GlobalStatementContext):
         pass
 
 
@@ -125,6 +125,15 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#assignableExpression.
+    def enterAssignableExpression(self, ctx:ChronoParser.AssignableExpressionContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#assignableExpression.
+    def exitAssignableExpression(self, ctx:ChronoParser.AssignableExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#statement.
     def enterStatement(self, ctx:ChronoParser.StatementContext):
         pass
@@ -143,12 +152,12 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ChronoParser#methodCallExpression.
-    def enterMethodCallExpression(self, ctx:ChronoParser.MethodCallExpressionContext):
+    # Enter a parse tree produced by ChronoParser#primary.
+    def enterPrimary(self, ctx:ChronoParser.PrimaryContext):
         pass
 
-    # Exit a parse tree produced by ChronoParser#methodCallExpression.
-    def exitMethodCallExpression(self, ctx:ChronoParser.MethodCallExpressionContext):
+    # Exit a parse tree produced by ChronoParser#primary.
+    def exitPrimary(self, ctx:ChronoParser.PrimaryContext):
         pass
 
 

@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿//ChronoString.h
+#pragma once
 #include "ChronoObject.h"
 // #include "ChronoInt.h" // <-- 循环依赖！我们不能在这里包含 ChronoInt.h
                          // 我们必须使用 "前向声明"

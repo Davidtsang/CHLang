@@ -9,18 +9,22 @@ options { tokenVocab = ChronoLexer; }
 // --- 解析器规则 (Parser Rules) ---
 
 // 顶层规则
-program : globalStatement* (classDefinition | functionDefinition)+ EOF ;
+program : topLevelStatement+ EOF ;
 
-// [ 新增 ] 'class' 规则
+// topLevelStatement 允许这四种声明中的任意一种，按任意顺序
+topLevelStatement
+    : importDirective
+    | cppBlock
+    | classDefinition
+    | functionDefinition
+    ;
+    
 classDefinition : CLASS name=IDENTIFIER COLON base=IDENTIFIER LBRACE
-                    (declaration | functionDefinition | deinitBlock)* // 允许成员, 方法, 和 deinit
+                    (declaration | functionDefinition | deinitBlock | cppBlock)* // [ 已修正 ]
                   RBRACE ;
 
 // [ 新增 ] 'deinit' 规则
 deinitBlock : DEINIT LBRACE statement* RBRACE ;
-
-// [ 新规则 ] globalStatement 是一个包装器
-globalStatement : importDirective | cppBlock ;
 
 // --- 基础规则 ---
 
@@ -28,8 +32,8 @@ importDirective : IMPORT path=(STRING_LITERAL | INCLUDE_PATH) SEMIC_TOKEN ;
 
 // [ 已修正 ] 
 // 'functionDefinition' 现在可以接受 'parameters'
-functionDefinition : FUNC name=IDENTIFIER LPAREN parameters RPAREN ARROW returnType=IDENTIFIER LBRACE statement* RBRACE ;
-
+functionDefinition 
+    :(STATIC)? FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=IDENTIFIER)? LBRACE statement* RBRACE ;
 // [ 新增 ] 'parameters' 规则
 // (允许 0 个或多个参数, 例如 'title: String, x: i32')
 parameters : (parameter (COMMA parameter)*)? ;
@@ -49,7 +53,11 @@ returnStatement : RETURN expression SEMIC_TOKEN ;
 functionCallExpression : name=IDENTIFIER LPAREN expressionList? RPAREN ;
 
 // [ 新增 ] 赋值语句
-assignment : (THIS DOT IDENTIFIER | IDENTIFIER) ASSIGN expression SEMIC_TOKEN ;
+assignment : assignableExpression ASSIGN expression SEMIC_TOKEN ;
+
+assignableExpression
+    : (IDENTIFIER | THIS) (DOT IDENTIFIER)* // e.g., 'this.s.title' or 'my_var'
+    ;
 
 // --- 复合规则 ---
 
@@ -66,17 +74,19 @@ statement : declaration
 // [ 已修正 ]
 // 1. 添加了 'functionCallExpression' (允许 'let x = myFunc()')
 // 2. 'THIS DOT IDENTIFIER' 保持不变 (用于 'this.title')
+// 'expression' 现在是递归的
 expression
-    : literal
-    | IDENTIFIER
-    | methodCallExpression
-    | functionCallExpression // [ 修正 1 ]
-    | THIS DOT IDENTIFIER
+    : primary ( DOT IDENTIFIER (LPAREN expressionList? RPAREN)? )* // 匹配: primary.field or primary.method(args)
+    | functionCallExpression // 保持全局函数调用独立
     ;
 
-// [ 已修正 ] 
-// 'receiver' 现在可以是 'THIS' 或 'IDENTIFIER'
-methodCallExpression : receiver=(THIS | IDENTIFIER) DOT methodName=IDENTIFIER LPAREN expressionList? RPAREN ;
+// [ 新规则 ] 'primary' 是一个表达式链的 "起点"
+primary
+    : literal
+    | IDENTIFIER
+    | THIS
+    | LPAREN expression RPAREN // 允许 ( ... )
+    ;
 
 expressionList : expression (COMMA expression)* ;
 

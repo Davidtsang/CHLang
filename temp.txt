@@ -7,13 +7,11 @@ from parser.ChronoParserVisitor import ChronoParserVisitor as BaseChronoVisitor
 INDENT = "    " 
 
 class ChronoVisitor(BaseChronoVisitor):
-
     def __init__(self):
         super().__init__()
         self._in_class = False
         self._current_class_name = None
 
-    # --- 辅助函数 ---
     def _chrono_to_cpp_type(self, chrono_type_name):
         if chrono_type_name == "int" or chrono_type_name == "i32":
             return "int32_t"
@@ -27,21 +25,17 @@ class ChronoVisitor(BaseChronoVisitor):
 
     # --- 顶层规则 ---
     def visitProgram(self, ctx: ChronoParser.ProgramContext):
-        globals_code = "".join(self.visit(g) for g in ctx.globalStatement())
-        
-        definitions_code = ""
-        for child in ctx.children:
-            if isinstance(child, (ChronoParser.ClassDefinitionContext, 
-                                 ChronoParser.FunctionDefinitionContext)):
-                definitions_code += self.visit(child)
-        
+        all_code = "".join(self.visit(stmt) for stmt in ctx.topLevelStatement())
         main_wrapper = (
             "\n// C++ 程序的标准入口\n"
             "int main() {\n"
             f"{INDENT}return Chrono_main();\n"
             "}\n"
         )
-        return globals_code + definitions_code + main_wrapper
+        return all_code + main_wrapper
+
+    def visitTopLevelStatement(self, ctx: ChronoParser.TopLevelStatementContext):
+        return self.visitChildren(ctx)
 
     def visitImportDirective(self, ctx: ChronoParser.ImportDirectiveContext):
         path_text = ctx.path.text
@@ -57,21 +51,17 @@ class ChronoVisitor(BaseChronoVisitor):
     def visitClassDefinition(self, ctx: ChronoParser.ClassDefinitionContext):
         class_name = ctx.name.text
         base_name = ctx.base.text
-        
         self._in_class = True
         self._current_class_name = class_name
-        
         body_code = ""
-        for decl in ctx.declaration():
-            body_code += self.visit(decl)
-        for func in ctx.functionDefinition():
-            body_code += self.visit(func)
-        for deinit in ctx.deinitBlock():
-            body_code += self.visit(deinit)
-            
+        for child in ctx.children:
+            if isinstance(child, (ChronoParser.DeclarationContext,
+                                 ChronoParser.FunctionDefinitionContext,
+                                 ChronoParser.DeinitBlockContext,
+                                 ChronoParser.CppBlockContext)):
+                body_code += self.visit(child)
         self._in_class = False
         self._current_class_name = None
-        
         return (
             f"\nclass {class_name} : public {base_name} {{\n"
             "public:\n"
@@ -91,22 +81,24 @@ class ChronoVisitor(BaseChronoVisitor):
 
     def visitFunctionDefinition(self, ctx: ChronoParser.FunctionDefinitionContext):
         func_name = ctx.name.text
-        return_type = ctx.returnType.text
         params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
         body_code = "".join(self.visit(s) for s in ctx.statement())
-        
         cpp_return_type = ""
         cpp_func_name = ""
         
-        if func_name == "main" and return_type == "Int":
-            cpp_return_type = "int"
-            cpp_func_name = "Chrono_main"
-        else:
-            if return_type in ("i32", "i64", "int"):
-                cpp_return_type = self._chrono_to_cpp_type(return_type)
+        if ctx.returnType():
+            return_type = ctx.returnType.text
+            if func_name == "main" and return_type == "Int":
+                cpp_return_type = "int"
+                cpp_func_name = "Chrono_main"
             else:
-                cpp_return_type = f"{self._chrono_to_cpp_type(return_type)}*"
-            
+                if return_type in ("i32", "i64", "int"):
+                    cpp_return_type = self._chrono_to_cpp_type(return_type)
+                else:
+                    cpp_return_type = f"{self._chrono_to_cpp_type(return_type)}*"
+                cpp_func_name = func_name
+        else:
+            cpp_return_type = "void"
             if func_name == "init":
                 cpp_return_type = "" 
                 cpp_func_name = self._current_class_name
@@ -114,11 +106,9 @@ class ChronoVisitor(BaseChronoVisitor):
                 cpp_func_name = func_name
         
         indent = INDENT*2 if self._in_class else INDENT
-        
         if self._in_class:
              return (
                 f"\n{INDENT}{cpp_return_type} {cpp_func_name}({params_code}) {{\n"
-                f"{indent}// --- Chrono Method Body: {func_name} ---\n"
                 f"{body_code.replace(INDENT, indent)}"
                 f"{indent}// --- Method End ---\n"
                 f"{INDENT}}}\n"
@@ -141,7 +131,6 @@ class ChronoVisitor(BaseChronoVisitor):
     def visitParameter(self, ctx: ChronoParser.ParameterContext):
         name = ctx.name.text
         type_name = ctx.typeName.text
-        
         if type_name in ("i32", "i64", "int"):
             cpp_type = self._chrono_to_cpp_type(type_name)
             return f"{cpp_type} {name}"
@@ -159,19 +148,15 @@ class ChronoVisitor(BaseChronoVisitor):
             return self.visit(ctx.returnStatement())
         if ctx.cppBlock():
             return self.visit(ctx.cppBlock())
-        
         if ctx.expression():
             expr_code = self.visit(ctx.expression())
             return f"{INDENT}{expr_code};\n"
-            
         return ""
 
     def visitDeclaration(self, ctx: ChronoParser.DeclarationContext):
         var_name = ctx.variableName.text
         type_name = ctx.typeName.text
-        
         cpp_type = ""
-        
         if type_name in ("i32", "i64", "int"):
             cpp_type = self._chrono_to_cpp_type(type_name)
             if self._in_class:
@@ -184,23 +169,17 @@ class ChronoVisitor(BaseChronoVisitor):
         else:
             cpp_class_name = self._chrono_to_cpp_type(type_name)
             cpp_type = f"{cpp_class_name}*"
-            
             if self._in_class:
                 return f"{INDENT}{cpp_type} {var_name};\n"
             else:
                 cpp_value = "nullptr"
                 if ctx.expression():
                     expression_code = self.visit(ctx.expression())
-                    expression_node = ctx.expression()
-                    
-                    if expression_node.methodCallExpression() or \
-                       expression_node.functionCallExpression() or \
-                       expression_node.IDENTIFIER() or \
-                       (expression_node.THIS() and expression_node.IDENTIFIER()):
-                        cpp_value = expression_code
-                    elif expression_node.literal():
+                    # [ 修正 ] 检查表达式是否是 'literal'
+                    if ctx.expression().primaryExpression() and ctx.expression().primaryExpression().literal():
                         cpp_value = f"{cpp_class_name}::create({expression_code})"
-                
+                    else:
+                        cpp_value = expression_code
                 return f"{INDENT}{cpp_type} const {var_name} = {cpp_value};\n"
 
     def visitReturnStatement(self, ctx: ChronoParser.ReturnStatementContext):
@@ -216,50 +195,108 @@ class ChronoVisitor(BaseChronoVisitor):
             f"{raw_cpp.strip()}\n" 
             f"{INDENT}// --- @cpp Block End ---\n\n"
         )
-        
+    
+    # [ 已修正 ]
     def visitAssignment(self, ctx: ChronoParser.AssignmentContext):
-        target_node = ctx.getChild(0)
-        target = ""
-        if target_node.THIS():
-            target = f"this->{target_node.IDENTIFIER().getText()}"
-        else:
-            target = target_node.getText()
+        # 访问左侧 (lvalue) 和右侧 (expression)
+        target = self.visit(ctx.assignableExpression())
         value = self.visit(ctx.expression())
         return f"{INDENT}{target} = {value};\n"
 
+    # [ 新增 ]
+    def visitAssignableExpression(self, ctx: ChronoParser.AssignableExpressionContext):
+        # 这是一个简化的 'lvalue' 访问器，它与 'visitExpression' 类似
+        # 但它知道自己是一个 'lvalue'
+        current_code = ""
+        if ctx.THIS():
+            current_code = "this"
+        else:
+            current_code = ctx.IDENTIFIER(0).getText()
+
+        # 遍历链: this.s.x
+        is_first_ident = True
+        for ident_node in ctx.IDENTIFIER():
+            if is_first_ident and not ctx.THIS():
+                is_first_ident = False
+                continue
+            
+            ident = ident_node.getText()
+            current_code = f"{current_code}->{ident}"
+
+        return current_code
+
     # --- 表达式 ---
+    
+    # [ 已修正 ]
     def visitExpression(self, ctx: ChronoParser.ExpressionContext):
+        if ctx.functionCallExpression():
+            return self.visit(ctx.functionCallExpression())
+        
+        # 处理: primary ( (DOT IDENTIFIER ( LPAREN ... )? )* )
+        
+        # 1. 获取 "base" (e.g., 'this', 'my_obj', 'MyClass')
+        current_code = self.visit(ctx.primaryExpression())
+        
+        # 2. 检查 base 是否是静态类型 (类名)
+        is_static = False
+        if ctx.primaryExpression().IDENTIFIER():
+             if ctx.primaryExpression().IDENTIFIER().getText()[0].isupper():
+                 is_static = True
+
+        # 3. 遍历链
+        child_nodes = ctx.children[1:] # 获取 'primary' 之后的所有节点
+        
+        i = 0
+        while i < len(child_nodes):
+            # 节点 1: DOT
+            i += 1 # 跳过 DOT
+            
+            # 节点 2: IDENTIFIER (e.g., 's' or 'release')
+            ident = child_nodes[i].getText()
+            i += 1
+            
+            # 节点 3: 检查 (
+            if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LPAREN:
+                
+                # --- 是一个方法调用 (e.g., '.release()') ---
+                i += 1 # 跳过 LPAREN
+                args = ""
+                
+                if i < len(child_nodes) and isinstance(child_nodes[i], ChronoParser.ExpressionListContext):
+                    args = self.visit(child_nodes[i])
+                    i += 1 # 跳过 expressionList
+                
+                i += 1 # 跳过 RPAREN
+                
+                if is_static:
+                    current_code = f"{current_code}::{ident}({args})"
+                else:
+                    current_code = f"{current_code}->{ident}({args})"
+                
+                is_static = False # 方法调用的结果总是一个实例
+            else:
+                # --- 是一个字段访问 (e.g., '.s') ---
+                if is_static:
+                    current_code = f"{current_code}::{ident}"
+                else:
+                    current_code = f"{current_code}->{ident}"
+                
+                if ident[0].isupper():
+                    is_static = True
+                
+        return current_code
+
+    # [ 新增 ]
+    def visitPrimaryExpression(self, ctx: ChronoParser.PrimaryExpressionContext):
         if ctx.literal():
             return self.visit(ctx.literal())
         if ctx.IDENTIFIER():
             return ctx.IDENTIFIER().getText()
-        if ctx.methodCallExpression():
-            return self.visit(ctx.methodCallExpression())
-        if ctx.functionCallExpression():
-            return self.visit(ctx.functionCallExpression())
         if ctx.THIS():
-            return f"this->{ctx.IDENTIFIER().getText()}"
-        raise Exception(f"Unknown expression type at line {ctx.start.line}")
-
-    # [ Bug 3 已修正 ]
-    def visitMethodCallExpression(self, ctx: ChronoParser.MethodCallExpressionContext):
-        # 'ctx.receiver' 是一个 CommonToken
-        receiver_token = ctx.receiver 
-        receiver = ""
-        
-        # 修正: 直接访问 '.type' 属性
-        if receiver_token.type == ChronoParser.THIS:
-            receiver = "this"
-        else:
-            # 它是 IDENTIFIER
-            receiver = receiver_token.text
-            
-        method = ctx.methodName.text
-        args = ""
-        if ctx.expressionList():
-            args = self.visit(ctx.expressionList())
-            
-        return f"{receiver}->{method}({args})"
+            return "this"
+        if ctx.LPAREN():
+            return f"({self.visit(ctx.expression())})" # 括号
+        return ""
 
     def visitExpressionList(self, ctx: ChronoParser.ExpressionListContext):
         return ", ".join(self.visit(e) for e in ctx.expression())
@@ -279,14 +316,12 @@ class ChronoVisitor(BaseChronoVisitor):
             arg_code = self.visit(arg_expression)
             
             cpp_value = ""
-            # 检查表达式是否是字面量
             if arg_expression.literal():
                 if arg_expression.literal().STRING_LITERAL():
                     cpp_value = f"ChronoString::create({arg_code})"
                 elif arg_expression.literal().INTEGER_LITERAL():
                     cpp_value = f"ChronoInt::create({arg_code})"
             else:
-                # 已经是 T* 或 i32
                 cpp_value = arg_code
             
             return f"Print({cpp_value})"
