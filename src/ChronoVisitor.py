@@ -322,16 +322,25 @@ class ChronoVisitor(BaseChronoVisitor):
         
         return current_code
 
-# [ 新增 ] 'visitExpression' 需要这个方法
+# [ 已修正 ] 用这个版本替换
     def visitPrimary(self, ctx: ChronoParser.PrimaryContext):
         if ctx.literal():
             return self.visit(ctx.literal())
+        
         if ctx.IDENTIFIER():
-            return ctx.IDENTIFIER().getText()
+            # [ 关键修复 ]
+            # 我们必须翻译标识符, 以便 'String' 变为 'ChronoString'
+            # 这对于 's' 这样的变量名也同样有效,
+            # 因为 _chrono_to_cpp_type 会回退到返回 "s"
+            chrono_name = ctx.IDENTIFIER().getText()
+            return self._chrono_to_cpp_type(chrono_name)
+            
         if ctx.THIS():
             return "this"
+            
         if ctx.LPAREN():
             return f"({self.visit(ctx.expression())})"
+            
         return "" # 不应发生
     
 
