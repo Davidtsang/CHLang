@@ -87,6 +87,11 @@ inline void Print(const char* value) {
      std::cout << value << std::endl;
 }
 
+// [ 新增 ] 打印 bool 类型
+inline void Print(bool value) {
+    std::cout << (value ? "true" : "false") << std::endl;
+}
+
 // #pragma once
 
 // #include <memory>     // 用于 std::shared_ptr (我们的 ARC 实现)

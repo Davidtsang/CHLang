@@ -2,3 +2,4 @@
 *.exe
 *.jar
 build/
+gok/

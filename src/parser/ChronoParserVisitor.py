@@ -64,11 +64,6 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ChronoParser#functionCallExpression.
-    def visitFunctionCallExpression(self, ctx:ChronoParser.FunctionCallExpressionContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by ChronoParser#assignment.
     def visitAssignment(self, ctx:ChronoParser.AssignmentContext):
         return self.visitChildren(ctx)
@@ -76,6 +71,16 @@ class ChronoParserVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by ChronoParser#assignableExpression.
     def visitAssignableExpression(self, ctx:ChronoParser.AssignableExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#ifStatement.
+    def visitIfStatement(self, ctx:ChronoParser.IfStatementContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#whileStatement.
+    def visitWhileStatement(self, ctx:ChronoParser.WhileStatementContext):
         return self.visitChildren(ctx)
 
 
@@ -89,8 +94,18 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#simpleExpression.
+    def visitSimpleExpression(self, ctx:ChronoParser.SimpleExpressionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#primary.
     def visitPrimary(self, ctx:ChronoParser.PrimaryContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#functionCallExpression.
+    def visitFunctionCallExpression(self, ctx:ChronoParser.FunctionCallExpressionContext):
         return self.visitChildren(ctx)
 
 

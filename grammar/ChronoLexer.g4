@@ -1,59 +1,77 @@
 // -----------------------------------------------------------------------------
-// Chrono 词法分析器 (ChronoLexer.g4) - 已修正顺序
+// Chrono 词法分析器 (ChronoLexer.g4) - 最终修正版
 // -----------------------------------------------------------------------------
 lexer grammar ChronoLexer;
 
-// --- 默认模式 (DEFAULT_MODE) ---
-// 关键字
+// --- 关键字 (必须在 IDENTIFIER 之前) ---
 IMPORT  : 'import' ;
 FUNC    : 'func' ;
 LET     : 'let' ;
 RETURN  : 'return' ;
-//PRINT   : 'print' ;
-CLASS   : 'class' ;  // [ 新增 ]
-DEINIT  : 'deinit' ; // [ 新增 ]
-THIS    : 'this' ;   // [ 新增 ]
+CLASS   : 'class' ; 
+DEINIT  : 'deinit' ; 
+THIS    : 'this' ;   
 STATIC  : 'static' ;
-// 关键：遇到 @cpp 时，切换到 INSIDE_CPP_BLOCK 模式
-// (INSIDE_CPP_BLOCK 在文件末尾定义)
+IF      : 'if' ;
+ELSE    : 'else' ;
+WHILE   : 'while' ;
+
+PUBLIC  : 'public' ; // class attr access flag
+// BOOL_LITERAL 必须在 IDENTIFIER 之前
+BOOL_LITERAL    : 'true' | 'false' ;
+
+// --- @cpp 模式切换 ---
 AT_CPP  : '@cpp' -> pushMode(INSIDE_CPP_BLOCK);
 
-// 符号
+// [ 关键修复 ] 
+// 1. LT/GT/LTE/GTE 必须在 INCLUDE_PATH 之前
+// 2. INCLUDE_PATH 规则现在限制性更强，
+//    只匹配文件名中常见的字符 (字母, 数字, _, ., /)
+//    这可以防止它错误地匹配 'if (x < 5)'
+
+// 复杂操作符 (必须在简单操作符 = < > 之前)
+EQ      : '==' ;
+NEQ     : '!=' ;
+LTE     : '<=' ; 
+GTE     : '>=' ; 
+ARROW   : '->' ;
+
+// [ 新增 ] 算术运算符
+PLUS    : '+' ;
+MINUS   : '-' ;
+STAR    : '*' ;
+SLASH   : '/' ;
+
+// 简单符号 (必须在 INCLUDE_PATH 之前)
+LT      : '<' ; 
+GT      : '>' ; 
+
+// INCLUDE_PATH 现在在 LT/GT 之后，但只在 import 语句中使用
+// 我们在 Parser 中处理这个上下文
+INCLUDE_PATH
+    : '<' [a-zA-Z_0-9./]+ '>'
+    ;
+
 SEMIC_TOKEN : ';' ;
-LPAREN  : '(' ; // 修正：之前是 '()'
-RPAREN  : ')' ; // 修正：之前是 ')'
+LPAREN  : '(' ; 
+RPAREN  : ')' ; 
 LBRACE  : '{' ;
 RBRACE  : '}' ;
 COLON   : ':' ;
 ASSIGN  : '=' ;
-ARROW   : '->' ;
 DOT     : '.' ;
 COMMA   : ',' ;
 
-// 标识符
-IDENTIFIER : [a-zA-Z_] [a-zA-Z0-9_]* ;
-
-// --- 修正顺序 ---
-
-
-// Import 路径 (现在只匹配 <...>)
-INCLUDE_PATH
-    : '<' ( ~[>] )* '>'
-    ;
-
-// 字面量 (Literals)
+// --- 通用规则 (必须在最后) ---
+IDENTIFIER : [a-zA-Z_] [a-zA-Z0-9_]* ; 
 INTEGER_LITERAL : [0-9]+ ;
-STRING_LITERAL  : '"' ( ~["\\] | '\\' . )* '"' ; // <-- 在 INCLUDE_PATH 之后
+STRING_LITERAL  : '"' ( ~["\\] | '\\' . )* '"' ; 
 
-// 注释
+// --- 跳过 (Skipped) ---
 LINE_COMMENT : '//' ~[\r\n]* -> skip ;
+WHITESPACE : [ \t\r\n]+ -> skip ; 
 
-// 空格
-WHITESPACE : [ \t\r\n]+ -> skip ; // 跳过所有空格、制表符和换行
-
-// --- 词法分析器模式 (Lexer Modes) ---
-// 模式: 捕获 @cpp 和 @end 之间的所有内容
-// (必须在所有 DEFAULT_MODE 规则之后定义)
+// --- 词法分析器模式 ---
 mode INSIDE_CPP_BLOCK;
-    AT_END : '@end' -> popMode; // 优先级最高
-    CPP_BODY : . ;             // 捕获所有其他字符
+    AT_END : '@end' -> popMode;
+    CPP_BODY : . ;

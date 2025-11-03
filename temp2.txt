@@ -1,4 +1,4 @@
-    def visitDeclaration(self, ctx: ChronoParser.DeclarationContext):
+def visitDeclaration(self, ctx: ChronoParser.DeclarationContext):
         var_name = ctx.variableName.text
         type_name = ctx.typeName.text
 
@@ -7,15 +7,19 @@
         if type_name in ("i32", "i64", "int", "bool"):
             cpp_type = self._chrono_to_cpp_type(type_name)
             if self._in_class:
+                # 1. 类成员: 保持非初始化状态 (默认是可变的)
                 return f"{INDENT}{cpp_type} {var_name};\n"
             else:
-                cpp_value = "0"  # int 默认值
+                # 2. 局部变量: 移除 const
+                cpp_value = "0"
                 if type_name == "bool":
-                    cpp_value = "false"  # bool 默认值
+                    cpp_value = "false"
 
                 if ctx.expression():
                     cpp_value = self.visit(ctx.expression())
-                return f"{INDENT}const {cpp_type} {var_name} = {cpp_value};\n"
+
+                # [ 关键修复 ] 移除 'const'，使其可变
+                return f"{INDENT}{cpp_type} {var_name} = {cpp_value};\n"
         else:
             # --- 引用类型 (String, MyClass, etc.) ---
             cpp_class_name = self._chrono_to_cpp_type(type_name)
@@ -29,16 +33,14 @@
                     expression_code = self.visit(ctx.expression())
                     expression_node = ctx.expression()
 
-                    # [ 关键修复 ] 必须检查新的 'simpleExpression' 结构
                     if (expression_node.simpleExpression(0) and
-                            not expression_node.simpleExpression(1) and  # 确保它不是一个比较
+                            not expression_node.simpleExpression(1) and
                             expression_node.simpleExpression(0).primary() and
                             expression_node.simpleExpression(0).primary().literal()):
 
-                        # 是字面量, 自动调用 .create()
                         cpp_value = f"{cpp_class_name}::create({expression_code})"
                     else:
-                        # 是函数调用/变量/方法, 按原样使用
                         cpp_value = expression_code
 
+                # 保持 'const'，因为指针本身是不可变的 (但它指向的对象是可变的)
                 return f"{INDENT}{cpp_type} const {var_name} = {cpp_value};\n"

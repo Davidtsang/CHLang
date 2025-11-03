@@ -1,0 +1,7 @@
+--- Testing Comparisons ---
+T1: GT-PASS
+T2: LT-PASS
+T3: EQ-PASS
+T4: NEQ-PASS
+T5: GTE-PASS
+T6: LTE-PASS

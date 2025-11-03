@@ -1,93 +1,95 @@
 // -----------------------------------------------------------------------------
-// Chrono 解析器 (ChronoParser.g4) - 已修正
+// Chrono Parser (ChronoParser.g4) - Final Correct Version
 // -----------------------------------------------------------------------------
 parser grammar ChronoParser;
-
-// 关键：导入所有来自 ChronoLexer 的词法规则 (Tokens)
 options { tokenVocab = ChronoLexer; }
 
-// --- 解析器规则 (Parser Rules) ---
-
-// 顶层规则
+// --- Top Level Rules ---
 program : topLevelStatement+ EOF ;
 
-// topLevelStatement 允许这四种声明中的任意一种，按任意顺序
 topLevelStatement
     : importDirective
     | cppBlock
     | classDefinition
     | functionDefinition
     ;
-    
+
+
 classDefinition : CLASS name=IDENTIFIER COLON base=IDENTIFIER LBRACE
-                    (declaration | functionDefinition | deinitBlock | cppBlock)* // [ 已修正 ]
+                    (declaration | functionDefinition | deinitBlock | cppBlock)*
                   RBRACE ;
 
-// [ 新增 ] 'deinit' 规则
-deinitBlock : DEINIT LBRACE statement* RBRACE ;
+// [CRITICAL FIX] Must be statement*
+deinitBlock : DEINIT LBRACE statement* RBRACE ; 
 
-// --- 基础规则 ---
-
+// --- Basic Rules ---
 importDirective : IMPORT path=(STRING_LITERAL | INCLUDE_PATH) SEMIC_TOKEN ;
 
-// [ 已修正 ] 
-// 'functionDefinition' 现在可以接受 'parameters'
+// [CRITICAL FIX] Must be statement*
 functionDefinition 
-    :(STATIC)? FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=IDENTIFIER)? LBRACE statement* RBRACE ;
-// [ 新增 ] 'parameters' 规则
-// (允许 0 个或多个参数, 例如 'title: String, x: i32')
-parameters : (parameter (COMMA parameter)*)? ;
+    : (STATIC)? FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=IDENTIFIER)? 
+      LBRACE 
+          statement* RBRACE ;
 
-// [ 新增 ] 'parameter' 规则
+parameters : (parameter (COMMA parameter)*)? ;
 parameter : name=IDENTIFIER COLON typeName=IDENTIFIER ;
 
-// [ 已修正 ] 
-// 赋值 (ASSIGN expression) 现在是可选的 '?'
-// 这允许 'let title: String;' 这样的类成员
 declaration : LET variableName=IDENTIFIER COLON typeName=IDENTIFIER (ASSIGN expression)? SEMIC_TOKEN ;
 
 cppBlock : AT_CPP CPP_BODY* AT_END ;
 
 returnStatement : RETURN expression SEMIC_TOKEN ;
 
-functionCallExpression : name=IDENTIFIER LPAREN expressionList? RPAREN ;
-
-// [ 新增 ] 赋值语句
 assignment : assignableExpression ASSIGN expression SEMIC_TOKEN ;
-
 assignableExpression
-    : (IDENTIFIER | THIS) (DOT IDENTIFIER)* // e.g., 'this.s.title' or 'my_var'
+    : (IDENTIFIER | THIS) (DOT IDENTIFIER)*
     ;
 
-// --- 复合规则 ---
+// --- Flow Control ---
+// [CRITICAL FIX] Must be statement*
+ifStatement
+    : IF LPAREN expression RPAREN LBRACE if_statements=statement* RBRACE 
+      ( ELSE 
+        ( else_if=ifStatement 
+        | LBRACE else_statements=statement* RBRACE 
+        )
+      )? 
+    ;
 
-// [ 已修正 ]
-// 'methodCall' 和 'functionCall' 是多余的
-// 'expression SEMIC_TOKEN' 已经处理了 'myFunc();' 和 'myObj.method();'
+// [CRITICAL FIX] Must be statement*
+whileStatement
+    : WHILE LPAREN expression RPAREN LBRACE statements=statement* RBRACE 
+    ;
+
+// --- Composite Rule ---
 statement : declaration
           | assignment
           | returnStatement
-          | expression SEMIC_TOKEN // 表达式语句 (例如一个函数调用)
+          | expression SEMIC_TOKEN 
           | cppBlock
+          | ifStatement
+          | whileStatement
           ;
 
-// [ 已修正 ]
-// 1. 添加了 'functionCallExpression' (允许 'let x = myFunc()')
-// 2. 'THIS DOT IDENTIFIER' 保持不变 (用于 'this.title')
-// 'expression' 现在是递归的
+// --- Expressions ---
 expression
-    : primary ( DOT IDENTIFIER (LPAREN expressionList? RPAREN)? )* // 匹配: primary.field or primary.method(args)
-    | functionCallExpression // 保持全局函数调用独立
+    : simpleExpression (
+        (EQ | NEQ | LT | GT | LTE | GTE | PLUS | MINUS | STAR | SLASH) simpleExpression
+      )?
     ;
 
-// [ 新规则 ] 'primary' 是一个表达式链的 "起点"
+simpleExpression
+    : primary ( DOT IDENTIFIER (LPAREN expressionList? RPAREN)? )* | functionCallExpression 
+    ;
+
 primary
     : literal
     | IDENTIFIER
     | THIS
-    | LPAREN expression RPAREN // 允许 ( ... )
+    | LPAREN expression RPAREN 
     ;
 
+functionCallExpression : name=IDENTIFIER LPAREN expressionList? RPAREN ;
 expressionList : expression (COMMA expression)* ;
 
-literal : INTEGER_LITERAL | STRING_LITERAL ;
+literal : INTEGER_LITERAL | STRING_LITERAL | BOOL_LITERAL ;
