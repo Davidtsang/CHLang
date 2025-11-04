@@ -71,13 +71,7 @@ class ChronoVisitor(BaseChronoVisitor):
     # --- 顶层规则 ---
     def visitProgram(self, ctx: ChronoParser.ProgramContext):
         all_code = "".join(self.visit(stmt) for stmt in ctx.topLevelStatement())
-        main_wrapper = (
-            "\n// C++ 程序的标准入口\n"
-            "int main() {\n"
-            f"{INDENT}return Chrono_main();\n"
-            "}\n"
-        )
-        return all_code + main_wrapper
+        return all_code
 
     def visitImportDirective(self, ctx: ChronoParser.ImportDirectiveContext):
         path_text = ctx.path.text
@@ -312,7 +306,7 @@ class ChronoVisitor(BaseChronoVisitor):
             return_type = ctx.returnType.text
             if func_name == "main" and return_type == "Int":
                 cpp_return_type = "int"
-                cpp_func_name = "Chrono_main"
+                cpp_func_name = "main"
             else:
                 if return_type in ("i32", "i64", "int", "bool"):
                     cpp_return_type = self._chrono_to_cpp_type(return_type)
