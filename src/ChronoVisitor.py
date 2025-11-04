@@ -46,10 +46,7 @@ class ChronoVisitor(BaseChronoVisitor):
             return "int32_t"
         if chrono_type_name == "i64":
             return "int64_t"
-        if chrono_type_name == "String":
-            return "ChronoString"
-        if chrono_type_name == "Int":
-            return "ChronoInt"
+
         return chrono_type_name
 
     def _get_access_level(self, ctx):

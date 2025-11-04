@@ -35,3 +35,5 @@ public:
     
     std::string& getValue() { return m_value; }
 };
+
+using String = ChronoString;

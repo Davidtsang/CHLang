@@ -23,3 +23,5 @@ public:
         return std::to_string(m_value);
     }
 };
+
+using Int = ChronoInt;
