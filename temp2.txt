@@ -1,24 +1,39 @@
-    def visitClassDefinition(self, ctx: ChronoParser.ClassDefinitionContext):
-        class_name = ctx.name.text
-        base_name = ctx.base.text
+def visitMethodDefinition(self, ctx: ChronoParser.MethodDefinitionContext):
+    self._in_class_method = True
+    func_name = ctx.name.text
+    params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
 
-        self._in_class = True
-        self._current_class_name = class_name
+    statements = self._safe_iterate_statements(ctx.statement())
+    body_code = "".join(self.visit(s) for s in statements)
 
-        body_code = ""
-        for child in ctx.children:
-            if isinstance(child, (ChronoParser.DeclarationContext,
-                                  ChronoParser.FunctionDefinitionContext,
-                                  ChronoParser.DeinitBlockContext,
-                                  ChronoParser.CppBlockContext)):
-                body_code += self.visit(child)
+    is_static = getattr(ctx, '_chrono_static', False)
+    access = getattr(ctx, '_chrono_access', 'private')
 
-        self._in_class = False
-        self._current_class_name = None
+    # --- (签名逻辑...) ---
+    if ctx.returnType:
+        return_type = ctx.returnType.text
+        if return_type in ("i32", "i64", "int", "bool"):
+            cpp_return_type = self._chrono_to_cpp_type(return_type)
+        else:
+            cpp_return_type = f"{self._chrono_to_cpp_type(return_type)}*"
+        cpp_func_name = func_name
+    else:
+        cpp_return_type = "void"
+        cpp_func_name = func_name
 
-        return (
-            f"\nclass {class_name} : public {base_name} {{\n"
-            "public:\n"
-            f"{body_code}"
-            "};\n"
-        )
+    # --- [ 关键移除 ] ---
+    # 'if func_name == "init":' 这一段特殊逻辑已被删除
+    # --- (签名逻辑结束) ---
+
+    static_prefix = "static " if is_static else ""
+
+    func_def_code = (
+        f"\n{INDENT}{static_prefix}{cpp_return_type} {cpp_func_name}({params_code}) {{\n"
+        f"{body_code}"
+        f"{INDENT}// --- Method End ---\n"
+        f"{INDENT}}}\n"
+    )
+
+    self._class_sections[access] += func_def_code
+    self._in_class_method = False
+    return ""

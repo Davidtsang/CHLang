@@ -1,59 +1,55 @@
 ﻿#include "ChronoInt.h"
 #include "ChronoObject.h"
 #include "ChronoString.h"
+#include <iostream>
 
-class AccessTest : public ChronoObject {
+class MemberTest : public ChronoObject {
 private:
-  int32_t val;
+  int32_t x;
+  ChronoString *s;
   ChronoString *name;
 
-  AccessTest(int32_t v, ChronoString *n) {
-    Print(ChronoString::create("Init (Private)"));
-    this->val = v;
-    this->name = n;
-    this->name->retain();
-    // --- Method End ---
+  MemberTest(int32_t val, ChronoString *str) {
+    this->x = val;
+    this->s = str;
+    this->s->retain();
   }
 
-  int32_t doInternalCalc() {
-    Print(ChronoString::create("Private Method: doInternalCalc()"));
-    return this->val * 2;
+  ChronoString *getName() {
+    return this->name;
     // --- Method End ---
   }
 
 public:
-  virtual ~AccessTest() {
+  virtual ~MemberTest() {
     // --- Chrono Deinit Block ---
-    Print(ChronoString::create("Deinit (Public)"));
-    this->name->release();
+
+    // --- @cpp Block Start ---
+    std::cout << "DEINIT" << std::endl;
+    // --- @cpp Block End ---
+
+    this->s->release();
     // --- Deinit End ---
   }
 
-  ChronoInt *getCalculatedValue() {
-    Print(ChronoString::create("Public Method: getCalculatedValue()"));
-    int32_t result = this->doInternalCalc();
-    return ChronoInt::create(result);
+  void printAll() {
+    Print(this->x);
+    Print(this->s);
     // --- Method End ---
   }
 
-  static AccessTest *create(int32_t v, ChronoString *n) {
-    Print(ChronoString::create("Public Static: create()"));
-    return new AccessTest(v, n);
+  static MemberTest *create(int32_t val, ChronoString *str) {
+    return new MemberTest(val, str);
     // --- Method End ---
   }
 };
 
 int Chrono_main() {
-  Print(ChronoString::create("--- Test Start ---"));
-  ChronoString *s = ChronoString::create("Test");
-  AccessTest *obj = AccessTest::create(10, s);
-  ChronoInt *val_obj = obj->getCalculatedValue();
-  Print(ChronoString::create("Final Value:"));
-  Print(val_obj);
-  s->release();
+  ChronoString *s = ChronoString::create("Hello");
+  MemberTest *obj = MemberTest::create(100, s);
+  obj->printAll();
   obj->release();
-  val_obj->release();
-  Print(ChronoString::create("--- Test End ---"));
+  s->release();
   return 0;
 }
 

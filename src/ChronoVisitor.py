@@ -128,9 +128,9 @@ class ChronoVisitor(BaseChronoVisitor):
 
     # [新增] visitClassBodyStatement (用于传递修饰符)
     def visitClassBodyStatement(self, ctx: ChronoParser.ClassBodyStatementContext):
-        # 1. 确定修饰符 (来自 G4 )
+        # 1. 确定修饰符
         is_static = hasattr(ctx, 'STATIC') and ctx.STATIC()
-        access = self._get_access_level(ctx)  # (读取 PUBLIC 关键字)
+        access = self._get_access_level(ctx)
 
         print("===>", type(ctx))
         child_type_name = type(ctx).__name__
@@ -139,17 +139,22 @@ class ChronoVisitor(BaseChronoVisitor):
 
         # 2. 将修饰符 "注入" 到子上下文中
         if ctx.declaration():
-            # (我们稍后会修复 visitDeclaration，现在先传递)
             ctx.declaration()._chrono_access = access
             return self.visit(ctx.declaration())
 
         elif ctx.methodDefinition():
             ctx.methodDefinition()._chrono_access = access
-            ctx.methodDefinition()._chrono_static = is_static  # 传递 static
+            ctx.methodDefinition()._chrono_static = is_static
             return self.visit(ctx.methodDefinition())
 
+        # --- [ 新增分支 ] ---
+        elif ctx.initDefinition():
+            # 将 access 注入
+            ctx.initDefinition()._chrono_access = access
+            return self.visit(ctx.initDefinition())
+        # --- [ 新增结束 ] ---
+
         elif ctx.deinitBlock():
-            print("visit deinit block!")
             return self.visit(ctx.deinitBlock())
 
         elif ctx.cppBlock():
@@ -164,10 +169,9 @@ class ChronoVisitor(BaseChronoVisitor):
 
         statements = self._safe_iterate_statements(ctx.statement())
         body_code = "".join(self.visit(s) for s in statements)
-        print("method body code:", body_code)
-        # [修复] 从父级注入的属性中读取修饰符
+
         is_static = getattr(ctx, '_chrono_static', False)
-        access = getattr(ctx, '_chrono_access', 'private')  # 默认为 private
+        access = getattr(ctx, '_chrono_access', 'private')
 
         # --- (签名逻辑...) ---
         if ctx.returnType:
@@ -179,11 +183,10 @@ class ChronoVisitor(BaseChronoVisitor):
             cpp_func_name = func_name
         else:
             cpp_return_type = "void"
-            if func_name == "init":
-                cpp_return_type = ""
-                cpp_func_name = self._current_class_name
-            else:
-                cpp_func_name = func_name
+            cpp_func_name = func_name
+
+        # --- [ 关键移除 ] ---
+        # 'if func_name == "init":' 这一段特殊逻辑已被删除
         # --- (签名逻辑结束) ---
 
         static_prefix = "static " if is_static else ""
@@ -196,6 +199,35 @@ class ChronoVisitor(BaseChronoVisitor):
         )
 
         self._class_sections[access] += func_def_code
+        self._in_class_method = False
+        return ""
+
+    def visitInitDefinition(self, ctx: ChronoParser.InitDefinitionContext):
+        self._in_class_method = True
+
+        # C++ 构造函数没有返回类型
+        cpp_return_type = ""
+        # 构造函数名称就是类名
+        cpp_func_name = self._current_class_name
+
+        # 1. 读取访问修饰符 (构造函数可以是 private/public)
+        access = getattr(ctx, '_chrono_access', 'private')
+
+        # 2. 访问参数和函数体
+        params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
+        statements = self._safe_iterate_statements(ctx.statement())
+        body_code = "".join(self.visit(s) for s in statements)
+
+        # 3. 组装 C++ 构造函数
+        init_code = (
+            f"\n{INDENT}{cpp_return_type} {cpp_func_name}({params_code}) {{\n"
+            f"{body_code}"
+            f"{INDENT}}}\n"
+        )
+
+        # 4. 追加到 Class Assembler
+        self._class_sections[access] += init_code
+
         self._in_class_method = False
         return ""
 

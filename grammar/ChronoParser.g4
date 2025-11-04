@@ -24,6 +24,7 @@ classBodyStatement
         (STATIC (accessModifier)?) // 匹配: static, static public
     | (accessModifier (STATIC)?) // 匹配: public, public static
       ) methodDefinition
+    |(accessModifier)? initDefinition     // <-- [ 新增 ]
     | methodDefinition // 匹配: (无修饰符)
     | deinitBlock
     | cppBlock
@@ -36,9 +37,13 @@ classDefinition : CLASS name=IDENTIFIER COLON base=IDENTIFIER LBRACE
 
 // [NEW] 2. 类方法定义 (func foo()) - 接受 STATIC 和 Access Control
 methodDefinition
-    : (accessModifier)? FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=IDENTIFIER)? LBRACE
+    : FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=IDENTIFIER)? LBRACE
       statement* RBRACE ;
 
+// [ 新增规则 ] initDefinition
+// 它没有 'FUNC' 关键字，也没有 'returnType'
+initDefinition
+    : INIT LPAREN parameters RPAREN LBRACE statement* RBRACE ;
 
 // [CRITICAL FIX] Must be statement*
 deinitBlock : DEINIT LBRACE statement* RBRACE ; 

@@ -27,7 +27,7 @@ class MemberTest : ChronoObject {
 
     // 构造函数 (init)
     // 默认 private。这是好的，因为它强制使用 'create' 工厂方法。
-    func init(val: i32, str: String) {
+    init(val: i32, str: String) {
         this.x = val;
         this.s = str;
         this.s.retain();

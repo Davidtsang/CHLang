@@ -13,7 +13,7 @@ class AccessTest : ChronoObject {
 
     // --- 2. 构造函数 (默认 Private) ---
     // 这强制用户使用 'create' 工厂方法
-    func init(v: i32, n: String) {
+    init(v: i32, n: String) {
         print("Init (Private)");
         this.val = v;
         this.name = n;

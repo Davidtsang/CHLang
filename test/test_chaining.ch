@@ -10,7 +10,7 @@ class Wrapper : ChronoObject {
     let s: String; // 默认 private
 
     // 默认 private (只能被 'create' 调用)
-    func init(str: String) {
+    init(str: String) {
         this.s = str;
         this.s.retain();
     }

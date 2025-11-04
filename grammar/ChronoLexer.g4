@@ -8,7 +8,8 @@ IMPORT  : 'import' ;
 FUNC    : 'func' ;
 LET     : 'let' ;
 RETURN  : 'return' ;
-CLASS   : 'class' ; 
+CLASS   : 'class' ;
+INIT    : 'init' ;    // <-- [ 新增 ]
 DEINIT  : 'deinit' ; 
 THIS    : 'this' ;   
 STATIC  : 'static' ;
