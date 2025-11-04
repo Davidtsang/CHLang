@@ -3,3 +3,6 @@
 *.jar
 build/
 gok/
+.idea/
+*.pyc
+src/parser

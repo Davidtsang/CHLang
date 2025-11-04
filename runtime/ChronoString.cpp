@@ -1,20 +1,15 @@
 ﻿// runtime/ChronoString.cpp
 
-// �������Լ���ͷ�ļ�
 #include "ChronoString.h" 
+#include "ChronoInt.h"
 
-// �ؼ�������������������� ChronoInt.h
-// ��Ϊ�����ṩ�� ChronoInt::create() ����������
-#include "ChronoInt.h" 
 
-// (���� C++ ��)
 #include <string>
 #include <algorithm> // for ::toupper
 
-// --- ����ʵ�� ---
 
 ChronoInt* ChronoString::length() const {
-    // �������ǿ��԰�ȫ�ص��� ChronoInt::create()
+    //  ChronoInt::create()
     return ChronoInt::create(static_cast<int32_t>(m_value.length()));
 }
 

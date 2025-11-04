@@ -1,5 +1,5 @@
 // file: test/test_chaining.ch
-// 目的: 验证复杂的 '.' 链式调用
+// 目的: [已修复] 验证 'public' 关键字和链式调用
 
 import "runtime/ChronoObject.h";
 import "runtime/ChronoString.h";
@@ -7,35 +7,33 @@ import "runtime/ChronoInt.h";
 
 // 1. 定义一个用于 'this' 链测试的类
 class Wrapper : ChronoObject {
-    let s: String;
+    let s: String; // 默认 private
 
+    // 默认 private (只能被 'create' 调用)
     func init(str: String) {
         this.s = str;
         this.s.retain();
     }
-    
+
     deinit {
         this.s.release();
     }
 
-    // 使用 'static func' 和 'Constructor Call'
-    static func create(str: String) -> Wrapper {
+    // [关键修复] 必须是 public 才能被 'main' 调用
+    public static func create(str: String) -> Wrapper {
         return Wrapper(str);
     }
 
-    // [ 测试点 A ] 'this.member.method().method()'
-    // 返回一个 ChronoInt 对象
-    func getUpperLength() -> Int {
+    // [关键修复] 必须是 public 才能被 'main' 调用
+    public func getUpperLength() -> Int {
+        // [ 测试点 A ] 'this.member.method().method()'
         return this.s.toUpper().length();
     }
 }
 
 func main() -> Int {
-    
+
     // [ 测试点 B ] 静态 -> 实例 -> 实例
-    // String.create("...") -> ChronoString*
-    // .toUpper()          -> ChronoString*
-    // .length()           -> ChronoInt*
     let len1: Int = String.create("Hello World").toUpper().length();
     print(len1); // 应该输出 11
     len1.release();
@@ -49,9 +47,10 @@ func main() -> Int {
 
     // [ 测试点 D ] 'this' 链调用
     let w_str: String = "wrapped";
+    // (现在可以调用，因为 create 是 public)
     let w: Wrapper = Wrapper.create(w_str);
-    
-    // 调用 getUpperLength(), 它内部执行 'this.s.toUpper().length()'
+
+    // (现在可以调用，因为 getUpperLength 是 public)
     let len2: Int = w.getUpperLength();
     print(len2); // 应该输出 7
     

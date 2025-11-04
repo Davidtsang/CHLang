@@ -26,12 +26,39 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#accessModifier.
+    def enterAccessModifier(self, ctx:ChronoParser.AccessModifierContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#accessModifier.
+    def exitAccessModifier(self, ctx:ChronoParser.AccessModifierContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#classBodyStatement.
+    def enterClassBodyStatement(self, ctx:ChronoParser.ClassBodyStatementContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#classBodyStatement.
+    def exitClassBodyStatement(self, ctx:ChronoParser.ClassBodyStatementContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#classDefinition.
     def enterClassDefinition(self, ctx:ChronoParser.ClassDefinitionContext):
         pass
 
     # Exit a parse tree produced by ChronoParser#classDefinition.
     def exitClassDefinition(self, ctx:ChronoParser.ClassDefinitionContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#methodDefinition.
+    def enterMethodDefinition(self, ctx:ChronoParser.MethodDefinitionContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#methodDefinition.
+    def exitMethodDefinition(self, ctx:ChronoParser.MethodDefinitionContext):
         pass
 
 

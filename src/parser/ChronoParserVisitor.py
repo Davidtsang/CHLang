@@ -19,8 +19,23 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#accessModifier.
+    def visitAccessModifier(self, ctx:ChronoParser.AccessModifierContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#classBodyStatement.
+    def visitClassBodyStatement(self, ctx:ChronoParser.ClassBodyStatementContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#classDefinition.
     def visitClassDefinition(self, ctx:ChronoParser.ClassDefinitionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#methodDefinition.
+    def visitMethodDefinition(self, ctx:ChronoParser.MethodDefinitionContext):
         return self.visitChildren(ctx)
 
 

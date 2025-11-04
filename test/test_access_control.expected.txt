@@ -1,0 +1,9 @@
+--- Test Start ---
+Public Static: create()
+Init (Private)
+Public Method: getCalculatedValue()
+Private Method: doInternalCalc()
+Final Value:
+20
+Deinit (Public)
+--- Test End ---

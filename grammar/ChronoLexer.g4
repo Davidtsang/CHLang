@@ -69,7 +69,7 @@ STRING_LITERAL  : '"' ( ~["\\] | '\\' . )* '"' ;
 
 // --- 跳过 (Skipped) ---
 LINE_COMMENT : '//' ~[\r\n]* -> skip ;
-WHITESPACE : [ \t\r\n]+ -> skip ; 
+WHITESPACE : [ \t\r\n\u00A0]+ -> skip ;
 
 // --- 词法分析器模式 ---
 mode INSIDE_CPP_BLOCK;

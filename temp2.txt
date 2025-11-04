@@ -1,46 +1,24 @@
-def visitDeclaration(self, ctx: ChronoParser.DeclarationContext):
-        var_name = ctx.variableName.text
-        type_name = ctx.typeName.text
+    def visitClassDefinition(self, ctx: ChronoParser.ClassDefinitionContext):
+        class_name = ctx.name.text
+        base_name = ctx.base.text
 
-        cpp_type = ""
+        self._in_class = True
+        self._current_class_name = class_name
 
-        if type_name in ("i32", "i64", "int", "bool"):
-            cpp_type = self._chrono_to_cpp_type(type_name)
-            if self._in_class:
-                # 1. 类成员: 保持非初始化状态 (默认是可变的)
-                return f"{INDENT}{cpp_type} {var_name};\n"
-            else:
-                # 2. 局部变量: 移除 const
-                cpp_value = "0"
-                if type_name == "bool":
-                    cpp_value = "false"
+        body_code = ""
+        for child in ctx.children:
+            if isinstance(child, (ChronoParser.DeclarationContext,
+                                  ChronoParser.FunctionDefinitionContext,
+                                  ChronoParser.DeinitBlockContext,
+                                  ChronoParser.CppBlockContext)):
+                body_code += self.visit(child)
 
-                if ctx.expression():
-                    cpp_value = self.visit(ctx.expression())
+        self._in_class = False
+        self._current_class_name = None
 
-                # [ 关键修复 ] 移除 'const'，使其可变
-                return f"{INDENT}{cpp_type} {var_name} = {cpp_value};\n"
-        else:
-            # --- 引用类型 (String, MyClass, etc.) ---
-            cpp_class_name = self._chrono_to_cpp_type(type_name)
-            cpp_type = f"{cpp_class_name}*"
-
-            if self._in_class:
-                return f"{INDENT}{cpp_type} {var_name};\n"
-            else:
-                cpp_value = "nullptr"
-                if ctx.expression():
-                    expression_code = self.visit(ctx.expression())
-                    expression_node = ctx.expression()
-
-                    if (expression_node.simpleExpression(0) and
-                            not expression_node.simpleExpression(1) and
-                            expression_node.simpleExpression(0).primary() and
-                            expression_node.simpleExpression(0).primary().literal()):
-
-                        cpp_value = f"{cpp_class_name}::create({expression_code})"
-                    else:
-                        cpp_value = expression_code
-
-                # 保持 'const'，因为指针本身是不可变的 (但它指向的对象是可变的)
-                return f"{INDENT}{cpp_type} const {var_name} = {cpp_value};\n"
+        return (
+            f"\nclass {class_name} : public {base_name} {{\n"
+            "public:\n"
+            f"{body_code}"
+            "};\n"
+        )
