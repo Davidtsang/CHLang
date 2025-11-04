@@ -1,0 +1,8 @@
+--- Test Start ---
+MRC Init
+A: MRC object created (Factory).
+MRC Deinit
+Native Init
+B: Native object created (Factory).
+B: Native object deleted (explicit DELETE).
+--- Test End ---

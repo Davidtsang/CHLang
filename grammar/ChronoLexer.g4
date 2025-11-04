@@ -20,7 +20,9 @@ WHILE   : 'while' ;
 PUBLIC  : 'public' ; // class attr access flag
 // BOOL_LITERAL 必须在 IDENTIFIER 之前
 BOOL_LITERAL    : 'true' | 'false' ;
-
+// [新增] new / delete 关键字
+NEW     : 'new' ;
+DELETE  : 'delete' ;
 // --- @cpp 模式切换 ---
 AT_CPP  : '@cpp' -> pushMode(INSIDE_CPP_BLOCK);
 

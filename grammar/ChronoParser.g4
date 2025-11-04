@@ -31,7 +31,7 @@ classBodyStatement
     ;
 
 // --- 替换 classDefinition 规则 (使用新的 classBodyStatement) ---
-classDefinition : CLASS name=IDENTIFIER COLON base=IDENTIFIER LBRACE
+classDefinition : CLASS name=IDENTIFIER (COLON base=IDENTIFIER)? LBRACE
                     (classBodyStatement)* RBRACE ;
 
 
@@ -97,8 +97,9 @@ statement : declaration
           | cppBlock
           | ifStatement
           | whileStatement
+          | deleteStatement // <-- 引用新的专用规则
           ;
-
+deleteStatement : DELETE expression SEMIC_TOKEN ;
 // --- Expressions ---
 expression
     : simpleExpression (
@@ -111,10 +112,11 @@ simpleExpression
     ;
 
 primary
-    : literal
+    : NEW IDENTIFIER LPAREN expressionList? RPAREN // <-- NEW 关键字创建对象
+    | literal
     | IDENTIFIER
     | THIS
-    | LPAREN expression RPAREN 
+    | LPAREN expression RPAREN
     ;
 
 functionCallExpression : name=IDENTIFIER LPAREN expressionList? RPAREN ;

@@ -82,15 +82,22 @@ class ChronoVisitor(BaseChronoVisitor):
         return f"// ERROR: Invalid import path {path_text}\n"
 
     # 替换 [visitClassDefinition] (移除重复的 行)
+
     def visitClassDefinition(self, ctx: ChronoParser.ClassDefinitionContext):
         class_name = ctx.name.text
-        base_name = ctx.base.text
 
+        # [ 关键修复 ] 检查 base class 是否存在
+        base_name_str = ""
+        if ctx.base:
+            # 如果存在基类 (e.g., : ChronoObject)
+            base_name = ctx.base.text
+            base_name_str = f" : public {base_name}" # 假设所有继承都是 public
+
+        # --- (Class Assembler 逻辑保持不变) ---
         self._in_class = True
         self._current_class_name = class_name
         self._class_sections = {"private": "", "public": ""}
 
-        # 遍历 classBodyStatement 规则
         if hasattr(ctx, 'classBodyStatement'):
             for child in ctx.classBodyStatement():
                 self.visit(child)  # <--- 这将调用 visitClassBodyStatement
@@ -98,22 +105,21 @@ class ChronoVisitor(BaseChronoVisitor):
         self._in_class = False
         self._current_class_name = None
 
-        # [修复] 组装 C++ 类体 (移除了重复代码 )
         final_class_body = ""
 
         # 1. 输出 private (默认)
         if self._class_sections["private"]:
             final_class_body += "\nprivate:\n"
             final_class_body += self._class_sections["private"]
-
-        # 2. 输出 public
         if self._class_sections["public"]:
             final_class_body += "\npublic:\n"
             final_class_body += self._class_sections["public"]
+        # --- (Class Assembler 逻辑结束) ---
 
+        # [ 关键修复 ] 使用 base_name_str 变量
         return (
-            f"\nclass {class_name} : public {base_name} {{\n"
-            f"{final_class_body.strip()}\n"  # <-- 现在只包含正确的代码
+            f"\nclass {class_name}{base_name_str} {{\n" # <-- 动态添加继承
+            f"{final_class_body.strip()}\n"
             "};\n"
         )
 
@@ -363,7 +369,9 @@ class ChronoVisitor(BaseChronoVisitor):
             return self.visit(ctx.ifStatement())
         if ctx.whileStatement():
             return self.visit(ctx.whileStatement())
-
+        # [ 关键 ] 确保此行存在
+        if ctx.deleteStatement():
+            return self.visit(ctx.deleteStatement())
         return ""
 
     # [ 已修正 ]
@@ -614,6 +622,14 @@ class ChronoVisitor(BaseChronoVisitor):
         return current_code
 
     def visitPrimary(self, ctx: ChronoParser.PrimaryContext):
+        if ctx.NEW():
+            class_name = self._chrono_to_cpp_type(ctx.IDENTIFIER().getText())
+            args = self.visit(ctx.expressionList()) if ctx.expressionList() else ""
+            new_code = f"new {class_name}({args})"
+            #print(new_code)
+            #exit()
+            return new_code
+
         if ctx.literal():
             return self.visit(ctx.literal())
 
@@ -627,8 +643,14 @@ class ChronoVisitor(BaseChronoVisitor):
 
         if ctx.LPAREN():
             return f"({self.visit(ctx.expression())})"
+            # [新增] 处理 NEW 关键字
 
         return ""
+
+    # [新增] 访问 delete 语句
+    def visitDeleteStatement(self, ctx: ChronoParser.DeleteStatementContext):
+        target = self.visit(ctx.expression())
+        return f"{INDENT}delete {target};\n"
 
     def visitExpressionList(self, ctx: ChronoParser.ExpressionListContext):
         return ", ".join(self.visit(e) for e in ctx.expression())
@@ -657,9 +679,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
                         literal_node = arg_expr.simpleExpression(0).primary().literal()
 
-                        if literal_node.STRING_LITERAL():
-                            args_list.append(f"ChronoString::create({arg_code})")
-                        elif literal_node.INTEGER_LITERAL():
+                        if literal_node.INTEGER_LITERAL():
                             if func_name == "print":
                                 args_list.append(f"ChronoInt::create({arg_code})")
                             else:

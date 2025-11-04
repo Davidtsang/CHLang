@@ -1,119 +1,40 @@
-# ... (imports 和 __init__ 保持不变) ...
 
-# ... (_safe_iterate_statements, _chrono_to_cpp_type, _get_access_level 保持不变) ...
+    def visitClassDefinition(self, ctx: ChronoParser.ClassDefinitionContext):
+        class_name = ctx.name.text
 
-# ... (visitProgram, visitImportDirective, visitClassDefinition 保持不变) ...
+        # [ 关键修复 ] 检查 base class 是否存在
+        base_name_str = ""
+        if ctx.base:
+            # 如果存在基类 (e.g., : ChronoObject)
+            base_name = ctx.base.text
+            base_name_str = f" : public {base_name}" # 假设所有继承都是 public
 
-# --- [ 关键修改 1 ] ---
-# 更新 visitClassBodyStatement 来处理 'initDefinition'
-def visitClassBodyStatement(self, ctx: ChronoParser.ClassBodyStatementContext):
-    # 1. 确定修饰符
-    is_static = hasattr(ctx, 'STATIC') and ctx.STATIC()
-    access = self._get_access_level(ctx)
+        # --- (Class Assembler 逻辑保持不变) ---
+        self._in_class = True
+        self._current_class_name = class_name
+        self._class_sections = {"private": "", "public": ""}
 
-    # ... (调试打印保持不变) ...
+        if hasattr(ctx, 'classBodyStatement'):
+            for child in ctx.classBodyStatement():
+                self.visit(child)  # <--- 这将调用 visitClassBodyStatement
 
-    # 2. 将修饰符 "注入" 到子上下文中
-    if ctx.declaration():
-        ctx.declaration()._chrono_access = access
-        return self.visit(ctx.declaration())
+        self._in_class = False
+        self._current_class_name = None
 
-    elif ctx.methodDefinition():
-        ctx.methodDefinition()._chrono_access = access
-        ctx.methodDefinition()._chrono_static = is_static
-        return self.visit(ctx.methodDefinition())
+        final_class_body = ""
 
-    # --- [ 新增分支 ] ---
-    elif ctx.initDefinition():
-        # 将 access 注入
-        ctx.initDefinition()._chrono_access = access
-        return self.visit(ctx.initDefinition())
-    # --- [ 新增结束 ] ---
+        # 1. 输出 private (默认)
+        if self._class_sections["private"]:
+            final_class_body += "\nprivate:\n"
+            final_class_body += self._class_sections["private"]
+        if self._class_sections["public"]:
+            final_class_body += "\npublic:\n"
+            final_class_body += self._class_sections["public"]
+        # --- (Class Assembler 逻辑结束) ---
 
-    elif ctx.deinitBlock():
-        return self.visit(ctx.deinitBlock())
-
-    elif ctx.cppBlock():
-        return self.visit(ctx.cppBlock())
-
-    return ""
-
-# --- [ 关键修改 2 ] ---
-# visitMethodDefinition 现在变得*更简单*了
-def visitMethodDefinition(self, ctx: ChronoParser.MethodDefinitionContext):
-    self._in_class_method = True
-    func_name = ctx.name.text
-    params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
-
-    statements = self._safe_iterate_statements(ctx.statement())
-    body_code = "".join(self.visit(s) for s in statements)
-
-    is_static = getattr(ctx, '_chrono_static', False)
-    access = getattr(ctx, '_chrono_access', 'private')
-
-    # --- (签名逻辑...) ---
-    if ctx.returnType:
-        return_type = ctx.returnType.text
-        if return_type in ("i32", "i64", "int", "bool"):
-            cpp_return_type = self._chrono_to_cpp_type(return_type)
-        else:
-            cpp_return_type = f"{self._chrono_to_cpp_type(return_type)}*"
-        cpp_func_name = func_name
-    else:
-        cpp_return_type = "void"
-        cpp_func_name = func_name
-
-    # --- [ 关键移除 ] ---
-    # 'if func_name == "init":' 这一段特殊逻辑已被删除
-    # --- (签名逻辑结束) ---
-
-    static_prefix = "static " if is_static else ""
-
-    func_def_code = (
-        f"\n{INDENT}{static_prefix}{cpp_return_type} {cpp_func_name}({params_code}) {{\n"
-        f"{body_code}"
-        f"{INDENT}// --- Method End ---\n"
-        f"{INDENT}}}\n"
-    )
-
-    self._class_sections[access] += func_def_code
-    self._in_class_method = False
-    return ""
-
-# --- [ 关键修改 3 ] ---
-# [ 新增方法 ] visitInitDefinition
-# (这个方法的主体是从 visitMethodDefinition 中“窃取”的)
-def visitInitDefinition(self, ctx: ChronoParser.InitDefinitionContext):
-    self._in_class_method = True
-
-    # C++ 构造函数没有返回类型
-    cpp_return_type = ""
-    # 构造函数名称就是类名
-    cpp_func_name = self._current_class_name
-
-    # 1. 读取访问修饰符 (构造函数可以是 private/public)
-    access = getattr(ctx, '_chrono_access', 'private')
-
-    # 2. 访问参数和函数体
-    params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
-    statements = self._safe_iterate_statements(ctx.statement())
-    body_code = "".join(self.visit(s) for s in statements)
-
-    indent = INDENT*2
-
-    # 3. 组装 C++ 构造函数
-    init_code = (
-        f"\n{INDENT}{cpp_return_type} {cpp_func_name}({params_code}) {{\n"
-        f"{body_code.replace(INDENT, indent)}"
-        f"{indent}// --- Initializer End ---\n"
-        f"{INDENT}}}\n"
-    )
-
-    # 4. 追加到 Class Assembler
-    self._class_sections[access] += init_code
-
-    self._in_class_method = False
-    return ""
-
-
-# ... (visitDeinitBlock, visitDeclaration, visitFunctionDefinition (全局) ... 保持不变) ...
+        # [ 关键修复 ] 使用 base_name_str 变量
+        return (
+            f"\nclass {class_name}{base_name_str} {{\n" # <-- 动态添加继承
+            f"{final_class_body.strip()}\n"
+            "};\n"
+        )

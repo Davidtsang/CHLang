@@ -1,39 +1,34 @@
-def visitMethodDefinition(self, ctx: ChronoParser.MethodDefinitionContext):
-    self._in_class_method = True
-    func_name = ctx.name.text
-    params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
+    def visitClassDefinition(self, ctx: ChronoParser.ClassDefinitionContext):
+        class_name = ctx.name.text
+        base_name = ctx.base.text
 
-    statements = self._safe_iterate_statements(ctx.statement())
-    body_code = "".join(self.visit(s) for s in statements)
+        self._in_class = True
+        self._current_class_name = class_name
+        self._class_sections = {"private": "", "public": ""}
 
-    is_static = getattr(ctx, '_chrono_static', False)
-    access = getattr(ctx, '_chrono_access', 'private')
+        # 遍历 classBodyStatement 规则
+        if hasattr(ctx, 'classBodyStatement'):
+            for child in ctx.classBodyStatement():
+                self.visit(child)  # <--- 这将调用 visitClassBodyStatement
 
-    # --- (签名逻辑...) ---
-    if ctx.returnType:
-        return_type = ctx.returnType.text
-        if return_type in ("i32", "i64", "int", "bool"):
-            cpp_return_type = self._chrono_to_cpp_type(return_type)
-        else:
-            cpp_return_type = f"{self._chrono_to_cpp_type(return_type)}*"
-        cpp_func_name = func_name
-    else:
-        cpp_return_type = "void"
-        cpp_func_name = func_name
+        self._in_class = False
+        self._current_class_name = None
 
-    # --- [ 关键移除 ] ---
-    # 'if func_name == "init":' 这一段特殊逻辑已被删除
-    # --- (签名逻辑结束) ---
+        # [修复] 组装 C++ 类体 (移除了重复代码 )
+        final_class_body = ""
 
-    static_prefix = "static " if is_static else ""
+        # 1. 输出 private (默认)
+        if self._class_sections["private"]:
+            final_class_body += "\nprivate:\n"
+            final_class_body += self._class_sections["private"]
 
-    func_def_code = (
-        f"\n{INDENT}{static_prefix}{cpp_return_type} {cpp_func_name}({params_code}) {{\n"
-        f"{body_code}"
-        f"{INDENT}// --- Method End ---\n"
-        f"{INDENT}}}\n"
-    )
+        # 2. 输出 public
+        if self._class_sections["public"]:
+            final_class_body += "\npublic:\n"
+            final_class_body += self._class_sections["public"]
 
-    self._class_sections[access] += func_def_code
-    self._in_class_method = False
-    return ""
+        return (
+            f"\nclass {class_name} : public {base_name} {{\n"
+            f"{final_class_body.strip()}\n"  # <-- 现在只包含正确的代码
+            "};\n"
+        )
