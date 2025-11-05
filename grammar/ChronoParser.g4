@@ -48,8 +48,9 @@ initDefinition
 // [CRITICAL FIX] Must be statement*
 deinitBlock : DEINIT LBRACE statement* RBRACE ; 
 
-// --- Basic Rules ---
-importDirective : IMPORT path=(STRING_LITERAL | INCLUDE_PATH) SEMIC_TOKEN ;
+// [替换] importDirective 规则
+importDirective
+    : IMPORT path=(STRING_LITERAL | INCLUDE_PATH) (AS alias=IDENTIFIER)? SEMIC_TOKEN ;
 
 // --- 修正 functionDefinition (移除 STATIC 和 accessModifier，因为它们在 classBodyStatement 中) ---
 functionDefinition

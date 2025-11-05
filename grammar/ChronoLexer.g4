@@ -18,6 +18,7 @@ ELSE    : 'else' ;
 WHILE   : 'while' ;
 
 PUBLIC  : 'public' ; // class attr access flag
+AS      : 'as' ;     // [新增] 用于 import 别名
 // BOOL_LITERAL 必须在 IDENTIFIER 之前
 BOOL_LITERAL    : 'true' | 'false' ;
 // [新增] new / delete 关键字

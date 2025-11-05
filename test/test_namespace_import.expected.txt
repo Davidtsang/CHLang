@@ -1,0 +1,5 @@
+--- Namespace Import Test ---
+Test 1 (Auto Alias) Result:
+15
+Test 2 (Custom 'as') Result:
+30

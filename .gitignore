@@ -6,3 +6,4 @@ gok/
 .idea/
 *.pyc
 src/parser
+gen/

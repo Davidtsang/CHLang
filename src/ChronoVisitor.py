@@ -1,5 +1,5 @@
 ﻿# src/ChronoVisitor.py
-
+import os
 from antlr4 import *
 from parser.ChronoParser import ChronoParser
 from parser.ChronoParserVisitor import ChronoParserVisitor as BaseChronoVisitor
@@ -17,6 +17,8 @@ class ChronoVisitor(BaseChronoVisitor):
         self._current_class_name = None
         # [新增] Class Assembler 状态
         self._class_sections = {"private": "", "public": ""}
+        # [新增] 命名空间别名 (一个集合，存储所有别名)
+        self._alias_to_namespace_map = {}
 
     # ... (在 __init__ 之后) ...
 
@@ -70,8 +72,32 @@ class ChronoVisitor(BaseChronoVisitor):
         all_code = "".join(self.visit(stmt) for stmt in ctx.topLevelStatement())
         return all_code
 
+        # (确保在 ChronoVisitor.py 顶部添加 'import os')
+
+        # [ 替换 ] visitImportDirective
     def visitImportDirective(self, ctx: ChronoParser.ImportDirectiveContext):
         path_text = ctx.path.text
+
+        # 1. [ 关键 ] 推断 C++ 真实命名空间 (基于文件名)
+        # (这仍然是我们的“脆弱推断”，但现在它是正确的逻辑)
+        base_name = os.path.basename(path_text.strip('"<>'))
+        true_namespace, _ = os.path.splitext(base_name)
+
+        alias_name = ""
+
+        # 2. 确定别名
+        if ctx.alias:
+            # 场景 A: 自定义别名 (import "MyMath.h" as Math)
+            alias_name = ctx.alias.text
+        else:
+            # 场景 B: 自动别名 (import "MyMath.h")
+            alias_name = true_namespace
+
+        # 3. 注册映射：Chrono 别名 -> C++ 命名空间
+        if alias_name and true_namespace:
+            self._alias_to_namespace_map[alias_name] = true_namespace
+
+        # 4. 翻译为 C++ #include (逻辑不变)
         if path_text.startswith('<'):
             return f"#include {path_text}\n"
         elif path_text.startswith('"'):
@@ -458,30 +484,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         # src/ChronoVisitor.py (添加一个辅助函数，并替换 visitIfStatement)
 
-    # to ai助手：不要删除这个方法，以便调试 --- [ 新增的调试辅助函数 ] ---
-    def _recursive_analyze(self, node, indent_level=0):
-        """
-        递归地打印出 ANTLR 树中一个节点及其所有子节点的结构。
-        """
-        indent = "  " * indent_level
 
-        # 1. 获取节点类型名
-        node_type = type(node).__name__
-
-        # 2. 获取节点文本
-        node_text_repr = repr(node.getText())
-
-        # 3. 打印当前节点信息
-        print(f"{indent}Type: {node_type.ljust(30)} | Text: {node_text_repr}")
-
-        # 4. 递归 (只对 'Context' 对象，不对 'Terminal' 词元)
-        # 我们检查 'children' 属性是否存在且不为空
-        if hasattr(node, 'children') and node.children:
-            indent_level += 1
-            for child in node.children:
-                self._recursive_analyze(child, indent_level)
-
-        # --- [ 替换 visitIfStatement ] ---
 
     def visitIfStatement(self, ctx: ChronoParser.IfStatementContext):
 
@@ -577,23 +580,32 @@ class ChronoVisitor(BaseChronoVisitor):
 
     # [ 已重命名/修正 ] 这是我们旧的 'visitExpression'
     # 它现在处理链式调用和全局函数调用
+        # [ 替换 ] visitSimpleExpression
     def visitSimpleExpression(self, ctx: ChronoParser.SimpleExpressionContext):
         if ctx.functionCallExpression():
             return self.visit(ctx.functionCallExpression())
 
-        # 这处理 'primary ( DOT IDENTIFIER (LPAREN ...)? )*' 规则
         current_code = self.visit(ctx.primary())
+        primary_text = ctx.primary().getText()
 
-        is_static = False
+        # [ 关键修复 ] 检查是否是命名空间别名 (e.g., 'Math')
+        is_namespace_alias = primary_text in self._alias_to_namespace_map
+
+        is_static_class = False
         if ctx.primary().IDENTIFIER():
             if ctx.primary().IDENTIFIER().getText()[0].isupper():
-                is_static = True
+                is_static_class = True
 
+        # [ 关键修复 ] 如果是别名，立即替换为 C++ 命名空间
+        if is_namespace_alias:
+            current_code = self._alias_to_namespace_map[primary_text]
+
+        # 3. 遍历链条
         child_nodes = ctx.children[1:]
 
         i = 0
         while i < len(child_nodes):
-            i += 1
+            i += 1  # 跳过 '.' (DOT)
             ident = child_nodes[i].getText()
             i += 1
 
@@ -603,21 +615,25 @@ class ChronoVisitor(BaseChronoVisitor):
                 if i < len(child_nodes) and isinstance(child_nodes[i], ChronoParser.ExpressionListContext):
                     args = self.visit(child_nodes[i])
                     i += 1
-                i += 1
+                i += 1  # 跳过 ')' (RPAREN)
 
-                if is_static:
+                # [ 关键决策 ]
+                if is_static_class or is_namespace_alias:
+                    # 静态调用 (MyClass::create) 或 命名空间调用 (MyMath::add)
                     current_code = f"{current_code}::{ident}({args})"
                 else:
+                    # 实例调用 (obj->toUpper)
                     current_code = f"{current_code}->{ident}({args})"
-                is_static = False
+
             else:
-                if is_static:
+                # 属性访问
+                if is_static_class or is_namespace_alias:
                     current_code = f"{current_code}::{ident}"
                 else:
                     current_code = f"{current_code}->{ident}"
 
-                if ident[0].isupper():
-                    is_static = True
+            is_static_class = ident[0].isupper()
+            is_namespace_alias = False
 
         return current_code
 
