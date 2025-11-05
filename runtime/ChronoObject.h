@@ -51,7 +51,11 @@ public:
     }
 
     // --- 辅助方法 ---
-    
+    // [新增] 纯虚函数，强制所有子类实现
+    virtual void printValue() {
+        std::cout << "[ChronoObject <" << typeid(*this).name()
+                  << "> at: " << static_cast<void*>(this) << "]" << std::endl;
+    }
     // description() 用于 Print()
     virtual std::string description() const {
         return "<ChronoObject instance>";

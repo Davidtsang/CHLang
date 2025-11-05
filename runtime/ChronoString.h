@@ -34,6 +34,11 @@ public:
     }
     
     std::string& getValue() { return m_value; }
+
+    // [新增] 实现 Print 虚函数
+    void printValue() override {
+        std::cout << m_value << std::endl;
+    }
 };
 
 using String = ChronoString;

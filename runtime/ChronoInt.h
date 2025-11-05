@@ -22,6 +22,11 @@ public:
     std::string description() const override {
         return std::to_string(m_value);
     }
+
+    // [新增] 实现 Print 虚函数
+    void printValue() override {
+        std::cout << m_value << std::endl;
+    }
 };
 
 using Int = ChronoInt;

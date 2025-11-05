@@ -1,0 +1,12 @@
+--- Chrono.log Test Start ---
+Test 1 (i32):
+123
+Test 2 (bool):
+true
+Test 3 (Literal):
+Hello Literal
+Test 4 (ChronoString):
+MRC String
+Test 5 (ChronoInt):
+456
+--- Chrono.log Test End ---
