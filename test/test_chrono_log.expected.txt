@@ -5,8 +5,8 @@ Test 2 (bool):
 true
 Test 3 (Literal):
 Hello Literal
-Test 4 (ChronoString):
+Test 4 (String):
 MRC String
-Test 5 (ChronoInt):
+Test 5 (Int):
 456
 --- Chrono.log Test End ---

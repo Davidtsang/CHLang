@@ -1,51 +1,54 @@
+// test_arithmetic.ch
 import "runtime/ChronoObject.h";
 import "runtime/ChronoString.h";
 import "runtime/ChronoInt.h";
+import "runtime/Chrono.h"; // <-- [新增] 导入 Chrono 命名空间
 
+// 'main' 必须返回 'Int' 或 'i32'，访问者会将其转为 C++ 'int'
 func main() -> Int {
     let a: i32 = 10;
     let b: i32 = 5;
-    let result: i32 = 0; // 可变局部变量 (得益于我们移除了 const)
+    let result: i32 = 0;
 
-    print("--- Arithmetic Tests ---");
+    Chrono.log("--- Arithmetic Tests ---"); // <-- [更改]
 
     // Test 1: 加法 (+) (10 + 5 = 15)
     result = a + b;
     if (result == 15) {
-        print("T1: ADDITION PASS");
+        Chrono.log("T1: ADDITION PASS"); // <-- [更改]
     } else {
-        print("T1: ADDITION FAIL");
+        Chrono.log("T1: ADDITION FAIL"); // <-- [更改]
     }
 
     // Test 2: 减法 (-) (10 - 5 = 5)
     result = a - b;
     if (result == 5) {
-        print("T2: SUBTRACTION PASS");
+        Chrono.log("T2: SUBTRACTION PASS"); // <-- [更改]
     } else {
-        print("T2: SUBTRACTION FAIL");
+        Chrono.log("T2: SUBTRACTION FAIL"); // <-- [更改]
     }
 
     // Test 3: 乘法 (*) (10 * 5 = 50)
     result = a * b;
     if (result == 50) {
-        print("T3: MULTIPLICATION PASS");
+        Chrono.log("T3: MULTIPLICATION PASS"); // <-- [更改]
     } else {
-        print("T3: MULTIPLICATION FAIL");
+        Chrono.log("T3: MULTIPLICATION FAIL"); // <-- [更改]
     }
 
     // Test 4: 除法 (/) (10 / 5 = 2)
     result = a / b;
     if (result == 2) {
-        print("T4: DIVISION PASS");
+        Chrono.log("T4: DIVISION PASS"); // <-- [更改]
     } else {
-        print("T4: DIVISION FAIL");
+        Chrono.log("T4: DIVISION FAIL"); // <-- [更改]
     }
 
     // Test 5: 组合赋值与比较 (10 * 5 == 50)
     if ((a * b) == 50) {
-        print("T5: COMBINATION PASS");
+        Chrono.log("T5: COMBINATION PASS"); // <-- [更改]
     } else {
-        print("T5: COMBINATION FAIL");
+        Chrono.log("T5: COMBINATION FAIL"); // <-- [更改]
     }
 
     return 0;

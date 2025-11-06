@@ -1,8 +1,9 @@
 import "ChronoObject.h";
 import "ChronoInt.h";
+import "Chrono.h";
 
 func main() -> Int {
-    let five: Int = 5;
-    print(five);
+    let five: int = 5;
+    Chrono.log(five);
     return 0;
 }

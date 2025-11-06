@@ -1,43 +1,58 @@
-﻿#include "ChronoObject.h"
+﻿#include "Chrono.h"
+#include "ChronoInt.h"
+#include "ChronoObject.h"
 #include "ChronoString.h"
 
-class MRCClass : public ChronoObject {
+class AccessTest : public ChronoObject {
 private:
-  MRCClass() { Print("MRC Init"); }
+  int32_t val;
+  String *_name;
+
+  AccessTest(int32_t v, String *_n) {
+    Chrono::log("Init (Private)");
+    this->val = v;
+    this->name = _n;
+    this->name->retain();
+  }
+
+  int32_t doInternalCalc() {
+    Chrono::log("Private Method: doInternalCalc()");
+    return this->val * 2;
+    // --- Method End ---
+  }
 
 public:
-  virtual ~MRCClass() {
+  virtual ~AccessTest() {
     // --- Chrono Deinit Block ---
-    Print("MRC Deinit");
+    Chrono::log("Deinit (Public)");
+    this->name->release();
     // --- Deinit End ---
   }
 
-  static MRCClass *create() {
-    return new MRCClass();
+  Int *getCalculatedValue() {
+    Chrono::log("Public Method: getCalculatedValue()");
+    int32_t result = this->doInternalCalc();
+    return Int::create(result);
     // --- Method End ---
   }
-};
 
-class NativeClass {
-private:
-  NativeClass() { Print("Native Init"); }
-
-public:
-  static NativeClass *create() {
-    return new NativeClass();
+  static AccessTest *create(int32_t v, String *_n) {
+    Chrono::log("Public Static: create()");
+    return new AccessTest(v, _n);
     // --- Method End ---
   }
 };
 
 int main() {
-  Print("--- Test Start ---");
-  MRCClass *objA = MRCClass::create();
-  Print("A: MRC object created (Factory).");
-  objA->release();
-  NativeClass *objB = NativeClass::create();
-  Print("B: Native object created (Factory).");
-  delete objB;
-  Print("B: Native object deleted (explicit DELETE).");
-  Print("--- Test End ---");
+  Chrono::log("--- Test Start ---");
+  String *_s = String::create("Test");
+  AccessTest *_obj = AccessTest::create(10, _s);
+  Int *_val_obj = _obj->getCalculatedValue();
+  Chrono::log("Final Value:");
+  Chrono::log(_val_obj);
+  _s->release();
+  _obj->release();
+  _val_obj->release();
+  Chrono::log("--- Test End ---");
   return 0;
 }

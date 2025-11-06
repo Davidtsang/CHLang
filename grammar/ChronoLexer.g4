@@ -67,7 +67,7 @@ DOT     : '.' ;
 COMMA   : ',' ;
 
 // --- 通用规则 (必须在最后) ---
-IDENTIFIER : [a-zA-Z_] [a-zA-Z0-9_]* ; 
+IDENTIFIER : '$'? [a-zA-Z_] [a-zA-Z0-9_]* ;
 INTEGER_LITERAL : [0-9]+ ;
 STRING_LITERAL  : '"' ( ~["\\] | '\\' . )* '"' ; 
 

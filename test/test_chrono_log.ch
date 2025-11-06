@@ -6,7 +6,7 @@ import "runtime/ChronoObject.h";
 import "runtime/ChronoString.h";
 import "runtime/ChronoInt.h";
 
-func main() -> Int {
+func main() -> int {
 
     Chrono.log("--- Chrono.log Test Start ---");
 
@@ -23,19 +23,19 @@ func main() -> Int {
     Chrono.log("Test 3 (Literal):");
     Chrono.log("Hello Literal"); // 预期: Hello Literal
 
-    // Test 4: 打印 ChronoString (MRC 对象)
-    // [ 关键修复 ] 必须使用 .create() 工厂方法
-    let s: ChronoString = ChronoString.create("MRC String");
-    Chrono.log("Test 4 (ChronoString):");
-    Chrono.log(s);
-    s.release();
+    // Test 4: 打印 String (MRC 对象)
+    // [ 更改 ] 使用 '$' 标记内存责任
+    let $s: String = String.create("MRC String");
+    Chrono.log("Test 4 (String):");
+    Chrono.log($s);
+    $s.release();
 
-    // Test 5: 打印 ChronoInt (MRC 对象)
-    // [ 关键修复 ] 必须使用 .create() 工厂方法
-    let i: ChronoInt = ChronoInt.create(456);
-    Chrono.log("Test 5 (ChronoInt):");
-    Chrono.log(i);
-    i.release();
+    // Test 5: 打印 Int (MRC 对象)
+    // [ 更改 ] 使用 '$' 标记内存责任
+    let $i: Int = Int.create(456);
+    Chrono.log("Test 5 (Int):");
+    Chrono.log($i);
+    $i.release();
 
     Chrono.log("--- Chrono.log Test End ---");
     return 0;

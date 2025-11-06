@@ -1,7 +1,6 @@
 // file: test/test_namespace_import.ch
 // 目的: 验证 'import as' 和 C++ 原生打印
 
-// [修改] 移除 ChronoInt 和 ChronoString，因为我们不再使用 Chrono::print
 import "runtime/ChronoObject.h";
 import <iostream>; // [新增] 导入 C++ 原生打印
 

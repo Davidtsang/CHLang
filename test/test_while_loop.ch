@@ -1,6 +1,10 @@
+// file: test/test_while_loop.ch
+// 目的: 验证 while 循环, 赋值, 和 i32 比较
+
 import "runtime/ChronoObject.h";
 import "runtime/ChronoString.h";
-import "runtime/ChronoInt.h"; // 需要 Int::create
+import "runtime/ChronoInt.h";
+import "runtime/Chrono.h"; // <-- [新增] 'print' 需要它
 
 func main() -> Int {
 
@@ -8,17 +12,18 @@ func main() -> Int {
     let keep_looping: bool = true;
     while (keep_looping) {
         print("Test 1: Loop executing...");
-        keep_looping = false; // 赋值 (现在可以工作了)
+        keep_looping = false; // 赋值
     }
 
     // --- 场景 2: 计数的 while 循环 (使用 i32) ---
-    // (这个测试需要我们下一步添加 + 运算符)
-    // let count: i32 = 0;
-    // while (count < 3) {
-    //     print("Test 2: Count:");
-    //     print(Int::create(count));
-    //     count = count + 1;
-    // }
+    // [修改] 已取消注释，因为 < 和 + 运算符现在受支持
+    let count: i32 = 0;
+    while (count < 3) {
+        print("Test 2: Count:");
+        // [修改] Chrono.log(i32) 是支持的，不需要 Int::create
+        print(count);
+        count = count + 1;
+    }
 
     // --- 场景 3: 永不执行的 while 循环 ---
     while (false) {

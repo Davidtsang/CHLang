@@ -1,2 +1,8 @@
 Test 1: Loop executing...
+Test 2: Count:
+0
+Test 2: Count:
+1
+Test 2: Count:
+2
 Test 4: Loop finished.

@@ -1,40 +1,53 @@
+# [ 替换 ] visitMethodDefinition
+    def visitMethodDefinition(self, ctx: ChronoParser.MethodDefinitionContext):
+        self._in_class_method = True
+        self._enter_scope()
 
-    def visitClassDefinition(self, ctx: ChronoParser.ClassDefinitionContext):
-        class_name = ctx.name.text
+        self._add_variable("this", {
+            "cpp_name": "this",
+            "accessor": "->",
+            "cpp_type": f"{self._current_class_name}*"
+        })
 
-        # [ 关键修复 ] 检查 base class 是否存在
-        base_name_str = ""
-        if ctx.base:
-            # 如果存在基类 (e.g., : ChronoObject)
-            base_name = ctx.base.text
-            base_name_str = f" : public {base_name}" # 假设所有继承都是 public
+        func_name = ctx.name.text
+        params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
 
-        # --- (Class Assembler 逻辑保持不变) ---
-        self._in_class = True
-        self._current_class_name = class_name
-        self._class_sections = {"private": "", "public": ""}
+        statements = self._safe_iterate_statements(ctx.statement())
+        body_code = "".join(self.visit(s) for s in statements)
 
-        if hasattr(ctx, 'classBodyStatement'):
-            for child in ctx.classBodyStatement():
-                self.visit(child)  # <--- 这将调用 visitClassBodyStatement
+        is_static = getattr(ctx, '_chrono_static', False)
+        access = getattr(ctx, '_chrono_access', 'private')
 
-        self._in_class = False
-        self._current_class_name = None
+        if ctx.returnType:
+            # [ [ 关键修复 ] ]
+            # 1. 获取带 $ 的原始文本 (例如 "$Int")
+            return_type_raw = ctx.returnType.text
+            # 2. 剥离 $ (变为 "Int")
+            return_type_stripped = return_type_raw.lstrip('$')
+            # 3. 翻译类型 (变为 "ChronoInt")
+            return_type_cpp = self._chrono_to_cpp_type(return_type_stripped)
+            # [ [ 修复结束 ] ]
+            
+            if return_type_cpp in ("int32_t", "int64_t", "bool"):
+                cpp_return_type = return_type_cpp
+            else:
+                cpp_return_type = f"{return_type_cpp}*" # 变为 "ChronoInt*"
+            cpp_func_name = func_name
+        else:
+            cpp_return_type = "void"
+            cpp_func_name = func_name
 
-        final_class_body = ""
+        static_prefix = "static " if is_static else ""
 
-        # 1. 输出 private (默认)
-        if self._class_sections["private"]:
-            final_class_body += "\nprivate:\n"
-            final_class_body += self._class_sections["private"]
-        if self._class_sections["public"]:
-            final_class_body += "\npublic:\n"
-            final_class_body += self._class_sections["public"]
-        # --- (Class Assembler 逻辑结束) ---
-
-        # [ 关键修复 ] 使用 base_name_str 变量
-        return (
-            f"\nclass {class_name}{base_name_str} {{\n" # <-- 动态添加继承
-            f"{final_class_body.strip()}\n"
-            "};\n"
+        func_def_code = (
+            f"\n{INDENT}{static_prefix}{cpp_return_type} {cpp_func_name}({params_code}) {{\n"
+            f"{body_code}"
+            f"{INDENT}// --- Method End ---\n"
+            f"{INDENT}}}\n"
         )
+
+        self._class_sections[access] += func_def_code
+
+        self._exit_scope()
+        self._in_class_method = False
+        return ""
