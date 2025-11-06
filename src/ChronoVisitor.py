@@ -624,29 +624,54 @@ class ChronoVisitor(BaseChronoVisitor):
 
         # src/ChronoVisitor.py (添加一个辅助函数，并替换 visitIfStatement)
 
+        # src/ChronoVisitor.py
+
     def visitIfStatement(self, ctx: ChronoParser.IfStatementContext):
         condition = self.visit(ctx.expression())
 
-        self._enter_scope()  # <-- [新增]
-        if_body_statements = self._safe_iterate_statements(ctx.if_statements)
-        if_body = "".join(self.visit(s) for s in if_body_statements)
-        self._exit_scope()  # <-- [新增]
+        # [修改] 调用 self.visit(ctx.if_block)
+        # (如果 ctx.if_block 存在, 否则返回 "")
+        if_body = self.visit(ctx.if_block) if ctx.if_block else ""
 
+        # [修改] 作用域已在 visitIfBlock 内部处理
         code = f"{INDENT}if ({condition}) {{\n{if_body}{INDENT}}}\n"
 
         if ctx.ELSE():
             if ctx.else_if:
+                # 递归调用 'else if' (这部分不变)
                 code += f"{INDENT}else {self.visit(ctx.else_if)}"
-            elif ctx.else_statements:
-                self._enter_scope()  # <-- [新增]
-                else_body_statements = self._safe_iterate_statements(ctx.else_statements)
-                else_body = "".join(self.visit(s) for s in else_body_statements)
-                self._exit_scope()  # <-- [新增]
-                code += f"{INDENT}else {{\n{else_body}{INDENT}}}\n"
 
+            elif ctx.else_block:
+                # [修改] 调用 self.visit(ctx.else_block)
+                else_body = self.visit(ctx.else_block)
+                # [修改] 作用域已在 visitElseBlock 内部处理
+                code += f"{INDENT}else {{\n{else_body}{INDENT}}}\n"
         return code
 
-        # src/ChronoVisitor.py
+    def visitIfBlock(self, ctx: ChronoParser.IfBlockContext):
+        """[新增] 处理 if (...) { ... } 块"""
+        self._enter_scope()
+
+        # [关键修复]
+        # 使用默认的 ctx.statement() 访问器,
+        # 它被证明可以正确返回*所有*语句的列表。
+        statements = self._safe_iterate_statements(ctx.statement())
+
+        body_code = "".join(self.visit(s) for s in statements)
+        self._exit_scope()
+        return body_code
+
+    def visitElseBlock(self, ctx: ChronoParser.ElseBlockContext):
+        """[新增] 处理 else { ... } 块"""
+        self._enter_scope()
+
+        # [关键修复]
+        # 使用默认的 ctx.statement() 访问器
+        statements = self._safe_iterate_statements(ctx.statement())
+
+        body_code = "".join(self.visit(s) for s in statements)
+        self._exit_scope()
+        return body_code
 
     def visitWhileStatement(self, ctx: ChronoParser.WhileStatementContext):
         condition = self.visit(ctx.expression())

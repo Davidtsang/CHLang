@@ -74,20 +74,25 @@ assignableExpression
     : (IDENTIFIER | THIS) (DOT IDENTIFIER)*
     ;
 
-// --- Flow Control ---
-// [CRITICAL FIX] Must be statement*
+// 使用新的命名规则 if_block 和 else_block
 ifStatement
-    : IF LPAREN expression RPAREN LBRACE if_statements=statement* RBRACE 
-      ( ELSE 
-        ( else_if=ifStatement 
-        | LBRACE else_statements=statement* RBRACE 
+    : IF LPAREN expression RPAREN if_block=ifBlock // <-- [修改]
+      ( ELSE
+        ( else_if=ifStatement
+        | else_block=elseBlock // <-- [修改]
         )
-      )? 
+      )?
     ;
+
+// [ 2. 添加新的辅助规则 ]
+// 在这些规则中, "statement*" 是无歧义的
+// 并且可以通过 ctx.statement() (默认访问器) 正确访问
+ifBlock : LBRACE statement* RBRACE ;
+elseBlock : LBRACE statement* RBRACE ;
 
 // [CRITICAL FIX] Must be statement*
 whileStatement
-    : WHILE LPAREN expression RPAREN LBRACE statements=statement* RBRACE 
+    : WHILE LPAREN expression RPAREN LBRACE statement* RBRACE
     ;
 
 // --- Composite Rule ---
