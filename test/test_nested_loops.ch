@@ -5,7 +5,7 @@ import "runtime/ChronoObject.h";
 import "runtime/ChronoString.h";
 import "runtime/Chrono.h"; // <-- [新增] 'Chrono.log' 翻译为 'Chrono::log'
 
-func main() -> Int {
+func main() -> int {
 
     // --- Test 1: IF 块中嵌套 WHILE ---
     if (true) {

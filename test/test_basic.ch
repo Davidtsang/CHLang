@@ -2,7 +2,7 @@ import "ChronoObject.h";
 import "ChronoInt.h";
 import "Chrono.h";
 
-func main() -> Int {
+func main() -> int {
     let five: int = 5;
     Chrono.log(five);
     return 0;

@@ -1,8 +1,26 @@
 // -----------------------------------------------------------------------------
-// Chrono Parser (ChronoParser.g4) - Final Correct Version
+// Chrono Parser (ChronoParser.g4) - [已升级: 支持泛型]
 // -----------------------------------------------------------------------------
 parser grammar ChronoParser;
 options { tokenVocab = ChronoLexer; }
+
+// --- [ 1. 新增: 递归泛型规则 ] ---
+// typeSpecifier 现在是 'baseType' 加上可选的 'typeList'
+typeSpecifier
+    : baseType (LBRACK typeList RBRACK)? // (例如 'std.vector' '[' 'i32' ']')
+    ;
+
+// baseType 是带点号的名称 (例如 'std.vector' 或 '$String')
+baseType
+    : IDENTIFIER (DOT IDENTIFIER)*
+    ;
+
+// typeList 是 'typeSpecifier' 的逗号分隔列表
+// (这允许 'map[string, vector[i32]]')
+typeList
+    : typeSpecifier (COMMA typeSpecifier)*
+    ;
+
 
 // --- Top Level Rules ---
 program : topLevelStatement+ EOF ;
@@ -14,83 +32,81 @@ topLevelStatement
     | functionDefinition
     ;
 
-// --- 新增: 访问控制修饰符规则 ---
 accessModifier : PUBLIC ;
 
-// --- 新增: classBodyStatement 规则 (整合属性和方法) ---
 classBodyStatement
-    : (accessModifier)? declaration          // 属性声明接受可选的 public
-    | ( // 允许修饰符的任意组合 (替代 )
-        (STATIC (accessModifier)?) // 匹配: static, static public
-    | (accessModifier (STATIC)?) // 匹配: public, public static
+    : (accessModifier)? declaration
+    | ( (STATIC (accessModifier)?)
+      | (accessModifier (STATIC)?)
       ) methodDefinition
-    |(accessModifier)? initDefinition     // <-- [ 新增 ]
-    | methodDefinition // 匹配: (无修饰符)
+    | (accessModifier)? initDefinition
+    | methodDefinition
     | deinitBlock
     | cppBlock
     ;
 
-// --- 替换 classDefinition 规则 (使用新的 classBodyStatement) ---
-classDefinition : CLASS name=IDENTIFIER (COLON base=IDENTIFIER)? LBRACE
-                    (classBodyStatement)* RBRACE ;
+classDefinition : CLASS name=IDENTIFIER (COLON base=IDENTIFIER)?
+    LBRACE
+        (classBodyStatement)* RBRACE ;
 
-
-// [NEW] 2. 类方法定义 (func foo()) - 接受 STATIC 和 Access Control
+// [修改] methodDefinition 现在使用新的 typeSpecifier
 methodDefinition
-    : FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=IDENTIFIER)? LBRACE
+    : FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)? // <-- [修改]
+    LBRACE
       statement* RBRACE ;
 
-// [ 新增规则 ] initDefinition
-// 它没有 'FUNC' 关键字，也没有 'returnType'
 initDefinition
     : INIT LPAREN parameters RPAREN LBRACE statement* RBRACE ;
 
-// [CRITICAL FIX] Must be statement*
-deinitBlock : DEINIT LBRACE statement* RBRACE ; 
+deinitBlock : DEINIT LBRACE statement* RBRACE ;
 
-// [替换] importDirective 规则
 importDirective
     : IMPORT path=(STRING_LITERAL | INCLUDE_PATH) (AS alias=IDENTIFIER)? SEMIC_TOKEN ;
 
-// --- 修正 functionDefinition (移除 STATIC 和 accessModifier，因为它们在 classBodyStatement 中) ---
+// [修改] functionDefinition 现在使用新的 typeSpecifier
 functionDefinition
-    : (STATIC)? FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=IDENTIFIER)?
-      LBRACE 
+    : (STATIC)?
+    FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)? // <-- [修改]
+      LBRACE
           statement* RBRACE ;
 
 parameters : (parameter (COMMA parameter)*)? ;
-parameter : name=IDENTIFIER COLON typeName=IDENTIFIER ;
 
-//declaration : LET variableName=IDENTIFIER COLON typeName=IDENTIFIER (ASSIGN expression)? SEMIC_TOKEN ;
-// --- 修正 declaration (移除 accessModifier，因为它在 classBodyStatement 中) ---
-declaration : LET variableName=IDENTIFIER COLON typeName=IDENTIFIER (ASSIGN expression)? SEMIC_TOKEN ;
+// --- [ 2. 已修改: 'parameter' 规则 ] ---
+// 'typeName' 现在使用新的 'typeSpecifier' 规则
+parameter
+    : name=IDENTIFIER COLON typeName=typeSpecifier
+    ;
+
+// --- [ 3. 已修改: 'declaration' 规则 ] ---
+// 'typeName' 现在使用新的 'typeSpecifier' 规则
+declaration
+    : LET variableName=IDENTIFIER COLON typeName=typeSpecifier (ASSIGN expression)? SEMIC_TOKEN
+    ;
 
 cppBlock : AT_CPP CPP_BODY* AT_END ;
 
 returnStatement : RETURN expression SEMIC_TOKEN ;
 
 assignment : assignableExpression ASSIGN expression SEMIC_TOKEN ;
+
 assignableExpression
     : (IDENTIFIER | THIS) (DOT IDENTIFIER)*
     ;
 
-// 使用新的命名规则 if_block 和 else_block
+// --- Flow Control (使用重构后的新规则) ---
 ifStatement
-    : IF LPAREN expression RPAREN if_block=ifBlock // <-- [修改]
+    : IF LPAREN expression RPAREN if_block=ifBlock
       ( ELSE
         ( else_if=ifStatement
-        | else_block=elseBlock // <-- [修改]
+        | else_block=elseBlock
         )
       )?
     ;
 
-// [ 2. 添加新的辅助规则 ]
-// 在这些规则中, "statement*" 是无歧义的
-// 并且可以通过 ctx.statement() (默认访问器) 正确访问
 ifBlock : LBRACE statement* RBRACE ;
 elseBlock : LBRACE statement* RBRACE ;
 
-// [CRITICAL FIX] Must be statement*
 whileStatement
     : WHILE LPAREN expression RPAREN LBRACE statement* RBRACE
     ;
@@ -99,13 +115,15 @@ whileStatement
 statement : declaration
           | assignment
           | returnStatement
-          | expression SEMIC_TOKEN 
+          | expression SEMIC_TOKEN
           | cppBlock
           | ifStatement
           | whileStatement
-          | deleteStatement // <-- 引用新的专用规则
+          | deleteStatement
           ;
+
 deleteStatement : DELETE expression SEMIC_TOKEN ;
+
 // --- Expressions ---
 expression
     : simpleExpression (
@@ -114,11 +132,12 @@ expression
     ;
 
 simpleExpression
-    : primary ( DOT IDENTIFIER (LPAREN expressionList? RPAREN)? )* | functionCallExpression 
+    : primary ( DOT IDENTIFIER (LPAREN expressionList? RPAREN)? )* | functionCallExpression
     ;
 
+// [修改] primary (NEW) 现在使用 baseType
 primary
-    : NEW IDENTIFIER LPAREN expressionList? RPAREN // <-- NEW 关键字创建对象
+    : NEW baseType LPAREN expressionList? RPAREN // <-- [修改] (例如 new std.vector[i32]())
     | literal
     | IDENTIFIER
     | THIS
@@ -127,5 +146,4 @@ primary
 
 functionCallExpression : name=IDENTIFIER LPAREN expressionList? RPAREN ;
 expressionList : expression (COMMA expression)* ;
-
-literal : INTEGER_LITERAL | STRING_LITERAL | BOOL_LITERAL ;
+literal : INTEGER_LITERAL | STRING_LITERAL | BOOL_LITERAL | CHAR_LITERAL ; // <-- [新增]

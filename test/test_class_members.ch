@@ -55,7 +55,7 @@ class MemberTest : ChronoObject {
 // -------------------------------------------
 // 全局 Main
 // -------------------------------------------
-func main() -> Int {
+func main() -> int {
     // a. 创建参数 (RC=1)
     let $s: String = String.create("Hello");
 

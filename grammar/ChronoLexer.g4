@@ -61,6 +61,8 @@ LPAREN  : '(' ;
 RPAREN  : ')' ; 
 LBRACE  : '{' ;
 RBRACE  : '}' ;
+LBRACK  : '[' ;
+RBRACK  : ']' ;
 COLON   : ':' ;
 ASSIGN  : '=' ;
 DOT     : '.' ;
@@ -70,11 +72,12 @@ COMMA   : ',' ;
 IDENTIFIER : '$'? [a-zA-Z_] [a-zA-Z0-9_]* ;
 INTEGER_LITERAL : [0-9]+ ;
 STRING_LITERAL  : '"' ( ~["\\] | '\\' . )* '"' ; 
+CHAR_LITERAL    : '\'' ( ~['\\] | '\\' . ) '\'' ; // 匹配单引号字符 (例如 'a', '\n')
 
 // --- 跳过 (Skipped) ---
 LINE_COMMENT : '//' ~[\r\n]* -> skip ;
 WHITESPACE : [ \t\r\n\u00A0]+ -> skip ;
-
+NEWLINE: ('\r' '\n'? | '\n') -> skip;
 // --- 词法分析器模式 ---
 mode INSIDE_CPP_BLOCK;
     AT_END : '@end' -> popMode;

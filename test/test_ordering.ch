@@ -20,7 +20,7 @@ import "runtime/ChronoString.h";
 import "runtime/Chrono.h"; // <-- [新增] 'print' 需要它
 
 // 4. 入口函数
-func main() -> Int {
+func main() -> int {
 
     // 输出 #1: 应该首先出现
     print("Chrono Statement 1");

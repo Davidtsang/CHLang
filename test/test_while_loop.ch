@@ -6,7 +6,7 @@ import "runtime/ChronoString.h";
 import "runtime/ChronoInt.h";
 import "runtime/Chrono.h"; // <-- [新增] 'print' 需要它
 
-func main() -> Int {
+func main() -> int {
 
     // --- 场景 1: 简单的 while 循环 (使用 bool) ---
     let keep_looping: bool = true;

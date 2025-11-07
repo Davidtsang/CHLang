@@ -31,7 +31,7 @@ class NativeClass {
     }
 }
 
-func main() -> Int {
+func main() -> int {
 
     print("--- Test Start ---");
 

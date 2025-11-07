@@ -10,7 +10,7 @@ import "lib/MyMath.h";
 // [测试 2: 自定义别名]
 import "lib/MyMath.h" as Math;
 
-func main() -> Int {
+func main() -> int {
 
     // [修改] 使用 @cpp 块
     @cpp

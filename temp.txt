@@ -1,53 +1,149 @@
-# [ 替换 ] visitMethodDefinition
-    def visitMethodDefinition(self, ctx: ChronoParser.MethodDefinitionContext):
-        self._in_class_method = True
-        self._enter_scope()
+// -----------------------------------------------------------------------------
+// Chrono Parser (ChronoParser.g4) - [已升级: 支持泛型]
+// -----------------------------------------------------------------------------
+parser grammar ChronoParser;
+options { tokenVocab = ChronoLexer; }
 
-        self._add_variable("this", {
-            "cpp_name": "this",
-            "accessor": "->",
-            "cpp_type": f"{self._current_class_name}*"
-        })
+// --- [ 1. 新增: 递归泛型规则 ] ---
+// typeSpecifier 现在是 'baseType' 加上可选的 'typeList'
+typeSpecifier
+    : baseType (LBRACK typeList RBRACK)? // (例如 'std.vector' '[' 'i32' ']')
+    ;
 
-        func_name = ctx.name.text
-        params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
+// baseType 是带点号的名称 (例如 'std.vector' 或 '$String')
+baseType
+    : IDENTIFIER (DOT IDENTIFIER)*
+    ;
 
-        statements = self._safe_iterate_statements(ctx.statement())
-        body_code = "".join(self.visit(s) for s in statements)
+// typeList 是 'typeSpecifier' 的逗号分隔列表
+// (这允许 'map[string, vector[i32]]')
+typeList
+    : typeSpecifier (COMMA typeSpecifier)*
+    ;
 
-        is_static = getattr(ctx, '_chrono_static', False)
-        access = getattr(ctx, '_chrono_access', 'private')
 
-        if ctx.returnType:
-            # [ [ 关键修复 ] ]
-            # 1. 获取带 $ 的原始文本 (例如 "$Int")
-            return_type_raw = ctx.returnType.text
-            # 2. 剥离 $ (变为 "Int")
-            return_type_stripped = return_type_raw.lstrip('$')
-            # 3. 翻译类型 (变为 "ChronoInt")
-            return_type_cpp = self._chrono_to_cpp_type(return_type_stripped)
-            # [ [ 修复结束 ] ]
-            
-            if return_type_cpp in ("int32_t", "int64_t", "bool"):
-                cpp_return_type = return_type_cpp
-            else:
-                cpp_return_type = f"{return_type_cpp}*" # 变为 "ChronoInt*"
-            cpp_func_name = func_name
-        else:
-            cpp_return_type = "void"
-            cpp_func_name = func_name
+// --- Top Level Rules ---
+program : topLevelStatement+ EOF ;
 
-        static_prefix = "static " if is_static else ""
+topLevelStatement
+    : importDirective
+    | cppBlock
+    | classDefinition
+    | functionDefinition
+    ;
+    
+accessModifier : PUBLIC ;
 
-        func_def_code = (
-            f"\n{INDENT}{static_prefix}{cpp_return_type} {cpp_func_name}({params_code}) {{\n"
-            f"{body_code}"
-            f"{INDENT}// --- Method End ---\n"
-            f"{INDENT}}}\n"
+classBodyStatement
+    : (accessModifier)? declaration
+    | ( (STATIC (accessModifier)?) 
+      | (accessModifier (STATIC)?) 
+      ) methodDefinition
+    | (accessModifier)? initDefinition
+    | methodDefinition 
+    | deinitBlock
+    | cppBlock
+    ;
+    
+classDefinition : CLASS name=IDENTIFIER (COLON base=IDENTIFIER)?
+    LBRACE
+        (classBodyStatement)* RBRACE ;
+
+// [修改] methodDefinition 现在使用新的 typeSpecifier
+methodDefinition
+    : FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)? // <-- [修改]
+    LBRACE
+      statement* RBRACE ;
+
+initDefinition
+    : INIT LPAREN parameters RPAREN LBRACE statement* RBRACE ;
+
+deinitBlock : DEINIT LBRACE statement* RBRACE ;
+
+importDirective
+    : IMPORT path=(STRING_LITERERAL | INCLUDE_PATH) (AS alias=IDENTIFIER)? SEMIC_TOKEN ;
+
+// [修改] functionDefinition 现在使用新的 typeSpecifier
+functionDefinition
+    : (STATIC)?
+    FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)? // <-- [修改]
+      LBRACE 
+          statement* RBRACE ;
+
+parameters : (parameter (COMMA parameter)*)? ;
+
+// --- [ 2. 已修改: 'parameter' 规则 ] ---
+// 'typeName' 现在使用新的 'typeSpecifier' 规则
+parameter 
+    : name=IDENTIFIER COLON typeName=typeSpecifier 
+    ;
+
+// --- [ 3. 已修改: 'declaration' 规则 ] ---
+// 'typeName' 现在使用新的 'typeSpecifier' 规则
+declaration 
+    : LET variableName=IDENTIFIER COLON typeName=typeSpecifier (ASSIGN expression)? SEMIC_TOKEN 
+    ;
+
+cppBlock : AT_CPP CPP_BODY* AT_END ;
+
+returnStatement : RETURN expression SEMIC_TOKEN ;
+
+assignment : assignableExpression ASSIGN expression SEMIC_TOKEN ;
+
+assignableExpression
+    : (IDENTIFIER | THIS) (DOT IDENTIFIER)*
+    ;
+
+// --- Flow Control (使用重构后的新规则) ---
+ifStatement
+    : IF LPAREN expression RPAREN if_block=ifBlock
+      ( ELSE 
+        ( else_if=ifStatement 
+        | else_block=elseBlock
         )
+      )?
+    ;
 
-        self._class_sections[access] += func_def_code
+ifBlock : LBRACE statement* RBRACE ;
+elseBlock : LBRACE statement* RBRACE ;
 
-        self._exit_scope()
-        self._in_class_method = False
-        return ""
+whileStatement
+    : WHILE LPAREN expression RPAREN LBRACE statement* RBRACE 
+    ;
+
+// --- Composite Rule ---
+statement : declaration
+          | assignment
+          | returnStatement
+          | expression SEMIC_TOKEN 
+          | cppBlock
+          | ifStatement
+          | whileStatement
+          | deleteStatement
+          ;
+
+deleteStatement : DELETE expression SEMIC_TOKEN ;
+
+// --- Expressions ---
+expression
+    : simpleExpression (
+        (EQ | NEQ | LT | GT | LTE | GTE | PLUS | MINUS | STAR | SLASH) simpleExpression
+      )?
+    ;
+
+simpleExpression
+    : primary ( DOT IDENTIFIER (LPAREN expressionList? RPAREN)? )* | functionCallExpression 
+    ;
+
+// [修改] primary (NEW) 现在使用 baseType
+primary
+    : NEW baseType LPAREN expressionList? RPAREN // <-- [修改] (例如 new std.vector[i32]())
+    | literal
+    | IDENTIFIER
+    | THIS
+    | LPAREN expression RPAREN
+    ;
+
+functionCallExpression : name=IDENTIFIER LPAREN expressionList? RPAREN ;
+expressionList : expression (COMMA expression)* ;
+literal : INTEGER_LITERAL | STRING_LITERAL | BOOL_LITERAL ;

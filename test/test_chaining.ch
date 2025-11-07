@@ -32,7 +32,7 @@ class Wrapper : ChronoObject {
     }
 }
 
-func main() -> Int { // 'Int' 或 'i32' 都可以, 都会被转为 C++ 'int'
+func main() -> int { // 'Int' 或 'i32' 都可以, 都会被转为 C++ 'int'
 
     // [ 测试点 B ] 静态 -> 实例 -> 实例
     let $len1: Int = String.create("Hello World").toUpper().length(); // <-- [更改]
