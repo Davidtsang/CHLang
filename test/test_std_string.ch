@@ -5,7 +5,7 @@ import "Chrono.h";
 func main() -> int {
     let s: std.string = "Helloaaa";
 
-    s.erase(1, 3);
+    s.insert(1, "bc");
 
     @cpp
         std::cout << s << std::endl;

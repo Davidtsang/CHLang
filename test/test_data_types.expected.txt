@@ -1,0 +1,22 @@
+--- Data Types Test Start ---
+Test 1: Integer Declarations
+  i8: -8
+  u8: 8
+  i16: -1616
+  u16: 1616
+  i32: -3232
+  u32: 3232
+  i64: -6464
+  u64: 6464
+Test 2: Float Declarations
+  f32: 3.14
+  f64: 1.61803
+Test 3: Numeric Literals
+  Decimal (42): 42
+  Hex (42): 42
+  Binary (42): 42
+  Octal (42): 42
+Test 4: Byte & Char Literals
+  Byte (b'A' -> 65): 65
+  Char ('C' -> 67): 67
+--- Data Types Test End ---

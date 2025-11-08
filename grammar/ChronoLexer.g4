@@ -68,9 +68,27 @@ ASSIGN  : '=' ;
 DOT     : '.' ;
 COMMA   : ',' ;
 
+// [修改] 1. 优先级最高的数字字面量
+// 必须在 DECIMAL_LITERAL 之前
+HEX_LITERAL     : '0' [xX] [0-9a-fA-F]+ ;
+BINARY_LITERAL  : '0' [bB] [01]+ ;
+OCTAL_LITERAL   : '0' [oO] [0-7]+ ;
+
+// [新增] 2. FLOAT_LITERAL (例如 3.14)
+// 必须在 DECIMAL_LITERAL 之前
+FLOAT_LITERAL   : [0-9]+ '.' [0-9]+ ;
+
+// [修改] 2. DECIMAL_LITERAL (之前是 INTEGER_LITERAL)
+// 必须在 Hex/Binary/Octal 之后
+DECIMAL_LITERAL : [0-9]+ ;
+
+// [新增] 3. BYTE_LITERAL (例如 b'A')
+// 必须在 CHAR_LITERAL 之前
+BYTE_LITERAL    : 'b' '\'' ( ~['\\] | '\\' . ) '\'' ;
+
 // --- 通用规则 (必须在最后) ---
 IDENTIFIER : '$'? [a-zA-Z_] [a-zA-Z0-9_]* ;
-INTEGER_LITERAL : [0-9]+ ;
+//INTEGER_LITERAL : [0-9]+ ;
 STRING_LITERAL  : '"' ( ~["\\] | '\\' . )* '"' ; 
 CHAR_LITERAL    : '\'' ( ~['\\] | '\\' . ) '\'' ; // 匹配单引号字符 (例如 'a', '\n')
 

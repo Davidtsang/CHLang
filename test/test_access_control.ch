@@ -57,8 +57,8 @@ class AccessTest : ChronoObject {
 // Why: main 必须返回 'int' (C++ 值类型)，而不是 '$Int'
 func main() -> int {
 
-    Chrono.log("--- Test Start ---");
 
+    @cpp std::cout <<  "--- Test Start ---" << std::endl; @end
     // Why: String.create 返回一个引用类型，必须使用 $s
     let $s: String = String.create("Test");
 

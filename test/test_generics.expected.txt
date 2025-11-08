@@ -1,0 +1,3 @@
+[C++] v[0]: 100
+[C++] s: Hello Generics!
+[C++] m['test_key'][2]: 300

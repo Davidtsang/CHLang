@@ -81,11 +81,29 @@ class ChronoVisitor(BaseChronoVisitor):
     def _chrono_to_cpp_type(self, chrono_type_name):
         if chrono_type_name == "bool":
             return "bool"
+            # --- [新增] 完整的整数类型映射 ---
+        if chrono_type_name == "i8":
+            return "int8_t"
+        if chrono_type_name == "u8":
+            return "uint8_t"
+        if chrono_type_name == "i16":
+            return "int16_t"
+        if chrono_type_name == "u16":
+            return "uint16_t"
         if chrono_type_name == "int" or chrono_type_name == "i32":
             return "int32_t"
+        if chrono_type_name == "u32":
+            return "uint32_t"
         if chrono_type_name == "i64":
             return "int64_t"
-
+        if chrono_type_name == "u64":
+            return "uint64_t"
+        # --- [新增] 浮点类型映射 ---
+        if chrono_type_name == "f32" or chrono_type_name == "float":
+            return "float"
+        if chrono_type_name == "f64":
+            return "double"
+        # --- [新增结束] ---
         return chrono_type_name
 
     def _get_access_level(self, ctx):
@@ -824,9 +842,12 @@ class ChronoVisitor(BaseChronoVisitor):
 
     # 'visitExpression' 现在是新的顶层, 处理比较
     def visitExpression(self, ctx: ChronoParser.ExpressionContext):
-        lhs = self.visit(ctx.simpleExpression(0))
-        if ctx.simpleExpression(1):
-            rhs = self.visit(ctx.simpleExpression(1))
+        # [修改] 现在调用 unaryExpression
+        lhs = self.visit(ctx.unaryExpression(0))
+
+        if ctx.unaryExpression(1):
+            rhs = self.visit(ctx.unaryExpression(1))
+            # [修改结束]
             op = ""
             if ctx.EQ():
                 op = "=="
@@ -854,6 +875,29 @@ class ChronoVisitor(BaseChronoVisitor):
             return f"{lhs} {op} {rhs}"
         else:
             return lhs
+
+        # src/ChronoVisitor.py (在 visitExpression 下方添加)
+
+    def visitUnaryExpression(self, ctx: ChronoParser.UnaryExpressionContext):
+        """
+        [新增] 访问新的一元表达式规则 (处理 -8)
+        """
+        if ctx.simpleExpression():
+            # 路径 A: 这是一个没有一元运算符的常规表达式 (例如 "8")
+            return self.visit(ctx.simpleExpression())
+
+        # 路径 B: 这是一个带一元运算符的表达式 (例如 "-8")
+        op = ""
+        if ctx.MINUS():
+            op = "-"
+        elif ctx.PLUS():
+            op = "+"
+
+        # 递归访问操作数
+        operand = self.visit(ctx.unaryExpression())
+
+        # C++ 原生支持一元 + 和 -
+        return f"{op}{operand}"  # (例如: "-8" 或 "+10")
 
     def visitSimpleExpression(self, ctx: ChronoParser.SimpleExpressionContext):
         if ctx.functionCallExpression():
@@ -944,6 +988,22 @@ class ChronoVisitor(BaseChronoVisitor):
         if ctx.CHAR_LITERAL():  # <-- [新增]
             return ctx.CHAR_LITERAL().getText()  # 原样返回 (例如 's')
 
+        # --- [新增] 翻译 Byte 字面量 ---
+        if ctx.BYTE_LITERAL():
+            raw_text = ctx.BYTE_LITERAL().getText()  # (例如: "b'A'")
+            char_part = raw_text[1:]  # (提取: "'A'")
+
+            # 翻译为 C++ (uint8_t)'A'
+            # 我们必须包含 stdint.h (Chrono.h 已经包含了)
+            return f"(uint8_t){char_part}"
+        # 现在的:
+        if ctx.OCTAL_LITERAL():
+            raw_text = ctx.OCTAL_LITERAL().getText()  # (例如: "0o52")
+            # 将 "0o52" 翻译为 "052" (C++ 经典语法)
+            return f"0{raw_text[2:]}"
+        # C++ 原生支持 3.14, 所以我们只返回文本
+        if ctx.FLOAT_LITERAL():
+            return ctx.FLOAT_LITERAL().getText()
         return ctx.getText()
 
     def visitFunctionCallExpression(self, ctx: ChronoParser.FunctionCallExpressionContext):
@@ -957,30 +1017,9 @@ class ChronoVisitor(BaseChronoVisitor):
             for arg_expr in ctx.expressionList().expression():
                 arg_code = self.visit(arg_expr)
 
-                if func_name == "print":  # 检查时仍使用带 $ 的原始名称
-                    if (arg_expr.simpleExpression(0) and
-                            not arg_expr.simpleExpression(1) and
-                            arg_expr.simpleExpression(0).primary() and
-                            arg_expr.simpleExpression(0).primary().literal()):
-
-                        literal_node = arg_expr.simpleExpression(0).primary().literal()
-                        if literal_node.INTEGER_LITERAL():
-                            args_list.append(f"ChronoInt::create({arg_code})")
-                        elif literal_node.STRING_LITERAL():
-                            args_list.append(f"ChronoString::create({arg_code})")
-                        else:
-                            args_list.append(arg_code)
-                    else:
-                        args_list.append(arg_code)
-                else:
-                    args_list.append(arg_code)
+                args_list.append(arg_code)
 
         args_code = ", ".join(args_list)
 
-        if func_name == "print":  # 检查时仍使用带 $ 的原始名称
-            return f"Chrono::log({args_code})"
-
-        else:
-            # --- [ 关键修复 ] ---
-            return f"{cpp_func_name}({args_code})"  # 使用剥离 $ 后的名称
+        return f"{cpp_func_name}({args_code})"  # 使用剥离 $ 后的名称
             # --- [ 修复结束 ] ---

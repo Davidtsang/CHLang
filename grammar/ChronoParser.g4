@@ -124,11 +124,17 @@ statement : declaration
 
 deleteStatement : DELETE expression SEMIC_TOKEN ;
 
-// --- Expressions ---
+// [修改] expression 现在调用 unaryExpression
 expression
-    : simpleExpression (
-        (EQ | NEQ | LT | GT | LTE | GTE | PLUS | MINUS | STAR | SLASH) simpleExpression
+    : unaryExpression (
+        (EQ | NEQ | LT | GT | LTE | GTE | PLUS | MINUS | STAR | SLASH) unaryExpression // <-- [修改]
       )?
+    ;
+
+// [新增] unaryExpression 规则 (处理 -8)
+unaryExpression
+    : (PLUS | MINUS) unaryExpression // 允许: -8, +8, --8 (递归)
+    | simpleExpression             // 允许: 8, s.foo()
     ;
 
 simpleExpression
@@ -146,4 +152,15 @@ primary
 
 functionCallExpression : name=IDENTIFIER LPAREN expressionList? RPAREN ;
 expressionList : expression (COMMA expression)* ;
-literal : INTEGER_LITERAL | STRING_LITERAL | BOOL_LITERAL | CHAR_LITERAL ; // <-- [新增]
+
+literal
+    : DECIMAL_LITERAL
+    | HEX_LITERAL
+    | BINARY_LITERAL
+    | OCTAL_LITERAL
+    | FLOAT_LITERAL
+    | BYTE_LITERAL
+    | STRING_LITERAL
+    | BOOL_LITERAL
+    | CHAR_LITERAL
+    ; // <-- [新增]

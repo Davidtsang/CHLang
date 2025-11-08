@@ -23,7 +23,7 @@ import "runtime/Chrono.h"; // <-- [新增] 'print' 需要它
 func main() -> int {
 
     // 输出 #1: 应该首先出现
-    print("Chrono Statement 1");
+    Chrono.log("Chrono Statement 1");
 
     // 输出 #2: C++ 块
     @cpp
@@ -35,7 +35,7 @@ func main() -> int {
     let $s: String = String.create("Chrono Statement 2");
 
     // 输出 #3: Chrono 打印
-    print($s); // <-- [更改] 访问 '$s'
+    Chrono.log($s); // <-- [更改] 访问 '$s'
 
     // 输出 #4: 另一个 C++ 块，
     // 它还测试它是否能 "看到" 全局 @cpp 块中声明的变量。
