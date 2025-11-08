@@ -1,0 +1,10 @@
+--- Array Syntax Test Start ---
+Test 1: Array declared with size 5.
+Test 2: Accessing index [2]:
+30
+Test 3: Assigning index [3] = 42:
+42
+Test 4: Variable size [size=3].
+  names[0]: Alice
+  names[2]: Charlie
+--- Array Syntax Test End ---
