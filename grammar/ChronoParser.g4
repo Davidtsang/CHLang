@@ -6,11 +6,11 @@ options { tokenVocab = ChronoLexer; }
 
 // --- [ 1. 升级: 泛型/数组类型规则 ] ---
 typeSpecifier
-    : ( // 路径 A: 泛型 (例如 std.vector[i32])
+    : ( // 路径 A: 泛型/基础 (std.vector[i32] or i32)
         baseType (LBRACK typeList RBRACK)?
       )
-    | ( // 路径 B: C-Style 数组 (例如 [char; 20])
-        LBRACK baseType SEMIC_TOKEN expression RBRACK
+    | ( // 路径 B: C-Style 数组 (递归)
+        LBRACK typeSpecifier SEMIC_TOKEN expression RBRACK // [关键修改] baseType -> typeSpecifier
       )
     ;
 
@@ -117,7 +117,7 @@ deleteStatement : DELETE expression SEMIC_TOKEN ;
 expression
     : unaryExpression (
         (EQ | NEQ | LT | GT | LTE | GTE | PLUS | MINUS | STAR | SLASH) unaryExpression
-      )?
+      )*
     ;
 
 unaryExpression

@@ -46,6 +46,20 @@ class ChronoVisitor(BaseChronoVisitor):
         if len(self._scope_stack) > 1:
             self._scope_stack.pop()
 
+    def _get_op_string_from_token_type(self, token_type):
+        """根据 ANTLR 词元类型返回操作符的 C++ 字符串"""
+        if token_type == ChronoParser.PLUS: return "+"
+        if token_type == ChronoParser.MINUS: return "-"
+        if token_type == ChronoParser.STAR: return "*"
+        if token_type == ChronoParser.SLASH: return "/"
+        if token_type == ChronoParser.EQ: return "=="
+        if token_type == ChronoParser.NEQ: return "!="
+        if token_type == ChronoParser.LT: return "<"
+        if token_type == ChronoParser.GT: return ">"
+        if token_type == ChronoParser.LTE: return "<="
+        if token_type == ChronoParser.GTE: return ">="
+        raise Exception(f"Unknown operator token type: {token_type}")
+
     def _add_variable(self, chrono_name, metadata):
         """在*当前*作用域中定义一个新变量 (使用 Chrono 名字 $s 或 s 作为 Key)"""
         # metadata 示例: {"accessor": ".", "cpp_name": "s"}
@@ -353,45 +367,35 @@ class ChronoVisitor(BaseChronoVisitor):
     def visitTypeSpecifier(self, ctx: ChronoParser.TypeSpecifierContext):
         """
         [修改] 访问 'typeSpecifier' 规则。
-        处理:
-        1. 泛型: std.vector[i32] -> std::vector<int32_t>
-        2. 数组: [char; 20] -> char[20]
         """
 
         # [ [ 关键修复 ] ]
-        # 我们必须首先检查数组路径。
-        # 路径 A = baseType [...]
-        # 路径 B = [baseType; ...]
-        # 检查 LBRACK 和 SEMIC_TOKEN 是区分它们的唯一可靠方法。
-
+        # 路径 B: C-Style 数组
         if ctx.LBRACK() and ctx.SEMIC_TOKEN():
-            # --- 路径 B: C-Style 数组 (例如 [char; 20]) ---
 
-            # 1. 翻译基础类型 (例如 "char")
-            base = self.visit(ctx.baseType())
+            # 1. 递归访问基础类型 (可能是 "int32_t" 或 "int32_t;[3]")
+            #    [关键修改] 我们现在调用 this.visit(ctx.typeSpecifier())
+            base = self.visit(ctx.typeSpecifier())
 
-            # 2. 翻译数组大小 (例如 "20")
+            # 2. 翻译数组大小
             size_expr = self.visit(ctx.expression())
 
-            # 3. 组合 (例如 "char[20]")
-            return f"{base}[{size_expr}]"
+            # 3. [新逻辑] 组合，使用分号
+            #    (例如: "int32_t" + ";[5]" -> "int32_t;[5]")
+            #    (例如: "int32_t;[3]" + ";[2]" -> "int32_t;[3];[2]")
+            return f"{base};[{size_expr}]"
 
+        # 路径 A: 泛型/基础 (逻辑不变)
         elif ctx.baseType():
-            # --- 路径 A: 泛型 (例如 std.vector[i32] 或 基础类型 i32) ---
-
-            # 1. 翻译基础类型 (例如 "std.vector" -> "std::vector")
             base = self.visit(ctx.baseType())
-
-            # 2. 如果有泛型参数 (LBRACK typeList RBRACK)
             if ctx.typeList():
-                # 3. 翻译参数列表 (例如 "i32, 5" -> "int32_t, 5")
                 args = self.visit(ctx.typeList())
-                # 4. 组合 (例如 "std::vector<int32_t>")
                 return f"{base}<{args}>"
             else:
-                return base  # (例如 "i32")
+                return base
 
-        return ""  # 不太可能
+        return ""
+
     # [替换] visitTypeList
     def visitTypeList(self, ctx: ChronoParser.TypeListContext):
         """
@@ -519,134 +523,147 @@ class ChronoVisitor(BaseChronoVisitor):
         # 3. 检查基础类型
         return self._chrono_to_cpp_type(cpp_namespace_type)  # (例如 "std::string", "int32_t")
 
+        # src/ChronoVisitor.py
+
     def visitDeclaration(self, ctx: ChronoParser.DeclarationContext):
         var_name = ctx.variableName.text
         key = var_name
-        cpp_name = var_name
+        # [修复] 基础 C++ 名称应始终剥离 $
+        cpp_name = ctx.variableName.text.lstrip('$')
 
-        # --- [ 升级 ] ---
-        # 之前的: base_type_cpp = self._translate_type_string(...)
-        # 现在的: 我们访问新的 'typeSpecifier' 规则
+        # 1. 获取类型字符串 (例如 "int32_t", "int32_t;[5]", "int32_t;[3];[2]")
         base_type_cpp = self.visit(ctx.typeName)
-        # (例如 "std::vector<int32_t>" 或 "std::string" 或 "int32_t[5]")
-        # --- [ 升级结束 ] ---
 
+        # 2. [ [ 关键修复：恢复缺失的逻辑 ] ]
+        #    根据变量名 ($) 和类型来定义 is_pointer 和 accessor
         accessor = "."
         is_pointer = False
 
         if var_name.startswith('$'):
             accessor = "->"
             is_pointer = True
-            cpp_name = f"_{var_name.lstrip('$')}"
+            cpp_name = f"_{cpp_name}"  # 为指针添加 '_' 前缀
         else:
-            accessor = "."
-            is_pointer = False
+            # 处理身为值类型但使用 '->' 的特殊情况 (例如迭代器)
             if base_type_cpp in _ACCESSOR_EXCEPTION_LIST or "::iterator" in base_type_cpp:
                 accessor = "->"
+        # [ [ 修复结束 ] ] - 现在 'is_pointer' 已经被正确定义
 
-        cpp_final_type = f"{base_type_cpp}*" if is_pointer else base_type_cpp
-
-        # [ [ 关键修复：数组 ] ]
-        # 如果类型是数组 (例如 "int32_t[5]")，我们需要将名称放在类型和方括号之间
-        # "int32_t[5]" (base_type_cpp) + "numbers" (cpp_name)
-        # 变为: "int32_t numbers[5]"
-
+        # 3. 处理类型和名称的最终 C++ 构造
+        cpp_final_type = base_type_cpp  # 默认为基础类型 (例如 "int32_t")
         is_c_array = False
-        if not is_pointer and '[' in base_type_cpp and base_type_cpp.endswith(']'):
+
+        # 4. [ [ 新的多维数组逻辑 ] ]
+        #    检查它是否是一个 C-Style 数组 (并且不是指针)
+        if not is_pointer and ';[' in base_type_cpp:
             is_c_array = True
-            parts = base_type_cpp.split('[')
+
+            # 解析我们的特殊格式: "int32_t;[3];[2]"
+            parts = base_type_cpp.split(';')
             base_only = parts[0]  # "int32_t"
-            array_part = '[' + parts[1]  # "[5]"
+            dim_parts = parts[1:]  # ["[3]", "[2]"]
 
-            # C++ 最终类型现在是 "int32_t"
-            cpp_final_type = base_only
-            # C++ 名称现在是 "numbers[5]"
-            cpp_name = f"{cpp_name}{array_part}"
+            # C++ 语法要求维度颠倒
+            dim_parts.reverse()  # 变为: ["[2]", "[3]"]
+            dims_str = "".join(dim_parts)  # "[2][3]"
 
-            # (访问器保持为 '.')
+            # 最终的 C++ 声明部分
+            cpp_final_type = base_only  # "int32_t"
+            cpp_name = f"{cpp_name}{dims_str}"  # "matrix[2][3]"
 
+        elif is_pointer:
+            # 如果它是一个指针 (例如 $String), 添加 *
+            cpp_final_type = f"{base_type_cpp}*"  # "String*"
+
+        # 5. 添加到作用域栈
         self._add_variable(key, {
-            "cpp_name": cpp_name if not is_c_array else ctx.variableName.text,  # 作用域栈使用 'numbers'
+            # 存储干净的 C++ 名称 (例如 "matrix", "_s")
+            "cpp_name": ctx.variableName.text.lstrip('$') if not is_pointer else cpp_name,
             "accessor": accessor,
-            "cpp_type": cpp_final_type if not is_c_array else base_type_cpp  # 作用域栈使用 'int32_t[5]'
+            # 存储原始的、未解析的类型字符串 (用于调试和未来的类型检查)
+            "cpp_type": base_type_cpp
         })
 
-        # ... (I. 局部变量 和 II. 类成员 逻辑) ...
+        # 6. 生成 C++ 代码
         # I. 局部变量
         if not self._in_class or self._in_class_method:
             cpp_value = ""
 
-            # [修改] 数组不需要 ' = nullptr' 或 ' = 0'
-            if not is_c_array:
-                if is_pointer:
-                    cpp_value = " = nullptr"
-                elif base_type_cpp == "bool":
-                    cpp_value = " = false"
-                elif base_type_cpp in ("int32_t", "int64_t"):
-                    cpp_value = " = 0"
-                # (std::string 和 std::vector 会被默认构造, 这是正确的)
-
+            # C-Style 数组和指针都可以有初始化器
             if ctx.expression():
                 cpp_value = f" = {self.visit(ctx.expression())}"
+            # 如果是指针且没有初始化器，则默认为 nullptr
+            elif is_pointer and not ctx.expression():
+                cpp_value = " = nullptr"
 
+            # 这将正确生成:
+            # "    int32_t matrix[2][3] = {{...}};"
+            # "    String* _s = new String(...);"
+            # "    int32_t x;"
             return f"{INDENT}{cpp_final_type} {cpp_name}{cpp_value};\n"
 
         # II. 类成员
         else:
             access = getattr(ctx, '_chrono_access', 'private')
-            # [修改] C-Style 数组在类中也需要特殊处理
-            if is_c_array:
-                declaration_line = f"{INDENT}{cpp_final_type} {cpp_name};\n"
-            else:
-                declaration_line = f"{INDENT}{cpp_final_type} {cpp_name};\n"
-
+            # 这将生成: "    int32_t matrix[2][3];" 或 "    String* _s;"
+            declaration_line = f"{INDENT}{cpp_final_type} {cpp_name};\n"
             self._class_sections[access] += declaration_line
             return ""
+
+        # src/ChronoVisitor.py
 
     def visitParameter(self, ctx: ChronoParser.ParameterContext):
         var_name = ctx.name.text
         key = var_name
-        cpp_name = var_name
+        cpp_name = ctx.name.text.lstrip('$')  # 基础 C++ 名称
 
-        # --- [ 升级 ] ---
-        # 现在的: 我们访问新的 'typeSpecifier' 规则
+        # 1. 获取类型字符串 (例如 "int32_t", "$String", "int32_t;[3]")
         base_type_cpp = self.visit(ctx.typeName)
-        # --- [ 升级结束 ] ---
 
+        # 2. 定义 accessor 和 is_pointer
         accessor = "."
         is_pointer = False
 
         if var_name.startswith('$'):
             accessor = "->"
             is_pointer = True
-            cpp_name = f"_{var_name.lstrip('$')}"
-        elif base_type_cpp in _ACCESSOR_EXCEPTION_LIST or "::iterator" in base_type_cpp:
-            accessor = "->"
-            is_pointer = False
+            cpp_name = f"_{cpp_name}"  # 指针使用 '_' 前缀
+        else:
+            if base_type_cpp in _ACCESSOR_EXCEPTION_LIST or "::iterator" in base_type_cpp:
+                accessor = "->"
 
-        cpp_final_type = f"{base_type_cpp}*" if is_pointer else base_type_cpp
+        # 3. [ [ 关键修复：数组参数 ] ]
+        #    处理类型 (指针, 值, 或衰变的数组)
 
-        # [ [ 新增：处理 C-Style 数组参数 ] ]
-        # C++ 不允许值传递 C-Style 数组，它们会衰变为指针。
-        # [i32; 5] 必须翻译为 int32_t*
-        # (我们在此处不支持 C++20 的 std::array)
-        is_c_array = False
-        if not is_pointer and '[' in base_type_cpp and base_type_cpp.endswith(']'):
-            is_c_array = True
-            parts = base_type_cpp.split('[')
+        cpp_final_type = base_type_cpp  # 默认 (例如 "int32_t")
+
+        if not is_pointer and ';[' in base_type_cpp:
+            # --- 路径 A: 这是一个 C-Style 数组参数 ---
+            # 它必须衰变为一个指针
+
+            # 1. 解析: "int32_t;[3];[2]"
+            parts = base_type_cpp.split(';')
             base_only = parts[0]  # "int32_t"
 
-            # 将 'int32_t[5]' 衰变为 'int32_t*'
+            # 2. 衰变: "int32_t*"
             cpp_final_type = f"{base_only}*"
-            # 访问器应为 '->' (虽然我们不能索引它)
-            accessor = "->"
 
+            # 3. 访问器保持为 '.'，因为我们将使用 arr[i] 访问
+            accessor = "."
+
+        elif is_pointer:
+            # --- 路径 B: 这是一个 Chrono 引用 ($) ---
+            cpp_final_type = f"{base_type_cpp}*"  # "String*"
+
+        # 4. 添加到作用域栈
         self._add_variable(key, {
-            "cpp_name": cpp_name,
-            "accessor": accessor,
-            "cpp_type": cpp_final_type
+            "cpp_name": cpp_name,  # "arr" 或 "_s"
+            "accessor": accessor,  # "." 或 "->"
+            "cpp_type": base_type_cpp  # 原始类型 "int32_t;[3]"
         })
 
+        # 5. 返回 C++ 参数字符串
+        #    (例如 "int32_t* arr" 或 "String* _s")
         return f"{cpp_final_type} {cpp_name}"
 
     def visitFunctionDefinition(self, ctx: ChronoParser.FunctionDefinitionContext):
@@ -965,41 +982,52 @@ class ChronoVisitor(BaseChronoVisitor):
 
     # 'visitExpression' 现在是新的顶层, 处理比较
     def visitExpression(self, ctx: ChronoParser.ExpressionContext):
-        # [修改] 现在调用 unaryExpression
-        lhs = self.visit(ctx.unaryExpression(0))
+        """
+        [修改] 访问 'expression' 规则。
+        现在支持链式操作 (A + B + C)，但*不支持*优先级。
+        """
 
-        if ctx.unaryExpression(1):
-            rhs = self.visit(ctx.unaryExpression(1))
-            # [修改结束]
-            op = ""
-            if ctx.EQ():
-                op = "=="
-            elif ctx.NEQ():
-                op = "!="
-            elif ctx.LT():
-                op = "<"
-            elif ctx.GT():
-                op = ">"
-            elif ctx.LTE():
-                op = "<="
-            elif ctx.GTE():
-                op = ">="
-            # [新增] 算术翻译 (使用 hasattr 防御性检查)
-            elif hasattr(ctx, 'PLUS') and ctx.PLUS():
-                op = "+"
-            elif hasattr(ctx, 'MINUS') and ctx.MINUS():
-                op = "-"
-            elif hasattr(ctx, 'STAR') and ctx.STAR():
-                op = "*"
-            elif hasattr(ctx, 'SLASH') and ctx.SLASH():
-                op = "/"
-            else:
-                raise Exception("Unknown comparison operator")
-            return f"{lhs} {op} {rhs}"
-        else:
-            return lhs
+        # 1. 获取所有操作数 (例如 [arr[0], arr[1], arr[2]])
+        operand_nodes = ctx.unaryExpression()
 
-        # src/ChronoVisitor.py (在 visitExpression 下方添加)
+        # 2. 访问第一个操作数 (LHS)
+        current_code = self.visit(operand_nodes[0])
+
+        # 3. 检查是否有任何操作符
+        if len(operand_nodes) == 1:
+            return current_code  # 只有一个操作数 (例如 "arr[0]")
+
+        # 4. [新循环逻辑]
+        #    构建一个包含所有操作符的列表
+        all_ops = []
+        if ctx.PLUS(): all_ops.extend(ctx.PLUS())
+        if ctx.MINUS(): all_ops.extend(ctx.MINUS())
+        if ctx.STAR(): all_ops.extend(ctx.STAR())
+        if ctx.SLASH(): all_ops.extend(ctx.SLASH())
+        if ctx.EQ(): all_ops.extend(ctx.EQ())
+        if ctx.NEQ(): all_ops.extend(ctx.NEQ())
+        if ctx.LT(): all_ops.extend(ctx.LT())
+        if ctx.GT(): all_ops.extend(ctx.GT())
+        if ctx.LTE(): all_ops.extend(ctx.LTE())
+        if ctx.GTE(): all_ops.extend(ctx.GTE())
+
+        # 5. [关键] 按它们在源代码中出现的顺序对操作符进行排序
+        #    (因为 ctx.PLUS() 等只返回一种类型的列表)
+        all_ops.sort(key=lambda x: x.getSymbol().tokenIndex)
+
+        # 6. 遍历操作符，构建 C++ 字符串
+        for i in range(len(all_ops)):
+            # 获取操作符 (例如 "+")
+            op_node = all_ops[i]
+            op_str = self._get_op_string_from_token_type(op_node.getSymbol().type)
+
+            # 获取右侧操作数 (RHS)
+            rhs_code = self.visit(operand_nodes[i + 1])
+
+            # C++ 支持左结合 (left-associativity)
+            current_code = f"{current_code} {op_str} {rhs_code}"
+
+        return current_code
 
     def visitUnaryExpression(self, ctx: ChronoParser.UnaryExpressionContext):
         """

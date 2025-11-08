@@ -1,0 +1,7 @@
+--- Multi-Array Test Start ---
+Test 1: Declared matrix[2][3]
+Test 2: Accessing matrix[0][1]
+11
+Test 3: Writing matrix[1][2] = 99
+99
+--- Multi-Array Test End ---

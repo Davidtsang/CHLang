@@ -1,0 +1,32 @@
+// test/test_multi_arrays.ch
+import <iostream>;
+import <cstdint>;
+import "runtime/ChronoObject.h";
+
+func main() -> int {
+    @cpp std::cout << "--- Multi-Array Test Start ---" << std::endl; @end
+
+    // 1. 声明
+    // Chrono: [[i32; 3]; 2]
+    // C++: int32_t matrix[2][3]
+    let matrix: [[i32; 3]; 2] = {{10, 11, 12}, {20, 21, 22}};
+
+    @cpp std::cout << "Test 1: Declared matrix[2][3]" << std::endl; @end
+
+    // 2. 访问
+    @cpp
+        std::cout << "Test 2: Accessing matrix[0][1]" << std::endl;
+        std::cout << matrix[0][1] << std::endl; // 预期: 11
+    @end
+
+    // 3. 写入
+    matrix[1][2] = 99;
+
+    @cpp
+        std::cout << "Test 3: Writing matrix[1][2] = 99" << std::endl;
+        std::cout << matrix[1][2] << std::endl; // 预期: 99
+    @end
+
+    @cpp std::cout << "--- Multi-Array Test End ---" << std::endl; @end
+    return 0;
+}

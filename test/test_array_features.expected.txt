@@ -1,0 +1,11 @@
+--- Array Features Test Start ---
+Test 1 (Local Array Param):
+  Func Param Sum: 6
+ArrayTester Init
+Test 2 (Class Member Access):
+  this.data[1]: 20
+  this.matrix[1][1]: 99
+Test 3 (Passing 'this.data' to func):
+  Func Param Sum: 60
+--- Array Features Test End ---
+------------------------------
