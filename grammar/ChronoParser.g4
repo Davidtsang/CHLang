@@ -110,8 +110,46 @@ statement : declaration
           | ifStatement
           | whileStatement
           | deleteStatement
+          | forStatement // <-- [新增]
           ;
+
 deleteStatement : DELETE expression SEMIC_TOKEN ;
+
+// [新增] C-Style For 循环
+// [修改] C-Style For 循环
+forStatement
+    : FOR LPAREN init=forInit? SEMIC_TOKEN cond=expression? SEMIC_TOKEN incr=forIncrement? RPAREN
+      LBRACE
+          statement*
+      RBRACE
+    ;
+
+// 'forInit' 规则允许两种形式的初始化：
+// 1. let i: i32 = 0 (一个*无分号*的声明)
+// 2. i = 0 (一个*无分号*的赋值)
+forInit
+    : declaration_no_semicolon
+    | assignment_no_semicolon
+    ;
+
+// [ [ 新增 ] ]
+// 'forIncrement' 规则
+// 允许增量部分是 'i = i + 1' (赋值) 或 'myFunc()' (表达式)
+forIncrement
+    : assignment_no_semicolon
+    | expression
+    ;
+
+// 我们需要复制 'declaration' 和 'assignment' 规则，
+// 但移除它们末尾的 SEMIC_TOKEN。
+
+declaration_no_semicolon
+    : LET variableName=IDENTIFIER COLON typeName=typeSpecifier (ASSIGN expression)?
+    ;
+
+assignment_no_semicolon
+    : assignableExpression ASSIGN expression
+    ;
 
 // --- Expressions ---
 expression

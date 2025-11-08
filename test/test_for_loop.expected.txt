@@ -1,0 +1,15 @@
+--- For Loop Test Start ---
+Test 1: Standard loop (0 to 2)
+  i = 0
+  i = 1
+  i = 2
+Test 2: Scoping (Declaring new 'i')
+  New i = 99
+Test 3: Loop with existing variable (99 to 100)
+  i = 99
+  i = 100
+  After loop, i = 101
+Test 4: Loop with empty init/incr (i=101)
+  i = 101
+  i = 102
+--- For Loop Test End ---

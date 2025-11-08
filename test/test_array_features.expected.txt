@@ -8,4 +8,3 @@ Test 2 (Class Member Access):
 Test 3 (Passing 'this.data' to func):
   Func Param Sum: 60
 --- Array Features Test End ---
-------------------------------

@@ -16,7 +16,7 @@ STATIC  : 'static' ;
 IF      : 'if' ;
 ELSE    : 'else' ;
 WHILE   : 'while' ;
-
+FOR     : 'for' ;   // <-- [新增]
 PUBLIC  : 'public' ; // class attr access flag
 AS      : 'as' ;     // [新增] 用于 import 别名
 // BOOL_LITERAL 必须在 IDENTIFIER 之前

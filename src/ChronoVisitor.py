@@ -774,6 +774,8 @@ class ChronoVisitor(BaseChronoVisitor):
         # [ 关键 ] 确保此行存在
         if ctx.deleteStatement():
             return self.visit(ctx.deleteStatement())
+        if ctx.forStatement():
+            return self.visit(ctx.forStatement())
         return ""
 
     # [ 已修正 ]
@@ -871,6 +873,108 @@ class ChronoVisitor(BaseChronoVisitor):
                 i += 1
 
         return current_code
+
+    def visitForStatement(self, ctx: ChronoParser.ForStatementContext):
+
+        self._enter_scope()
+
+        init_code = ""
+        if ctx.init:
+            init_code = self.visit(ctx.init)  # 调用 visitForInit
+
+        cond_code = ""
+        if ctx.cond:
+            cond_code = self.visit(ctx.cond)  # 调用 visitExpression
+
+        incr_code = ""
+        if ctx.incr:
+            incr_code = self.visit(ctx.incr)  # [修改] 现在调用 visitForIncrement
+
+        statements = self._safe_iterate_statements(ctx.statement())
+        body_code = "".join(self.visit(s) for s in statements)
+
+        self._exit_scope()
+
+        code = f"{INDENT}for ({init_code}; {cond_code}; {incr_code}) {{\n"
+        code += body_code
+        code += f"{INDENT}}}\n"
+        return code
+
+    # [ [ 新增 ] ]
+    def visitForInit(self, ctx: ChronoParser.ForInitContext):
+        # 这个辅助方法会访问 'declaration_no_semicolon'
+        # 或 'assignment_no_semicolon'
+        if ctx.declaration_no_semicolon():
+            return self.visit(ctx.declaration_no_semicolon())
+        if ctx.assignment_no_semicolon():
+            return self.visit(ctx.assignment_no_semicolon())
+        return ""
+
+    # [ [ 新增 ] ]
+    def visitForIncrement(self, ctx: ChronoParser.ForIncrementContext):
+        # 访问它唯一的子节点，无论是赋值还是表达式
+        if ctx.assignment_no_semicolon():
+            return self.visit(ctx.assignment_no_semicolon())
+        if ctx.expression():
+            return self.visit(ctx.expression())
+        return ""
+
+    # [ [ 新增 ] ]
+    def visitDeclaration_no_semicolon(self, ctx: ChronoParser.Declaration_no_semicolonContext):
+        # 这是 visitDeclaration 的一个精简版本。
+        # 它*会*注册变量，但*不会*返回分号
+
+        var_name = ctx.variableName.text
+        key = var_name
+        cpp_name = ctx.variableName.text.lstrip('$')
+        base_type_cpp = self.visit(ctx.typeName)
+
+        # (省略了多维数组和指针的复杂逻辑，假设 for 循环只用简单类型)
+        # (为了简洁，我们先做一个简版实现)
+
+        accessor = "."
+        is_pointer = False
+        if var_name.startswith('$'):
+            is_pointer = True
+            accessor = "->"
+            cpp_name = f"_{cpp_name}"
+
+        cpp_final_type = base_type_cpp
+
+        if not is_pointer and ';[' in base_type_cpp:
+            # 是一个 C-Style 数组... (在 for 循环中不常见，但我们应该支持)
+            parts = base_type_cpp.split(';')
+            base_only = parts[0]
+            dim_parts = parts[1:]
+            dim_parts.reverse()
+            dims_str = "".join(dim_parts)
+            cpp_final_type = base_only
+            cpp_name = f"{cpp_name}{dims_str}"
+        elif is_pointer:
+            cpp_final_type = f"{base_type_cpp}*"
+
+        # [关键] 将 'i' 注册到 for 循环的内部作用域
+        self._add_variable(key, {
+            "cpp_name": ctx.variableName.text.lstrip('$') if not is_pointer else cpp_name,
+            "accessor": accessor,
+            "cpp_type": base_type_cpp
+        })
+
+        cpp_value = ""
+        if ctx.expression():
+            cpp_value = f" = {self.visit(ctx.expression())}"
+
+        # [关键] 返回 C++ 代码时 *不带* 分号
+        return f"{cpp_final_type} {cpp_name}{cpp_value}"
+
+    # [ [ 新增 ] ]
+    def visitAssignment_no_semicolon(self, ctx: ChronoParser.Assignment_no_semicolonContext):
+        # 这就像 visitAssignment，但没有分号
+        target = self.visit(ctx.assignableExpression())
+        value = self.visit(ctx.expression())
+
+        # [关键] 返回 C++ 代码时 *不带* 分号
+        return f"{target} = {value}"
 
     def _recursive_analyze(self, node, indent_level=0):
         """
