@@ -18,6 +18,8 @@ ELSE    : 'else' ;
 WHILE   : 'while' ;
 FOR     : 'for' ;   // <-- [新增]
 PUBLIC  : 'public' ; // class attr access flag
+INTERFACE: 'interface' ; // <-- [新增]
+IMPL    : 'impl' ;      // <-- [新增]
 AS      : 'as' ;     // [新增] 用于 import 别名
 // BOOL_LITERAL 必须在 IDENTIFIER 之前
 BOOL_LITERAL    : 'true' | 'false' ;

@@ -1,0 +1,8 @@
+--- Interface Test Start ---
+Test 1: Polymorphism with IShape
+  Detail: Name=Circle, Area=314.159
+  Detail: Name=Square, Area=100
+Test 2: Polymorphism with ILoggable
+  Log Trigger:
+Log: Circle (r=10)
+--- Interface Test End ---

@@ -39,6 +39,7 @@ topLevelStatement
     | cppBlock
     | classDefinition
     | functionDefinition
+    | interfaceDefinition // <-- [新增]
     ;
 accessModifier : PUBLIC ;
 classBodyStatement
@@ -51,9 +52,16 @@ classBodyStatement
     | deinitBlock
     | cppBlock
     ;
-classDefinition : CLASS name=IDENTIFIER (COLON base=IDENTIFIER)?
-    LBRACE
-        (classBodyStatement)* RBRACE ;
+
+classDefinition
+    : CLASS name=IDENTIFIER
+      (COLON base=IDENTIFIER)?      // [不变] 基类：可选，且只有一个
+      (IMPL interfaces=typeList)? // [新增] 接口：可选，可以是一个列表
+      LBRACE
+          (classBodyStatement)*
+      RBRACE
+    ;
+
 methodDefinition
     : FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)?
     LBRACE
@@ -140,6 +148,20 @@ forIncrement
     | expression
     ;
 
+// [新增] 接口中的方法签名
+// (注意：没有 'public' 或 'static'，接口方法默认是 public virtual)
+methodSignature
+    : FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)? SEMIC_TOKEN
+    ;
+
+// [新增] 接口定义
+interfaceDefinition
+    : INTERFACE name=IDENTIFIER
+      LBRACE
+          (methodSignature | cppBlock)* // 接口只能包含方法签名或 @cpp 块
+      RBRACE
+    ;
+    
 // 我们需要复制 'declaration' 和 'assignment' 规则，
 // 但移除它们末尾的 SEMIC_TOKEN。
 
