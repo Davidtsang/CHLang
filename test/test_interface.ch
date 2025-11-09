@@ -46,6 +46,7 @@ class Circle : ChronoObject impl ILoggable, IShape {
     public func getName() -> std.string {
         return "Circle";
     }
+
     public func getArea() -> f32 {
         return 3.14159 * this.radius * this.radius;
     }

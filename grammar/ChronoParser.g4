@@ -176,12 +176,13 @@ assignment_no_semicolon
 // --- Expressions ---
 expression
     : unaryExpression (
-        (EQ | NEQ | LT | GT | LTE | GTE | PLUS | MINUS | STAR | SLASH) unaryExpression
+        (EQ | NEQ | LT | GT | LTE | GTE | PLUS | MINUS | STAR | SLASH
+        | MODULO | AND_OP | OR_OP) unaryExpression // <-- [修改]
       )*
     ;
 
 unaryExpression
-    : (PLUS | MINUS) unaryExpression
+    : (PLUS | MINUS | NOT_OP) unaryExpression // <-- [修改]
     | simpleExpression
     ;
 

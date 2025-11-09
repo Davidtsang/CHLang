@@ -52,12 +52,15 @@ class ChronoVisitor(BaseChronoVisitor):
         if token_type == ChronoParser.MINUS: return "-"
         if token_type == ChronoParser.STAR: return "*"
         if token_type == ChronoParser.SLASH: return "/"
+        if token_type == ChronoParser.MODULO: return "%"  # <-- [新增]
         if token_type == ChronoParser.EQ: return "=="
         if token_type == ChronoParser.NEQ: return "!="
         if token_type == ChronoParser.LT: return "<"
         if token_type == ChronoParser.GT: return ">"
         if token_type == ChronoParser.LTE: return "<="
         if token_type == ChronoParser.GTE: return ">="
+        if token_type == ChronoParser.AND_OP: return "&&"  # <-- [新增]
+        if token_type == ChronoParser.OR_OP: return "||"  # <-- [新增]
         raise Exception(f"Unknown operator token type: {token_type}")
 
     def _add_variable(self, chrono_name, metadata):
@@ -1133,12 +1136,15 @@ class ChronoVisitor(BaseChronoVisitor):
         if ctx.MINUS(): all_ops.extend(ctx.MINUS())
         if ctx.STAR(): all_ops.extend(ctx.STAR())
         if ctx.SLASH(): all_ops.extend(ctx.SLASH())
+        if ctx.MODULO(): all_ops.extend(ctx.MODULO())  # <-- [新增]
         if ctx.EQ(): all_ops.extend(ctx.EQ())
         if ctx.NEQ(): all_ops.extend(ctx.NEQ())
         if ctx.LT(): all_ops.extend(ctx.LT())
         if ctx.GT(): all_ops.extend(ctx.GT())
         if ctx.LTE(): all_ops.extend(ctx.LTE())
         if ctx.GTE(): all_ops.extend(ctx.GTE())
+        if ctx.AND_OP(): all_ops.extend(ctx.AND_OP())  # <-- [新增]
+        if ctx.OR_OP(): all_ops.extend(ctx.OR_OP())  # <-- [新增]
 
         # 5. [关键] 按它们在源代码中出现的顺序对操作符进行排序
         #    (因为 ctx.PLUS() 等只返回一种类型的列表)
@@ -1172,7 +1178,8 @@ class ChronoVisitor(BaseChronoVisitor):
             op = "-"
         elif ctx.PLUS():
             op = "+"
-
+        elif ctx.NOT_OP():  # <-- [新增]
+            op = "!"  # <-- [新增]
         # 递归访问操作数
         operand = self.visit(ctx.unaryExpression())
 
