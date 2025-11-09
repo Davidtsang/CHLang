@@ -98,9 +98,9 @@ def run_test(test_file_path):
         print_color(f"  [FAIL] Process failed with return code {e.returncode}", 31)
         # 打印编译器或翻译器的错误信息
         print("  --- STDOUT ---")
-        print(e.stdout.decode(errors='ignore'))
+        print(e.stdout)
         print("  --- STDERR ---")
-        print(e.stderr.decode(errors='ignore'))
+        print(e.stderr)
         return False
     except FileNotFoundError as e:
         # 捕获 python3, cl.exe, 或 .exe 未找到的错误

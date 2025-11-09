@@ -38,6 +38,7 @@ topLevelStatement
     : importDirective
     | cppBlock
     | classDefinition
+    | structDefinition // <-- [新增]
     | functionDefinition
     | interfaceDefinition // <-- [新增]
     ;
@@ -60,6 +61,25 @@ classDefinition
       LBRACE
           (classBodyStatement)*
       RBRACE
+    ;
+
+// structDefinition 规则
+// 注意：它故意不允许 ':', 'impl' (无继承)
+structDefinition
+    : STRUCT name=IDENTIFIER
+      LBRACE
+          (structBodyStatement)*
+      RBRACE
+    ;
+
+// structBodyStatement 规则
+// 故意不允许 'STATIC'
+structBodyStatement
+    : (accessModifier)? declaration
+    | (accessModifier)? methodDefinition
+    | (accessModifier)? initDefinition
+    | deinitBlock // deinit 总是 public
+    | cppBlock
     ;
 
 methodDefinition

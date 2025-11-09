@@ -25,6 +25,7 @@ class ChronoVisitor(BaseChronoVisitor):
         super().__init__()
         self._in_class_method = False
         self._in_class = False
+        self._in_struct = False  # <-- [新增]
         self._current_class_name = None
         self._class_sections = {"private": "", "public": ""}
         self._alias_to_namespace_map = {}
@@ -131,8 +132,10 @@ class ChronoVisitor(BaseChronoVisitor):
         # --- [新增结束] ---
         return chrono_type_name
 
-    def _get_access_level(self, ctx):
-        """检查上下文是否包含访问修饰符，返回 'public' 或默认 'private'。"""
+        # [ 替换 ] _get_access_level
+
+    def _get_access_level(self, ctx, default_level='private'):
+        """检查上下文是否包含访问修饰符，返回 'public' 或指定的默认值。"""
         # [修复] 检查 'ctx' 本身是否有 'accessModifier'
         if hasattr(ctx, 'accessModifier') and ctx.accessModifier():
             # 检查 accessModifier 规则的文本，我们假设只有 PUBLIC
@@ -145,7 +148,7 @@ class ChronoVisitor(BaseChronoVisitor):
                                                           'accessModifier') and ctx.methodDefinition().accessModifier():
             return "public"
 
-        return "private"  # 默认是 private (Rust/Swift 哲学)
+        return default_level  # <-- [修改] 返回 'private' 或 'public'
 
     # --- 顶层规则 ---
     def visitProgram(self, ctx: ChronoParser.ProgramContext):
@@ -187,8 +190,6 @@ class ChronoVisitor(BaseChronoVisitor):
                 path_content = path_content.replace('runtime/', '')
             return f'#include "{path_content}"\n'
         return f"// ERROR: Invalid import path {path_text}\n"
-
-
 
     # [ [ 新增 ] ]
     def visitMethodSignature(self, ctx: ChronoParser.MethodSignatureContext):
@@ -261,6 +262,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         # --- (Class Assembler 逻辑保持不变) ---
         self._in_class = True
+        self._in_struct = False  # <-- [新增]
         self._current_class_name = class_name
         self._class_sections = {"private": "", "public": ""}
 
@@ -288,12 +290,11 @@ class ChronoVisitor(BaseChronoVisitor):
             "};\n"
         )
 
-
     # [新增] visitClassBodyStatement (用于传递修饰符)
     def visitClassBodyStatement(self, ctx: ChronoParser.ClassBodyStatementContext):
         # 1. 确定修饰符
         is_static = hasattr(ctx, 'STATIC') and ctx.STATIC()
-        access = self._get_access_level(ctx)
+        access = self._get_access_level(ctx, default_level='private')
 
         # 2. 将修饰符 "注入" 到子上下文中
         if ctx.declaration():
@@ -326,10 +327,14 @@ class ChronoVisitor(BaseChronoVisitor):
         self._in_class_method = True
         self._enter_scope()
 
+        # 'this' 永远是一个指针, 无论在 class 还是 struct 中
+        accessor = "->"
+        cpp_type = f"{self._current_class_name}*"
+
         self._add_variable("this", {
             "cpp_name": "this",
-            "accessor": "->",
-            "cpp_type": f"{self._current_class_name}*"
+            "accessor": accessor,  # <-- [修改]
+            "cpp_type": cpp_type  # <-- [修改]
         })
 
         func_name = ctx.name.text
@@ -378,11 +383,15 @@ class ChronoVisitor(BaseChronoVisitor):
         self._in_class_method = True
         self._enter_scope()  # <-- [新增]
 
+        # 'this' 永远是一个指针, 无论在 class 还是 struct 中
+        accessor = "->"
+        cpp_type = f"{self._current_class_name}*"
+
         # [新增] 注册 'this'
         self._add_variable("this", {
             "cpp_name": "this",
-            "accessor": "->",
-            "cpp_type": f"{self._current_class_name}*"
+            "accessor": accessor,  # <-- [修改]
+            "cpp_type": cpp_type  # <-- [修改]
         })
 
         cpp_return_type = ""
@@ -406,16 +415,19 @@ class ChronoVisitor(BaseChronoVisitor):
     # src/ChronoVisitor.py
 
     def visitDeinitBlock(self, ctx: ChronoParser.DeinitBlockContext):
+        self._in_class_method = True  # <-- [新增] 必须设置此标志
         self._enter_scope()
 
+        # 'this' 永远是一个指针, 无论在 class 还是 struct 中
+        accessor = "->"
+        cpp_type = f"{self._current_class_name}*"
+
         # --- [ 新增修复 ] ---
-        # 必须像 init/method 一样注册 'this'，否则 deinit 内部无法访问成员
         self._add_variable("this", {
             "cpp_name": "this",
-            "accessor": "->",
-            "cpp_type": f"{self._current_class_name}*"
+            "accessor": accessor,  # <-- [修改]
+            "cpp_type": cpp_type  # <-- [修改]
         })
-        # --- [ 修复结束 ] ---
 
         statements = self._safe_iterate_statements(ctx.statement())
         body_code = "".join(self.visit(s) for s in statements)
@@ -429,6 +441,7 @@ class ChronoVisitor(BaseChronoVisitor):
         self._class_sections["public"] += deinit_code
 
         self._exit_scope()
+        self._in_class_method = False  # <-- [新增] 必须重置此标志
         return ""
 
         # src/ChronoVisitor.py
@@ -641,8 +654,21 @@ class ChronoVisitor(BaseChronoVisitor):
             "cpp_type": base_type_cpp
         })
 
-        # 6. 生成 C++ 代码 (逻辑不变)
-        if not self._in_class or self._in_class_method:
+        # 6. 生成 C++ 代码 (逻辑修改)
+
+        # [ [ 关键修复 ] ]
+        # 检查这是一个 "成员变量" (在 class/struct 顶层)
+        # 还是 "局部变量" (在 func/method 内部, 或全局)
+        is_member_variable = (self._in_class or self._in_struct) and not self._in_class_method
+
+        if is_member_variable:
+            # [ 成员变量 ] -> 添加到 class/struct sections
+            access = getattr(ctx, '_chrono_access', 'private')
+            declaration_line = f"{INDENT}{cpp_final_type} {cpp_name};\n"
+            self._class_sections[access] += declaration_line
+            return ""
+        else:
+            # [ 局部变量 ] -> 返回完整的 C++ 语句
             cpp_value = ""
             if ctx.expression():
                 cpp_value = f" = {self.visit(ctx.expression())}"
@@ -650,11 +676,6 @@ class ChronoVisitor(BaseChronoVisitor):
                 cpp_value = " = nullptr"
 
             return f"{INDENT}{cpp_final_type} {cpp_name}{cpp_value};\n"
-        else:
-            access = getattr(ctx, '_chrono_access', 'private')
-            declaration_line = f"{INDENT}{cpp_final_type} {cpp_name};\n"
-            self._class_sections[access] += declaration_line
-            return ""
 
     def visitParameter(self, ctx: ChronoParser.ParameterContext):
         var_name = ctx.name.text
@@ -1269,3 +1290,87 @@ class ChronoVisitor(BaseChronoVisitor):
 
         # [关键] 返回 C++ 代码时 *不带* 分号
         return f"{target} {op_str} {value}"
+
+    # ... (在 visitInterfaceDefinition 之后, visitClassDefinition 之前) ...
+
+    # [ [ 新增 ] ]
+    def visitStructBodyStatement(self, ctx: ChronoParser.StructBodyStatementContext):
+        """
+        [新增] 访问 struct 体内的语句。
+        与 classBodyStatement 类似, 但
+        1. 默认是 'public'
+        2. 不支持 'static' (已在 Parser 中禁止)
+        """
+        # 1. 确定修饰符
+        # [ 关键 ] struct 默认是 'public'
+        access = self._get_access_level(ctx, default_level='public')
+
+        # 2. 将修饰符 "注入" 到子上下文中
+        if ctx.declaration():
+            ctx.declaration()._chrono_access = access
+            return self.visit(ctx.declaration())
+
+        elif ctx.methodDefinition():
+            ctx.methodDefinition()._chrono_access = access
+            ctx.methodDefinition()._chrono_static = False  # struct 不支持 static
+            return self.visit(ctx.methodDefinition())
+
+        elif ctx.initDefinition():
+            ctx.initDefinition()._chrono_access = access
+            return self.visit(ctx.initDefinition())
+
+        elif ctx.deinitBlock():
+            # deinit 总是 public (由 visitDeinitBlock 内部处理)
+            return self.visit(ctx.deinitBlock())
+
+        elif ctx.cppBlock():
+            return self.visit(ctx.cppBlock())
+
+        return ""
+
+    # [ [ 新增 ] ]
+    def visitStructDefinition(self, ctx: ChronoParser.StructDefinitionContext):
+        """
+        [新增] 访问 struct 定义
+        """
+        struct_name = ctx.name.text
+
+        # 1. [ 关键 ] 设置标志
+        #    self._in_class (引用类型) = False
+        #    self._in_struct (值类型) = True
+        self._in_class = False
+        self._in_struct = True
+        self._current_class_name = struct_name  # (重用此标志)
+
+        # 重置 sections
+        self._class_sections = {"private": "", "public": ""}
+
+        # 2. 遍历所有 'structBodyStatement'
+        if hasattr(ctx, 'structBodyStatement'):
+            for child in ctx.structBodyStatement():
+                self.visit(child)  # -> 调用 visitStructBodyStatement
+
+        # 3. 重置标志
+        self._in_struct = False
+        self._current_class_name = None
+
+        # 4. 组装 C++ struct
+        final_struct_body = ""
+
+        # [ 关键 ] C++ struct 默认是 public,
+        # 所以我们先输出 public, 再输出 private
+
+        if self._class_sections["public"]:
+            final_struct_body += "\npublic:\n"
+            final_struct_body += self._class_sections["public"]
+
+        if self._class_sections["private"]:
+            final_struct_body += "\nprivate:\n"
+            final_struct_body += self._class_sections["private"]
+
+        # 5. 返回最终代码
+        return (
+            f"\nstruct {struct_name} {{\n"  # 翻译为 C++ 'struct'
+            f"{final_struct_body.strip()}\n"
+            f"}};\n"
+        )

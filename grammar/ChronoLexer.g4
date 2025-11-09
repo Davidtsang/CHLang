@@ -9,6 +9,7 @@ FUNC    : 'func' ;
 LET     : 'let' ;
 RETURN  : 'return' ;
 CLASS   : 'class' ;
+STRUCT  : 'struct' ; // <-- [新增]
 INIT    : 'init' ;    // <-- [ 新增 ]
 DEINIT  : 'deinit' ; 
 THIS    : 'this' ;   

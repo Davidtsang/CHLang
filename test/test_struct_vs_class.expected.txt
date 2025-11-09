@@ -1,0 +1,7 @@
+--- Struct vs Class Test ---
+Testing Struct (Value Type)...
+10
+50
+Testing Class (Reference Type)...
+100
+--- Test End ---
