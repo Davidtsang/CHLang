@@ -61,6 +61,14 @@ class ChronoVisitor(BaseChronoVisitor):
         if token_type == ChronoParser.GTE: return ">="
         if token_type == ChronoParser.AND_OP: return "&&"  # <-- [新增]
         if token_type == ChronoParser.OR_OP: return "||"  # <-- [新增]
+
+        # [ [ 新增 ] ]
+        if token_type == ChronoParser.BIT_AND: return "&"
+        if token_type == ChronoParser.BIT_OR: return "|"
+        if token_type == ChronoParser.BIT_XOR: return "^"
+        if token_type == ChronoParser.LSHIFT: return "<<"
+        if token_type == ChronoParser.RSHIFT: return ">>"
+
         raise Exception(f"Unknown operator token type: {token_type}")
 
     def _add_variable(self, chrono_name, metadata):
@@ -825,10 +833,12 @@ class ChronoVisitor(BaseChronoVisitor):
     def visitAssignment(self, ctx: ChronoParser.AssignmentContext):
         target = self.visit(ctx.assignableExpression())
         value = self.visit(ctx.expression())
-        return f"{INDENT}{target} = {value};\n"
 
-        # [ 替换 ] visitAssignableExpression
-        # src/ChronoVisitor.py
+        # [ 修改 ] 不再硬编码 "="
+        # 而是访问 assignmentOperator 规则
+        op_str = self.visit(ctx.assignmentOperator())
+
+        return f"{INDENT}{target} {op_str} {value};\n"
 
     def visitAssignableExpression(self, ctx: ChronoParser.AssignableExpressionContext):
         """
@@ -995,15 +1005,6 @@ class ChronoVisitor(BaseChronoVisitor):
         # [关键] 返回 C++ 代码时 *不带* 分号
         return f"{cpp_final_type} {cpp_name}{cpp_value}"
 
-    # [ [ 新增 ] ]
-    def visitAssignment_no_semicolon(self, ctx: ChronoParser.Assignment_no_semicolonContext):
-        # 这就像 visitAssignment，但没有分号
-        target = self.visit(ctx.assignableExpression())
-        value = self.visit(ctx.expression())
-
-        # [关键] 返回 C++ 代码时 *不带* 分号
-        return f"{target} = {value}"
-
     def _recursive_analyze(self, node, indent_level=0):
         """
         递归地打印出 ANTLR 树中一个节点及其所有子节点的结构。
@@ -1039,6 +1040,17 @@ class ChronoVisitor(BaseChronoVisitor):
         # src/ChronoVisitor.py (添加一个辅助函数，并替换 visitIfStatement)
 
         # src/ChronoVisitor.py
+
+    def visitAssignmentOperator(self, ctx: ChronoParser.AssignmentOperatorContext):
+        """将赋值操作符词元翻译为 C++ 字符串"""
+        if ctx.ASSIGN(): return "="
+        if ctx.PLUS_ASSIGN(): return "+="
+        if ctx.MINUS_ASSIGN(): return "-="
+        if ctx.STAR_ASSIGN(): return "*="
+        if ctx.SLASH_ASSIGN(): return "/="
+        if ctx.MOD_ASSIGN(): return "%="
+        # 不太可能的回退
+        return "="
 
     def visitIfStatement(self, ctx: ChronoParser.IfStatementContext):
         condition = self.visit(ctx.expression())
@@ -1146,6 +1158,13 @@ class ChronoVisitor(BaseChronoVisitor):
         if ctx.AND_OP(): all_ops.extend(ctx.AND_OP())  # <-- [新增]
         if ctx.OR_OP(): all_ops.extend(ctx.OR_OP())  # <-- [新增]
 
+        # [ [ 新增 ] ]
+        if ctx.BIT_AND(): all_ops.extend(ctx.BIT_AND())
+        if ctx.BIT_OR(): all_ops.extend(ctx.BIT_OR())
+        if ctx.BIT_XOR(): all_ops.extend(ctx.BIT_XOR())
+        if ctx.LSHIFT(): all_ops.extend(ctx.LSHIFT())
+        if ctx.RSHIFT(): all_ops.extend(ctx.RSHIFT())
+
         # 5. [关键] 按它们在源代码中出现的顺序对操作符进行排序
         #    (因为 ctx.PLUS() 等只返回一种类型的列表)
         all_ops.sort(key=lambda x: x.getSymbol().tokenIndex)
@@ -1180,6 +1199,8 @@ class ChronoVisitor(BaseChronoVisitor):
             op = "+"
         elif ctx.NOT_OP():  # <-- [新增]
             op = "!"  # <-- [新增]
+        elif ctx.BIT_NOT():  # <-- [新增]
+            op = "~"  # <-- [新增]
         # 递归访问操作数
         operand = self.visit(ctx.unaryExpression())
 
@@ -1236,3 +1257,15 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return f"{cpp_func_name}({args_code})"  # 使用剥离 $ 后的名称
         # --- [ 修复结束 ] ---
+
+    def visitAssignment_no_semicolon(self, ctx: ChronoParser.Assignment_no_semicolonContext):
+        # 这就像 visitAssignment，但没有分号
+        target = self.visit(ctx.assignableExpression())
+        value = self.visit(ctx.expression())
+
+        # [ 修改 ] 不再硬编码 "="
+        # 而是访问 assignmentOperator 规则
+        op_str = self.visit(ctx.assignmentOperator())
+
+        # [关键] 返回 C++ 代码时 *不带* 分号
+        return f"{target} {op_str} {value}"

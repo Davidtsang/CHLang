@@ -1,0 +1,18 @@
+--- Compound Assignment Test ---
+Start:
+100
+After += 10:
+110
+After -= 20:
+90
+After *= 2:
+180
+After /= 4:
+45
+After %= 40:
+5
+Test For-Loop (i += 2):
+0
+2
+4
+--- Test End ---

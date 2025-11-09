@@ -9,9 +9,7 @@ let $v: std.vector[i32];,std::vector<int32_t>* _v;,指针类型 ($ 变量)
 let $o: MyClass[$String];,MyClass<String*>* _o;,指针类型 (泛型参数是 $ 类型)
  
 ##未实现功能：
-
-interface
-
+# mrc @new 内存管理魔法
 
 ## 函数指针
 方案 A：类型别名（Type Alias）(最清晰)

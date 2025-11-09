@@ -85,7 +85,18 @@ declaration
     ;
 cppBlock : AT_CPP CPP_BODY* AT_END ;
 returnStatement : RETURN expression SEMIC_TOKEN ;
-assignment : assignableExpression ASSIGN expression SEMIC_TOKEN ;
+// [ 新增 ] 辅助规则，用于所有赋值操作
+assignmentOperator
+    : ASSIGN
+    | PLUS_ASSIGN
+    | MINUS_ASSIGN
+    | STAR_ASSIGN
+    | SLASH_ASSIGN
+    | MOD_ASSIGN
+    ;
+
+// [ 修改 ] assignment 规则
+assignment : assignableExpression assignmentOperator expression SEMIC_TOKEN ;
 
 // --- [ 2. 升级: 'assignableExpression' 规则 ] ---
 // [修改] 使其支持 '.' 和 '[]' 链 (例如 numbers[3])
@@ -169,20 +180,21 @@ declaration_no_semicolon
     : LET variableName=IDENTIFIER COLON typeName=typeSpecifier (ASSIGN expression)?
     ;
 
+// [ 修改 ] assignment_no_semicolon 规则
 assignment_no_semicolon
-    : assignableExpression ASSIGN expression
+    : assignableExpression assignmentOperator expression
     ;
-
 // --- Expressions ---
 expression
     : unaryExpression (
         (EQ | NEQ | LT | GT | LTE | GTE | PLUS | MINUS | STAR | SLASH
-        | MODULO | AND_OP | OR_OP) unaryExpression // <-- [修改]
+        | MODULO | AND_OP | OR_OP
+        | BIT_AND | BIT_OR | BIT_XOR | LSHIFT | RSHIFT) unaryExpression // <-- [修改]
       )*
     ;
 
 unaryExpression
-    : (PLUS | MINUS | NOT_OP) unaryExpression // <-- [修改]
+    : (PLUS | MINUS | NOT_OP | BIT_NOT) unaryExpression // <-- [修改]
     | simpleExpression
     ;
 

@@ -44,6 +44,10 @@ ARROW   : '->' ;
 AND_OP  : '&&' ; // <-- [新增]
 OR_OP   : '||' ; // <-- [新增]
 
+// [ 新增 ] 位移运算符 (必须在 LT/GT 之前)
+LSHIFT  : '<<' ;
+RSHIFT  : '>>' ;
+
 // [ 新增 ] 算术运算符
 PLUS    : '+' ;
 MINUS   : '-' ;
@@ -51,10 +55,25 @@ STAR    : '*' ;
 SLASH   : '/' ;
 MODULO  : '%' ; // <-- [新增]
 
+// [ 新增 ] 复合赋值运算符
+// [ 关键 ] 必须在 ASSIGN (=) 之前定义
+PLUS_ASSIGN   : '+=' ;
+MINUS_ASSIGN  : '-=' ;
+STAR_ASSIGN   : '*=' ;
+SLASH_ASSIGN  : '/=' ;
+MOD_ASSIGN    : '%=' ;
+
 // 简单符号 (必须在 INCLUDE_PATH 之前)
 LT      : '<' ; 
 GT      : '>' ; 
 NOT_OP  : '!' ; // <-- [新增] (注意: '!=' 必须在此之前定义)
+
+// [ 新增 ] 位运算符 (必须在 AND_OP/OR_OP 之后)
+BIT_AND : '&' ;
+BIT_OR  : '|' ;
+BIT_XOR : '^' ;
+BIT_NOT : '~' ;
+
 // INCLUDE_PATH 现在在 LT/GT 之后，但只在 import 语句中使用
 // 我们在 Parser 中处理这个上下文
 INCLUDE_PATH
