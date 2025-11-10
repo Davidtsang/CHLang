@@ -223,7 +223,11 @@ unaryExpression
 simpleExpression
     : ( primary | functionCallExpression )
       ( // 循环处理链式调用
-        DOT IDENTIFIER (LPAREN expressionList? RPAREN)? // 路径 A: .foo() 或 .foo
+
+        // [ [ 关键修改 ] ]
+        // 路径 A: .foo, .foo(), .foo[int], .foo[int]()
+        DOT IDENTIFIER (LBRACK typeList RBRACK)? (LPAREN expressionList? RPAREN)?
+
       | LBRACK expression RBRACK                      // 路径 B: [i] (数组索引)
       )* ;
 

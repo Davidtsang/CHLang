@@ -1,0 +1,6 @@
+--- Generic Call Test ---
+Verifying p1 (Explicit Type):
+  People(Name=Alice, Age=30)
+Verifying p2 (Inferred Type 'let'):
+  People(Name=Bob, Age=40)
+--- Test End ---

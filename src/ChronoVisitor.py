@@ -411,8 +411,110 @@ class ChronoVisitor(BaseChronoVisitor):
         self._in_class_method = False
         return ""
 
-    # 你的 ChronoVisitor.py 文件
-    # src/ChronoVisitor.py
+    def _determine_initial_accessor(self, raw_primary_text, translated_primary_code):
+        """
+        [重构] 根据 'raw_primary_text' (e.g., '$p', 'std', 'String')
+        决定正确的 C++ 起始代码和第一个访问器 (., ->, ::)。
+
+        返回: (初始 C++ 代码, 初始访问器)
+        """
+        variable_info = self._find_variable(raw_primary_text)
+
+        if variable_info:
+            # 案例 A: 变量 (e.g., $p, myStruct)
+            # 'translated_primary_code' 已经是正确的 C++ 名称 (e.g., _p, myStruct)
+            return translated_primary_code, variable_info["accessor"]
+
+        elif raw_primary_text in self._alias_to_namespace_map:
+            # 案例 B: 别名 (e.g., Chrono.log)
+            return self._alias_to_namespace_map[raw_primary_text], "::"
+
+        # [ [ 关键修复 ] ]
+        elif raw_primary_text == "std":
+            # 案例 C: 'std' 命名空间
+            return "std", "::"
+
+        elif raw_primary_text and raw_primary_text.lstrip('$')[0].isupper():
+            # 案例 D: 静态类名 (e.g., String.create)
+            # 我们需要 _chrono_to_cpp_type 来处理 'int' -> 'int32_t'
+            return self._chrono_to_cpp_type(raw_primary_text), "::"
+
+        else:
+            # 案例 E: 默认回退 (e.g., 10.foo() 或 functionCall.foo())
+            return translated_primary_code, "."
+
+    # [ [ 新增辅助方法 2 ] ]
+    def _process_dot_chain_step(self, child_nodes, i, current_code, current_accessor):
+        """
+        [重构] 处理链条中从 DOT 开始的步骤: .IDENTIFIER[T]()
+        返回: (新的代码片段, 更新的索引 i, 更新的访问器)
+        """
+
+        # --- 1. IDENTIFIER (方法/成员名) ---
+        i += 1  # 跳过 DOT
+        if i >= len(child_nodes): return current_code, i, current_accessor
+
+        ident_node = child_nodes[i]
+        i += 1
+
+        raw_ident_text = ident_node.getText()
+        cpp_ident = f"_{raw_ident_text.lstrip('$')}" if raw_ident_text.startswith('$') else raw_ident_text
+
+        # --- 2. 泛型/模板块 [T] ---
+        template_args_str = ""
+        if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LBRACK:
+            i += 1  # 跳过 [
+            if i < len(child_nodes) and isinstance(child_nodes[i], ChronoParser.TypeListContext):
+                template_args_str = self.visit(child_nodes[i])
+                i += 1  # 跳过 TypeListContext
+            if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.RBRACK:
+                i += 1  # 跳过 ]
+
+        if template_args_str:
+            cpp_ident = f"{cpp_ident}<{template_args_str}>"  # 翻译为 C++ 模板
+
+        # --- 3. 函数调用块 () ---
+        if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LPAREN:
+            i += 1  # 跳过 (
+            args = ""
+            if i < len(child_nodes) and isinstance(child_nodes[i], ChronoParser.ExpressionListContext):
+                args = self.visit(child_nodes[i])
+                i += 1
+            if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.RPAREN:
+                i += 1  # 跳过 )
+
+            # .foo<T>()
+            new_code = f"{current_code}{current_accessor}{cpp_ident}({args})"
+        else:
+            # .foo<T> or .foo
+            new_code = f"{current_code}{current_accessor}{cpp_ident}"
+
+        # --- 4. 更新下一次访问的访问器 (启发式) ---
+        new_accessor = "::" if cpp_ident and cpp_ident[0].isupper() else "->"
+
+        return new_code, i, new_accessor
+
+    # [ [ 新增辅助方法 3 ] ]
+    def _process_array_chain_step(self, child_nodes, i, current_code):
+        """
+        [重构] 处理链条中从 LBRACK 开始的步骤: [expression]
+        返回: (新的代码片段, 更新的索引 i, 更新的访问器)
+        """
+        i += 1  # 跳过 [
+        if i >= len(child_nodes): return current_code, i, "."
+
+        index_expr = self.visit(child_nodes[i])
+        i += 1  # 跳过 expression
+
+        if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.RBRACK:
+            i += 1  # 跳过 ]
+
+        new_code = f"{current_code}[{index_expr}]"
+
+        # 数组索引后，访问器总是 '.', 因为我们访问的是元素
+        new_accessor = "."
+
+        return new_code, i, new_accessor
 
     def visitDeinitBlock(self, ctx: ChronoParser.DeinitBlockContext):
         self._in_class_method = True  # <-- [新增] 必须设置此标志
@@ -513,65 +615,39 @@ class ChronoVisitor(BaseChronoVisitor):
         return f"{{{args_code}}}"
 
     def visitSimpleExpression(self, ctx: ChronoParser.SimpleExpressionContext):
-        # 处理 primary 或 functionCallExpression
+        # 1. 确定初始部分的代码和原始文本
         if ctx.primary():
             primary_ctx = ctx.primary()
-            translated_primary = self.visit(primary_ctx)
-            raw_primary_text = primary_ctx.getText()
+            translated_primary = self.visit(primary_ctx)  # e.g., "_p", "std", "String"
+            raw_primary_text = primary_ctx.getText()  # e.g., "$p", "std", "String"
         elif ctx.functionCallExpression():
-            translated_primary = self.visit(ctx.functionCallExpression())
-            raw_primary_text = ctx.functionCallExpression().getText()
+            translated_primary = self.visit(ctx.functionCallExpression())  # e.g., "log(10)"
+            raw_primary_text = ctx.functionCallExpression().getText()  # e.g., "log(10)"
         else:
             return ""
 
-        current_code = translated_primary
+        # 2. 确定初始访问器 (调用辅助函数)
+        current_code, current_accessor = self._determine_initial_accessor(raw_primary_text, translated_primary)
 
-        # 决定初始访问器
-        variable_info = self._find_variable(raw_primary_text)
-        if variable_info:
-            current_accessor = variable_info["accessor"]
-        elif raw_primary_text in self._alias_to_namespace_map:
-            current_code = self._alias_to_namespace_map[raw_primary_text]
-            current_accessor = "::"
-        elif raw_primary_text and raw_primary_text.lstrip('$')[0].isupper():
-            current_accessor = "::"
-        else:
-            current_accessor = "."
-
-        # 遍历链条
+        # 3. 遍历链条 (调用辅助函数)
         child_nodes = ctx.children[1:]
         i = 0
         while i < len(child_nodes):
-            if child_nodes[i].getSymbol().type == ChronoParser.DOT:
-                i += 1
-                if i >= len(child_nodes):
-                    break
-                ident_node = child_nodes[i]
-                i += 1
-                raw_ident_text = ident_node.getText()
-                cpp_ident = f"_{raw_ident_text.lstrip('$')}" if raw_ident_text.startswith('$') else raw_ident_text
-                if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LPAREN:
-                    i += 1
-                    args = ""
-                    if i < len(child_nodes) and isinstance(child_nodes[i], ChronoParser.ExpressionListContext):
-                        args = self.visit(child_nodes[i])
-                        i += 1
-                    if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.RPAREN:
-                        i += 1
-                    current_code = f"{current_code}{current_accessor}{cpp_ident}({args})"
-                else:
-                    current_code = f"{current_code}{current_accessor}{cpp_ident}"
-                current_accessor = "::" if cpp_ident and cpp_ident[0].isupper() else "->"
-            elif child_nodes[i].getSymbol().type == ChronoParser.LBRACK:
-                i += 1
-                if i >= len(child_nodes):
-                    break
-                index_expr = self.visit(child_nodes[i])
-                i += 1
-                if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.RBRACK:
-                    i += 1
-                current_code = f"{current_code}[{index_expr}]"
-                current_accessor = "."
+
+            token_type = child_nodes[i].getSymbol().type
+
+            if token_type == ChronoParser.DOT:
+                # 3a. 处理点访问 (.foo[T]())
+                current_code, i, current_accessor = self._process_dot_chain_step(
+                    child_nodes, i, current_code, current_accessor
+                )
+
+            elif token_type == ChronoParser.LBRACK:
+                # 3b. 处理数组索引 ([i])
+                current_code, i, current_accessor = self._process_array_chain_step(
+                    child_nodes, i, current_code
+                )
+
             else:
                 i += 1  # 跳过意外节点
 
@@ -763,39 +839,34 @@ class ChronoVisitor(BaseChronoVisitor):
 
     def visitPrimary(self, ctx: ChronoParser.PrimaryContext):
         if ctx.NEW():
-            # --- [ 升级 ] ---
-            # 之前的: class_name = self._chrono_to_cpp_type(ctx.IDENTIFIER().getText())
-            # 现在的: 访问 'baseType' 规则
+            # ... (此部分不变) ...
             class_name = self.visit(ctx.baseType())
-            # (注意: 'new' 不支持泛型参数, 'new std.vector[i32]()' 语法无效)
-            # (我们的语法 只支持 'new baseType()')
-            # --- [ 升级结束 ] ---
-
             args = self.visit(ctx.expressionList()) if ctx.expressionList() else ""
             return f"new {class_name}({args})"
 
         if ctx.literal():
             return self.visit(ctx.literal())
 
-        # [ [ 新增 ] ]
         if ctx.initializerList():
             return self.visit(ctx.initializerList())
 
         if ctx.IDENTIFIER():
             primary_text = ctx.IDENTIFIER().getText()
             variable_info = self._find_variable(primary_text)
+
             if variable_info:
-                # [ [ 关键修复：数组 ] ]
-                # 如果我们访问 'numbers' (一个 C 数组)
-                # 我们必须返回它的 C++ 名称 ("numbers")
-                # 而不是它的 (可能被修改的) "cpp_name" ("numbers[5]")
+                # [ 关键修复：数组 ]
+                # 如果是数组, 我们返回原始名称 (e.g., "numbers")
+                # 因为 'cpp_name' 可能是 "numbers[5]"
                 if '[' in variable_info["cpp_type"]:
                     return ctx.IDENTIFIER().getText().lstrip('$')
-
+                # 否则返回 C++ 变量名 (e.g., "_p")
                 return variable_info["cpp_name"]
             else:
-                # (处理 "String.create()" 中的 "String")
-                return self._chrono_to_cpp_type(primary_text.lstrip('$'))
+                # [ 关键简化 ]
+                # 如果未在作用域中找到 (e.g., 'std', 'String')
+                # 只返回原始文本。 'std' -> 'std'
+                return primary_text
 
         if ctx.THIS():
             return "this"
