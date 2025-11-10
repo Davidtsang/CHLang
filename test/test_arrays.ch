@@ -20,7 +20,7 @@ func main() -> int {
 
     // [测试 1: 声明和聚合初始化]
     // 预期翻译: int32_t numbers[5] = {10, 20, 30, 40, 50};
-    let numbers: [i32; 5] = {10, 20, 30, 40, 50};
+    var numbers: [i32; 5] = {10, 20, 30, 40, 50};
 
     @cpp
         std::cout << "Test 1: Array declared with size 5." << std::endl;
@@ -42,9 +42,9 @@ func main() -> int {
     @end
 
     // [测试 4: 变量作为数组大小]
-    let size: i32 = 3;
+    var size: i32 = 3;
     // 预期翻译: std::string names[size] = {"Alice", "Bob", "Charlie"};
-    let names: [std.string; 3] = {"Alice", "Bob", "Charlie"};
+    var names: [std.string; 3] = {"Alice", "Bob", "Charlie"};
 
     @cpp
         std::cout << "Test 4: Variable size [size=3]." << std::endl;

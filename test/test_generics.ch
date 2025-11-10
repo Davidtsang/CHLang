@@ -18,7 +18,7 @@ func main() -> Int {
     // [测试 1: std.vector[i32] (值类型)]
     // Chrono 声明 (无 $)
     // 预期翻译: std::vector<int32_t> v;
-    let v: std.vector[i32];
+    var v: std.vector[i32];
     //print("Declared std.vector[i32] (value type)");
 
     @cpp
@@ -31,7 +31,7 @@ func main() -> Int {
     // [测试 2: std.string (值类型)]
     // Chrono 声明 (无 $)
     // 预期翻译: std::string s = "Hello";
-    let s: std.string = "Hello";
+    var s: std.string = "Hello";
     //print("Declared std.string (value type)");
 
     @cpp
@@ -43,7 +43,7 @@ func main() -> Int {
     // [测试 3: 嵌套泛型 std.map[std.string, std.vector[i32]]]
     // Chrono 声明 (无 $)
     // 预期翻译: std::map<std::string, std::vector<int32_t>> m;
-    let m: std.map[std.string, std.vector[i32]];
+    var m: std.map[std.string, std.vector[i32]];
     //print("Declared nested map (value type)");
 
     @cpp

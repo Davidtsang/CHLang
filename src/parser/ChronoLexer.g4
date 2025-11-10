@@ -6,7 +6,10 @@ lexer grammar ChronoLexer;
 // --- 关键字 (必须在 IDENTIFIER 之前) ---
 IMPORT  : 'import' ;
 FUNC    : 'func' ;
-LET     : 'let' ;
+// [ [ 修改 ] ]
+VAR     : 'var';     // <-- [新增]
+CONST   : 'const';   // <-- [新增]
+
 RETURN  : 'return' ;
 CLASS   : 'class' ;
 STRUCT  : 'struct' ; // <-- [新增]

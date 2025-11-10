@@ -3,7 +3,7 @@ import "ChronoInt.h";
 import "Chrono.h";
 
 func main() -> int {
-    let five: int = 5;
+    var five: int = 5;
     Chrono.log(five);
     return 0;
 }

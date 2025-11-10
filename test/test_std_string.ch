@@ -3,7 +3,7 @@ import <string>;
 import "Chrono.h";
 
 func main() -> int {
-    let s: std.string = "Helloaaa";
+    var s: std.string = "Helloaaa";
 
     s.insert(1, "bc");
 

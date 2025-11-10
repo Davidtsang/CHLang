@@ -12,7 +12,7 @@ func main() -> int {
         Chrono.log("T1: IF entered"); // 1. IF 块开始执行
 
         // 'bool' 是值类型，不需要 $
-        let flag_a: bool = true;
+        var flag_a: bool = true;
 
         while (flag_a) {
             Chrono.log("T1: Inner WHILE executing"); // 2. WHILE 循环执行一次
@@ -30,7 +30,7 @@ func main() -> int {
     } else {
         Chrono.log("T2: ELSE entered"); // 4. ELSE 块开始执行
 
-        let flag_b: bool = true;
+        var flag_b: bool = true;
 
         while (flag_b) {
             Chrono.log("T2: Inner WHILE executing"); // 5. WHILE 循环执行一次

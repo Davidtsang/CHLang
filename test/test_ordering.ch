@@ -32,7 +32,7 @@ func main() -> int {
 
     // Chrono 声明
     // [更改] 必须使用 '$' 和 'String.create'
-    let $s: String = String.create("Chrono Statement 2");
+    var $s: String = String.create("Chrono Statement 2");
 
     // 输出 #3: Chrono 打印
     Chrono.log($s); // <-- [更改] 访问 '$s'

@@ -10,9 +10,9 @@ import "runtime/ChronoObject.h";
 func main() -> int {
     @cpp std::cout << "--- Bitwise Ops Test ---" << std::endl; @end
 
-    let a: i32 = 60;  // 0011 1100
-    let b: i32 = 13;  // 0000 1101
-    let result: i32 = 0;
+    var a: i32 = 60;  // 0011 1100
+    var b: i32 = 13;  // 0000 1101
+    var result: i32 = 0;
 
     // --- 测试 1-6 (保持不变) ---
     result = a & b;

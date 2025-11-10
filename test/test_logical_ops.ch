@@ -7,13 +7,13 @@ import "runtime/ChronoObject.h";
 func main() -> int {
     Chrono.log("--- Logical/Modulo Ops Test ---");
 
-    let a: i32 = 10;
-    let b: i32 = 3;
-    let c: i32 = -5;
+    var a: i32 = 10;
+    var b: i32 = 3;
+    var c: i32 = -5;
 
     // --- 测试 1: 取模 (%) ---
     // 预期: 1 (10 % 3)
-    let mod_result: i32 = a % b;
+    var mod_result: i32 = a % b;
     Chrono.log("Test 1: 10 % 3");
     Chrono.log(mod_result);
 

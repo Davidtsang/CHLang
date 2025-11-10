@@ -12,8 +12,8 @@ import <string>;   // 用于 std::string
 // 1. 定义一个用于测试的 "哑巴" struct
 //    (它不需要继承任何东西)
 struct People {
-    let name: std.string;
-    let age: i32;
+    var name: std.string;
+    var age: i32;
 
     // 公共构造函数 (C++: public init)
     public init(n: std.string, a: i32) {
@@ -38,7 +38,7 @@ func main() -> int {
     //
     // [验证] visitTypeSpecifier 必须能解析 std.shared_ptr[People]
     // [验证] visitSimpleExpression 必须能解析 std.make_shared[People]
-    let p1: std.shared_ptr[People] = std.make_shared[People]("Alice", 30);
+    var p1: std.shared_ptr[People] = std.make_shared[People]("Alice", 30);
 
     // [ [ 关键测试 2: 类型推导 (如果 'var' 已实现) ] ]
     //
@@ -49,8 +49,8 @@ func main() -> int {
     // [验证] 'var' (如果已实现) 必须能正确推导类型
 
     // (如果您还未实现 'var', 请将此行改为
-    //  'let p2: std.shared_ptr[People] = std.make_shared[People]("Bob", 40);' )
-let p2: std.shared_ptr[People] = std.make_shared[People]("Bob", 40);
+    //  'var p2: std.shared_ptr[People] = std.make_shared[People]("Bob", 40);' )
+var p2: std.shared_ptr[People] = std.make_shared[People]("Bob", 40);
 
     // [ [ 验证 ] ]
     // 我们必须使用 @cpp 块来访问 p1 和 p2，

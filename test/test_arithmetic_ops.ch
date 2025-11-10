@@ -6,9 +6,9 @@ import "runtime/Chrono.h"; // <-- [新增] 导入 Chrono 命名空间
 
 // 'main' 必须返回 'Int' 或 'i32'，访问者会将其转为 C++ 'int'
 func main() -> int {
-    let a: i32 = 10;
-    let b: i32 = 5;
-    let result: i32 = 0;
+    var a: i32 = 10;
+    var b: i32 = 5;
+    var result: i32 = 0;
 
     Chrono.log("--- Arithmetic Tests ---"); // <-- [更改]
 

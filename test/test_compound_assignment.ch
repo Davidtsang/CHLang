@@ -9,7 +9,7 @@ import "runtime/ChronoObject.h";
 func main() -> int {
     @cpp std::cout << "--- Compound Assignment Test ---" << std::endl; @end
 
-    let x: i32 = 100;
+    var x: i32 = 100;
     @cpp std::cout << "Start:" << std::endl; @end
     @cpp std::cout << x << std::endl; @end // 100
 
@@ -42,7 +42,7 @@ func main() -> int {
     // (这验证了 assignment_no_semicolon 规则)
     @cpp std::cout << "Test For-Loop (i += 2):" << std::endl; @end
 
-    for (let i: i32 = 0; i < 5; i += 2) {
+    for (var i: i32 = 0; i < 5; i += 2) {
         // [修改] @cpp 块在 for 循环的 Chrono 作用域内
         @cpp std::cout << i << std::endl; @end
     }

@@ -9,7 +9,7 @@ import "runtime/Chrono.h"; // <-- [新增] 'print' 需要它
 func main() -> int {
 
     // --- 场景 1: 简单的 while 循环 (使用 bool) ---
-    let keep_looping: bool = true;
+    var keep_looping: bool = true;
     while (keep_looping) {
         Chrono.log("Test 1: Loop executing...");
         keep_looping = false; // 赋值
@@ -17,7 +17,7 @@ func main() -> int {
 
     // --- 场景 2: 计数的 while 循环 (使用 i32) ---
     // [修改] 已取消注释，因为 < 和 + 运算符现在受支持
-    let count: i32 = 0;
+    var count: i32 = 0;
     while (count < 3) {
         Chrono.log("Test 2: Count:");
         // [修改] Chrono.log(i32) 是支持的，不需要 Int::create

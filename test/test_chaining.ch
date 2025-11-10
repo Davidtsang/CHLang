@@ -8,7 +8,7 @@ import "runtime/Chrono.h"; // <-- [新增]
 
 // 1. 定义一个用于 'this' 链测试的类
 class Wrapper : ChronoObject {
-    let $s: String; // <-- [更改] 's' 是一个指针 ($)
+    var $s: String; // <-- [更改] 's' 是一个指针 ($)
 
     // 默认 private (只能被 'create' 调用)
     init($str: String) { // <-- [更改] 'str' 是一个指针 ($)
@@ -35,25 +35,25 @@ class Wrapper : ChronoObject {
 func main() -> int { // 'Int' 或 'i32' 都可以, 都会被转为 C++ 'int'
 
     // [ 测试点 B ] 静态 -> 实例 -> 实例
-    let $len1: Int = String.create("Hello World").toUpper().length(); // <-- [更改]
+    var $len1: Int = String.create("Hello World").toUpper().length(); // <-- [更改]
     Chrono.log($len1); // 应该输出 11 // <-- [更改]
     $len1.release(); // <-- [更改]
 
     // [ 测试点 C ] 实例 -> 实例 (赋值)
-    let $s: String = String.create("lowercase"); // <-- [更改]
-    let $upper: String = $s.toUpper(); // <-- [更改]
+    var $s: String = String.create("lowercase"); // <-- [更改]
+    var $upper: String = $s.toUpper(); // <-- [更改]
     Chrono.log($upper); // 应该输出 "LOWERCASE" // <-- [更改]
     $s.release(); // <-- [更改]
     $upper.release(); // <-- [更改]
 
     // [ 测试点 D ] 'this' 链调用
-    let $w_str: String = String.create("wrapped"); // <-- [更改]
+    var $w_str: String = String.create("wrapped"); // <-- [更改]
 
     // (现在可以调用，因为 create 是 public)
-    let $w: Wrapper = Wrapper.create($w_str); // <-- [更改]
+    var $w: Wrapper = Wrapper.create($w_str); // <-- [更改]
 
     // (现在可以调用，因为 getUpperLength 是 public)
-    let $len2: Int = $w.getUpperLength(); // <-- [更改]
+    var $len2: Int = $w.getUpperLength(); // <-- [更改]
     Chrono.log($len2); // 应该输出 7 // <-- [更改]
 
     // 清理

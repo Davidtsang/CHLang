@@ -29,7 +29,7 @@ interface IShape {
 // - 实现 ILoggable 和 IShape
 class Circle : ChronoObject impl ILoggable, IShape {
 
-    let radius: f32;
+    var radius: f32;
 
     public init(r: f32) {
         this.radius = r;
@@ -57,7 +57,7 @@ class Circle : ChronoObject impl ILoggable, IShape {
 // - 只实现 IShape
 class Square : ChronoObject impl IShape {
 
-    let side: f32;
+    var side: f32;
 
     public init(s: f32) {
         this.side = s;
@@ -79,8 +79,8 @@ class Square : ChronoObject impl IShape {
 // 函数 1: 接受任何实现了 IShape 的对象
 // [关键] 接口作为参数，必须使用 $ 引用类型
 func printShapeDetails(s: $IShape) {
-    let name: std.string = s.getName();
-    let area: f32 = s.getArea();
+    var name: std.string = s.getName();
+    var area: f32 = s.getArea();
 
     @cpp
         std::cout << "  Detail: Name=" << name << ", Area=" << area << std::endl;
@@ -101,13 +101,13 @@ func main() -> int {
     @cpp std::cout << "--- Interface Test Start ---" << std::endl; @end
 
     // 创建实例
-    let $c: Circle = new Circle(10.0); // area = 314.159
-    let $s: Square = new Square(10.0); // area = 100
+    var $c: Circle = new Circle(10.0); // area = 314.159
+    var $s: Square = new Square(10.0); // area = 100
 
     // --- 测试 1: IShape 多态性 ---
     @cpp std::cout << "Test 1: Polymorphism with IShape" << std::endl; @end
     // 声明一个 $IShape 变量
-    let $shape_ref: IShape;
+    var $shape_ref: IShape;
 
     // 1a. 将 Circle 赋给 $IShape 引用
     $shape_ref = $c;

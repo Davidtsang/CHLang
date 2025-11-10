@@ -5,5 +5,7 @@ build/
 gok/
 .idea/
 *.pyc
-src/parser
+*.interp
+*.tokens
+
 gen/

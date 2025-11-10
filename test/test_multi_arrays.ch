@@ -9,7 +9,7 @@ func main() -> int {
     // 1. 声明
     // Chrono: [[i32; 3]; 2]
     // C++: int32_t matrix[2][3]
-    let matrix: [[i32; 3]; 2] = {{10, 11, 12}, {20, 21, 22}};
+    var matrix: [[i32; 3]; 2] = {{10, 11, 12}, {20, 21, 22}};
 
     @cpp std::cout << "Test 1: Declared matrix[2][3]" << std::endl; @end
 

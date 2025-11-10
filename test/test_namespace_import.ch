@@ -19,7 +19,7 @@ func main() -> int {
 
     // [测试 1 调用]
     // 预期翻译: MyMath::add(10, 5)
-    let x: i32 = MyMath.add(10, 5);
+    var x: i32 = MyMath.add(10, 5);
 
     // [修改] 使用 @cpp 块打印 i32 变量 'x'
     @cpp
@@ -29,7 +29,7 @@ func main() -> int {
 
     // [测试 2 调用]
     // 预期翻译: Math::multiply(x, 2)
-    let y: i32 = Math.multiply(x, 2);
+    var y: i32 = Math.multiply(x, 2);
 
     // [修改] 使用 @cpp 块打印 i32 变量 'y'
     @cpp

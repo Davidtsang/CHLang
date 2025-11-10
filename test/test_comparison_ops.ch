@@ -3,9 +3,9 @@ import "runtime/ChronoObject.h";
 import "runtime/ChronoString.h";
 
 func main() -> int {
-    let a: i32 = 10;
-    let b: i32 = 5;
-    let c: i32 = 10;
+    var a: i32 = 10;
+    var b: i32 = 5;
+    var c: i32 = 10;
 
     Chrono.log("--- Testing Comparisons ---");
 

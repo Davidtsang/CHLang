@@ -12,9 +12,9 @@ class MemberTest : ChronoObject {
     // -------------------------------------------
     // 属性 (Properties)
     // -------------------------------------------
-    let x: i32;       // 默认 private (值类型)
-    let $s: String;    // 默认 private (指针)
-    let $name: String; // 默认 private (指针)
+    var x: i32;       // 默认 private (值类型)
+    var $s: String;    // 默认 private (指针)
+    var $name: String; // 默认 private (指针)
 
     // -------------------------------------------
     // 生命周期
@@ -57,10 +57,10 @@ class MemberTest : ChronoObject {
 // -------------------------------------------
 func main() -> int {
     // a. 创建参数 (RC=1)
-    let $s: String = String.create("Hello");
+    var $s: String = String.create("Hello");
 
     // b. 创建对象 (RC=1)
-    let $obj: MemberTest = MemberTest.create(100, $s);
+    var $obj: MemberTest = MemberTest.create(100, $s);
 
     // c. 调用 'this.method()'
     $obj.printAll(); // 输出 100, "Hello"

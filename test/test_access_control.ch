@@ -9,10 +9,10 @@ import "runtime/ChronoInt.h";
 class AccessTest : ChronoObject {
 
     // --- 1. 属性 (默认 Private) ---
-    let val: i32; // 值类型，无 $
+    var val: i32; // 值类型，无 $
 
     // Why: 'String' 是引用类型，必须使用 $
-    let $name: String;
+    var $name: String;
 
     // --- 2. 构造函数 (默认 Private) ---
     // Why: 'n' 是引用类型，必须使用 $
@@ -40,7 +40,7 @@ class AccessTest : ChronoObject {
     // Why: 'Int' (ChronoInt) 是引用类型，返回值必须使用 $
     public func getCalculatedValue() -> $Int {
         Chrono.log("Public Method: getCalculatedValue()");
-        let result: i32 = this.doInternalCalc();
+        var result: i32 = this.doInternalCalc();
         return Int.create(result);
     }
 
@@ -60,15 +60,15 @@ func main() -> int {
 
     @cpp std::cout <<  "--- Test Start ---" << std::endl; @end
     // Why: String.create 返回一个引用类型，必须使用 $s
-    let $s: String = String.create("Test");
+    var $s: String = String.create("Test");
 
     // 1. 调用 Public Static 方法
     // Why: AccessTest.create 返回引用类型，必须使用 $obj
-    let $obj: AccessTest = AccessTest.create(10, $s);
+    var $obj: AccessTest = AccessTest.create(10, $s);
 
     // 2. 调用 Public Instance 方法
     // Why: getCalculatedValue 返回引用类型，必须使用 $val_obj
-    let $val_obj: Int = $obj.getCalculatedValue();
+    var $val_obj: Int = $obj.getCalculatedValue();
 
     // 3. 验证结果
     Chrono.log("Final Value:");

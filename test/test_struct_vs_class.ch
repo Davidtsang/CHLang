@@ -9,8 +9,8 @@ import "runtime/ChronoObject.h"; // (用于 class)
 // ---
 struct Point {
     // 默认 public
-    let x: i32;
-    let y: i32;
+    var x: i32;
+    var y: i32;
 
     // init (默认 public)
     init(val: i32) {
@@ -33,8 +33,8 @@ struct Point {
 // ---
 class RefPoint : ChronoObject {
     // 默认 private
-    let x: i32;
-    let y: i32;
+    var x: i32;
+    var y: i32;
 
     // init (必须设为 public 才能 'new')
     public init(val: i32) {
@@ -60,11 +60,11 @@ func main() -> int {
     @cpp std::cout << "Testing Struct (Value Type)..." << std::endl; @end
 
     // 声明在 C++ 栈上
-    let p: Point = Point(10);
+    var p: Point = Point(10);
 
     // [测试 5] 外部访问 struct
     // 应该翻译为: p.getX() (使用 '.')
-    let val_a: i32 = p.getX();
+    var val_a: i32 = p.getX();
     @cpp std::cout << val_a << std::endl; @end // 10
 
     // [测试 6] 外部访问 struct 成员
@@ -77,11 +77,11 @@ func main() -> int {
     @cpp std::cout << "Testing Class (Reference Type)..." << std::endl; @end
 
     // 声明在 C++ 堆上
-    let $rp: RefPoint = new RefPoint(100);
+    var $rp: RefPoint = new RefPoint(100);
 
     // [测试 7] 外部访问 class
     // 应该翻译为: _rp->getX() (使用 '->')
-    let val_b: i32 = $rp.getX();
+    var val_b: i32 = $rp.getX();
     @cpp std::cout << val_b << std::endl; @end // 100
 
     // [测试 8] 外部访问 class (成员是 private, 无法访问)

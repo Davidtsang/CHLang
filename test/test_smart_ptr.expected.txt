@@ -1,0 +1,21 @@
+ptr1 points to Resource 1
+  ptr1 is now null after move.
+  Inner scope ending (ptr2 dies)...
+
+--- 2. std::shared_ptr Demo (共享) ---
+
+  p_main and p_inner share Resource 2 (RC=2).
+  Inner scope ending (p_inner dies)...
+  Resource 2 is still alive (RC=1).
+  demo_shared_ptr() scope ending (p_main dies)...
+
+--- 3. std::weak_ptr Demo (打破循环) ---
+
+  Parent created.
+  Child created.
+  Cycle created. Scopes ending...
+  Parent destroyed.
+  Child destroyed.
+  Both Parent and Child were destroyed (no leak).
+
+--- C++ Smart Pointers Test End ---

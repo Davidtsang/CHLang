@@ -10,7 +10,7 @@ import "runtime/ChronoObject.h";
 // 场景 1: 数组作为函数参数
 // ---
 func printSum(arr: [i32; 3]) {
-    let sum: i32 = arr[0] + arr[1] + arr[2];
+    var sum: i32 = arr[0] + arr[1] + arr[2];
     @cpp
         std::cout << "  Func Param Sum: " << sum << std::endl;
     @end
@@ -21,8 +21,8 @@ func printSum(arr: [i32; 3]) {
 // ---
 class ArrayTester : ChronoObject {
 
-    let data: [i32; 3];
-    let matrix: [[i32; 2]; 2];
+    var data: [i32; 3];
+    var matrix: [[i32; 2]; 2];
 
     public init() {
         @cpp std::cout << "ArrayTester Init" << std::endl; @end
@@ -59,12 +59,12 @@ func main() -> int {
     @cpp std::cout << "--- Array Features Test Start ---" << std::endl; @end
 
     // --- Test 1: 局部数组 (复习) ---
-    let localArr: [i32; 3] = {1, 2, 3};
+    var localArr: [i32; 3] = {1, 2, 3};
     @cpp std::cout << "Test 1 (Local Array Param):" << std::endl; @end
     printSum(localArr);
 
     // --- Test 2 & 3: 类实例 ---
-    let $tester: ArrayTester = new ArrayTester();
+    var $tester: ArrayTester = new ArrayTester();
     $tester.printMemberData();
     $tester.testParamPassing();
     $tester.release();

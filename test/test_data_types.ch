@@ -18,14 +18,14 @@ func main() -> Int {
 
     // [测试 1: 声明所有整数类型]
     // 翻译器 应将它们映射到 <cstdint>
-    let i8_val: i8 = -8;
-    let u8_val: u8 = 8;
-    let i16_val: i16 = -1616;
-    let u16_val: u16 = 1616;
-    let i32_val: i32 = -3232;
-    let u32_val: u32 = 3232;
-    let i64_val: i64 = -6464;
-    let u64_val: u64 = 6464;
+    var i8_val: i8 = -8;
+    var u8_val: u8 = 8;
+    var i16_val: i16 = -1616;
+    var u16_val: u16 = 1616;
+    var i32_val: i32 = -3232;
+    var u32_val: u32 = 3232;
+    var i64_val: i64 = -6464;
+    var u64_val: u64 = 6464;
 
     @cpp
         std::cout << "Test 1: Integer Declarations" << std::endl;
@@ -42,8 +42,8 @@ func main() -> Int {
 
     // [测试 2: 声明所有浮点类型]
     // 翻译器 应将它们映射到 float/double
-    let f32_val: f32 = 3.14;
-    let f64_val: f64 = 1.6180339887;
+    var f32_val: f32 = 3.14;
+    var f64_val: f64 = 1.6180339887;
 
     @cpp
         std::cout << "Test 2: Float Declarations" << std::endl;
@@ -53,15 +53,15 @@ func main() -> Int {
 
     // [测试 3: 验证所有数字字面量]
     // 翻译器 应原样传递它们
-    let dec_val: i32 = 42;
-    let hex_val: i32 = 0x2A;    // 42
-    let bin_val: i32 = 0b101010; // 42
-    let oct_val: i32 = 0o52;    // 42
+    var dec_val: i32 = 42;
+    var hex_val: i32 = 0x2A;    // 42
+    var bin_val: i32 = 0b101010; // 42
+    var oct_val: i32 = 0o52;    // 42
 
     // [测试 4: 验证 Byte 和 Char 字面量]
     // 翻译器 应将 b'A' 翻译为 (uint8_t)'A'
-    let byte_val: u8 = b'A'; // 65
-    let char_val: i8 = 'C'; // 67 (i8 或 u8 都可以)
+    var byte_val: u8 = b'A'; // 65
+    var char_val: i8 = 'C'; // 67 (i8 或 u8 都可以)
 
     @cpp
         std::cout << "Test 3: Numeric Literals" << std::endl;

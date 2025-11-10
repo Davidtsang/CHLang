@@ -1,0 +1,10 @@
+--- Var/Const/Auto Test ---
+p1 (const explicit): 10
+p2 (var explicit): 21
+p3 (const auto): 30
+p4 (var auto): 41
+p5 (var uninitialized): 50
+For loop (var i):
+  i=0
+  i=1
+$s (var auto pointer): OK

@@ -11,7 +11,7 @@ func main() -> int {
     Chrono.log("--- Chrono.log Test Start ---");
 
     // Test 1: 打印 i32 (值类型)
-    let x: i32 = 123;
+    var x: i32 = 123;
     Chrono.log("Test 1 (i32):");
     Chrono.log(x); // 预期: 123
 
@@ -25,14 +25,14 @@ func main() -> int {
 
     // Test 4: 打印 String (MRC 对象)
     // [ 更改 ] 使用 '$' 标记内存责任
-    let $s: String = String.create("MRC String");
+    var $s: String = String.create("MRC String");
     Chrono.log("Test 4 (String):");
     Chrono.log($s);
     $s.release();
 
     // Test 5: 打印 Int (MRC 对象)
     // [ 更改 ] 使用 '$' 标记内存责任
-    let $i: Int = Int.create(456);
+    var $i: Int = Int.create(456);
     Chrono.log("Test 5 (Int):");
     Chrono.log($i);
     $i.release();

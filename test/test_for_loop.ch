@@ -14,7 +14,7 @@ func main() -> int {
     // 预期: 翻译为 for (int32_t i = 0; i < 3; i = i + 1)
     // ---
     @cpp std::cout << "Test 1: Standard loop (0 to 2)" << std::endl; @end
-    for (let i: i32 = 0; i < 3; i = i + 1) {
+    for (var i: i32 = 0; i < 3; i = i + 1) {
         @cpp
             std::cout << "  i = " << i << std::endl;
         @end
@@ -29,7 +29,7 @@ func main() -> int {
     // 预期: 'i' 在这里不应该存在。我们可以声明一个同名的新变量。
     // ---
     @cpp std::cout << "Test 2: Scoping (Declaring new 'i')" << std::endl; @end
-    let i: i32 = 99; // 如果 'i' 仍在作用域中, C++ 编译会失败
+    var i: i32 = 99; // 如果 'i' 仍在作用域中, C++ 编译会失败
     @cpp
         std::cout << "  New i = " << i << std::endl;
     @end
