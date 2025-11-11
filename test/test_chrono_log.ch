@@ -25,17 +25,17 @@ func main() -> int {
 
     // Test 4: 打印 String (MRC 对象)
     // [ 更改 ] 使用 '$' 标记内存责任
-    var $s: String = String.create("MRC String");
+    var s: String* = String.create("MRC String");
     Chrono.log("Test 4 (String):");
-    Chrono.log($s);
-    $s.release();
+    Chrono.log(s);
+    s.release();
 
     // Test 5: 打印 Int (MRC 对象)
     // [ 更改 ] 使用 '$' 标记内存责任
-    var $i: Int = Int.create(456);
+    var i: Int* = Int.create(456);
     Chrono.log("Test 5 (Int):");
-    Chrono.log($i);
-    $i.release();
+    Chrono.log(i);
+    i.release();
 
     Chrono.log("--- Chrono.log Test End ---");
     return 0;

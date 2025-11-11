@@ -115,7 +115,7 @@ DECIMAL_LITERAL : [0-9]+ ;
 BYTE_LITERAL    : 'b' '\'' ( ~['\\] | '\\' . ) '\'' ;
 
 // --- 通用规则 (必须在最后) ---
-IDENTIFIER : '$'? [a-zA-Z_] [a-zA-Z0-9_]* ;
+IDENTIFIER : [a-zA-Z_] [a-zA-Z0-9_]* ;
 //INTEGER_LITERAL : [0-9]+ ;
 STRING_LITERAL  : '"' ( ~["\\] | '\\' . )* '"' ; 
 CHAR_LITERAL    : '\'' ( ~['\\] | '\\' . ) '\'' ; // 匹配单引号字符 (例如 'a', '\n')

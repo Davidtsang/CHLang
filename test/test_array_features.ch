@@ -64,10 +64,10 @@ func main() -> int {
     printSum(localArr);
 
     // --- Test 2 & 3: 类实例 ---
-    var $tester: ArrayTester = new ArrayTester();
-    $tester.printMemberData();
-    $tester.testParamPassing();
-    $tester.release();
+    var tester: ArrayTester* = new ArrayTester();
+    tester.printMemberData();
+    tester.testParamPassing();
+    tester.release();
 
     @cpp std::cout << "--- Array Features Test End ---" << std::endl; @end
     return 0;

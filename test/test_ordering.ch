@@ -32,10 +32,10 @@ func main() -> int {
 
     // Chrono 声明
     // [更改] 必须使用 '$' 和 'String.create'
-    var $s: String = String.create("Chrono Statement 2");
+    var s: String* = String.create("Chrono Statement 2");
 
     // 输出 #3: Chrono 打印
-    Chrono.log($s); // <-- [更改] 访问 '$s'
+    Chrono.log(s); // <-- [更改] 访问 '$s'
 
     // 输出 #4: 另一个 C++ 块，
     // 它还测试它是否能 "看到" 全局 @cpp 块中声明的变量。
@@ -44,7 +44,7 @@ func main() -> int {
     @end
 
     // [新增] 必须释放 $s
-    $s.release();
+    s.release();
 
     return 0;
 }

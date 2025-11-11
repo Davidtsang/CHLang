@@ -78,7 +78,7 @@ class Square : ChronoObject impl IShape {
 
 // 函数 1: 接受任何实现了 IShape 的对象
 // [关键] 接口作为参数，必须使用 $ 引用类型
-func printShapeDetails(s: $IShape) {
+func printShapeDetails(s: IShape*) {
     var name: std.string = s.getName();
     var area: f32 = s.getArea();
 
@@ -88,7 +88,7 @@ func printShapeDetails(s: $IShape) {
 }
 
 // 函数 2: 接受任何实现了 ILoggable 的对象
-func triggerLog(l: $ILoggable) {
+func triggerLog(l: ILoggable*) {
     @cpp std::cout << "  Log Trigger:" << std::endl; @end
     l.logMessage(); // 调用接口方法
 }
@@ -101,31 +101,31 @@ func main() -> int {
     @cpp std::cout << "--- Interface Test Start ---" << std::endl; @end
 
     // 创建实例
-    var $c: Circle = new Circle(10.0); // area = 314.159
-    var $s: Square = new Square(10.0); // area = 100
+    var c: Circle* = new Circle(10.0); // area = 314.159
+    var s: Square* = new Square(10.0); // area = 100
 
     // --- 测试 1: IShape 多态性 ---
     @cpp std::cout << "Test 1: Polymorphism with IShape" << std::endl; @end
     // 声明一个 $IShape 变量
-    var $shape_ref: IShape;
+    var shape_ref: IShape*;
 
     // 1a. 将 Circle 赋给 $IShape 引用
-    $shape_ref = $c;
-    printShapeDetails($shape_ref); // 预期: Circle, 314.159
+    shape_ref = c;
+    printShapeDetails(shape_ref); // 预期: Circle, 314.159
 
     // 1b. 将 Square 赋给 $IShape 引用
-    $shape_ref = $s;
-    printShapeDetails($shape_ref); // 预期: Square, 100
+    shape_ref = s;
+    printShapeDetails(shape_ref); // 预期: Square, 100
 
     // --- 测试 2: ILoggable 多态性 ---
     @cpp std::cout << "Test 2: Polymorphism with ILoggable" << std::endl; @end
-    triggerLog($c); // 预期: Log: Circle (r=10)
+    triggerLog(c); // 预期: Log: Circle (r=10)
 
     // (Square 没有实现 ILoggable，所以 triggerLog($s) 会导致编译失败, 这是正确的)
 
     // 清理
-    $c.release();
-    $s.release();
+    c.release();
+    s.release();
 
     @cpp std::cout << "--- Interface Test End ---" << std::endl; @end
     return 0;

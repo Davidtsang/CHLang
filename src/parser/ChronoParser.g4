@@ -6,12 +6,19 @@ options { tokenVocab = ChronoLexer; }
 
 // --- [ 1. 升级: 泛型/数组类型规则 ] ---
 typeSpecifier
-    : ( // 路径 A: 泛型/基础 (std.vector[i32] or i32)
-        baseType (LBRACK typeList RBRACK)?
-      )
-    | ( // 路径 B: C-Style 数组 (递归)
+    : ( // 路径 A: C-Style 数组 (递归)
+        // e.g., [char; 20]
         LBRACK typeSpecifier SEMIC_TOKEN expression RBRACK
       )
+    | ( // 路径 B: 基础/泛型类型
+        // e.g., std.vector[i32] or i32
+        baseType (LBRACK typeList RBRACK)?
+      )
+      ( // [ [ 新增 ] ]
+        // 允许在类型末尾添加 * 或 &
+        // e.g., i32*, String*, IShape&, i32**
+        (STAR | BIT_AND)
+      )* // 允许 0 个或多个
     ;
 
 baseType

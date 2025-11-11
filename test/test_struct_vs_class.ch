@@ -77,17 +77,17 @@ func main() -> int {
     @cpp std::cout << "Testing Class (Reference Type)..." << std::endl; @end
 
     // 声明在 C++ 堆上
-    var $rp: RefPoint = new RefPoint(100);
+    var rp: RefPoint* = new RefPoint(100);
 
     // [测试 7] 外部访问 class
     // 应该翻译为: _rp->getX() (使用 '->')
-    var val_b: i32 = $rp.getX();
+    var val_b: i32 = rp.getX();
     @cpp std::cout << val_b << std::endl; @end // 100
 
     // [测试 8] 外部访问 class (成员是 private, 无法访问)
     // $rp.y = 500; // <- 这在 Chrono 中是非法的 (private)
 
-    $rp.release(); // 释放堆内存
+    rp.release(); // 释放堆内存
 
     @cpp std::cout << "--- Test End ---" << std::endl; @end
     return 0;

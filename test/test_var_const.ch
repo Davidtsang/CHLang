@@ -46,8 +46,8 @@ func main() -> int {
     }
 
     // 9. $ 指针推导
-    var $s = new ChronoObject(); // C++: auto _s = new ChronoObject();
-    $s.release();
+    var s = new ChronoObject(); // C++: auto _s = new ChronoObject();
+    s.release();
     @cpp std::cout << "$s (var auto pointer): OK" << std::endl; @end
 
     return 0;
