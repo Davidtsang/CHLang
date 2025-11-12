@@ -30,24 +30,51 @@ class ChronoVisitor(BaseChronoVisitor):
     def visitTypeSpecifier(self, ctx: ChronoParser.TypeSpecifierContext):
         """
         [重构] 访问 'typeSpecifier' 规则。
-        现在处理:
-        1. C-Style 数组 (e.g., [i32; 5])
-        2. 泛型 (e.g., std.vector[i32])
-        3. 基础 (e.g., i32)
-        4. [新增] 指针/引用后缀 (e.g., String* or i32&)
+        [最终方案]
+        1. (typeList?) -> R 语法总是先被构建为 std::function。
+        2. 如果 (1) 的后缀是 '*'，则将其转换为 C-Style 指针模式。
+        3. 括号 () 语法 (Path D) 被正确处理。
         """
 
-        core_type = ""  # 这将是 e.g., "int32_t;[5]" 或 "std::vector<int32_t>"
+        core_type = ""
+        is_function_type = False  # 标志位
 
-        # 路径 B: C-Style 数组 (e.g., [i32; 5] or [[i32; 2]; 2])
+        # 收集后缀
+        suffixes = self._collect_suffixes(ctx)
+
+        # --- 路径 A: C-Style 数组 ---
         if ctx.LBRACK() and ctx.SEMIC_TOKEN():
-            # 递归访问基础类型 (e.g., "int32_t" 或 "int32_t;[2]")
             base = self.visit(ctx.typeSpecifier())
             size_expr = self.visit(ctx.expression())
-            # [关键] 我们使用分号来标记 C 数组维度
             core_type = f"{base};[{size_expr}]"
 
-        # 路径 A: 泛型/基础 (e.g., std.vector[i32] or i32)
+        # --- [ [ [ 路径 C/D (LPAREN) ] ] ] ---
+        elif ctx.LPAREN() and ctx.RPAREN():
+
+            # 选项 1: 这是一个函数类型 (Path C)
+            if ctx.ARROW():
+                is_function_type = True  # 标记
+
+                # [ [ [ 关键变更 ] ] ]
+                # 我们现在访问 'params' (一个 typeList 节点)
+                # 'visitTypeList' 返回一个 "i32, std::string" 字符串
+                params_str = self.visit(ctx.params) if ctx.params else ""
+                return_str = self.visit(ctx.returnType)
+
+                # 总是先构建 std::function
+                core_type = f"std::function<{return_str}({params_str})>"
+
+            # 选项 2: 这是一个带括号的类型 (Path D)
+            elif ctx.nested:
+                core_type = self.visit(ctx.nested)
+                # 检查内层类型是否是函数
+                if core_type.startswith("std::function<"):
+                    is_function_type = True
+
+            else:
+                core_type = ""  # 不太可能
+
+        # --- 路径 B: 基础/泛型类型 ---
         elif ctx.baseType():
             base = self.visit(ctx.baseType())
             if ctx.typeList():
@@ -56,30 +83,35 @@ class ChronoVisitor(BaseChronoVisitor):
             else:
                 core_type = base
 
-        # [ [ 关键新增 ] ]
-        # 现在，附加所有 * 和 & 后缀
+        else:
+            return ""  # 兜底
 
-        # 1. 收集所有后缀词元 (STAR 和 BIT_AND)
-        suffixes = []
-        if ctx.STAR():
-            suffixes.extend(ctx.STAR())
-        if ctx.BIT_AND():
-            suffixes.extend(ctx.BIT_AND())
+        # --- [ [ [ 最终处理：C-Style 转换和后缀组合 ] ] ] ---
 
-        # 2. 保证顺序 (对于 i32** 很重要)
-        #    我们按它们在源代码中出现的顺序排序
-        suffixes.sort(key=lambda x: x.getSymbol().tokenIndex)
+        # 检查是否需要 C-Style 转换
+        if suffixes and suffixes[0].getText() == '*' and is_function_type:
+            # 它是一个指针 (*) 并且它附加到一个函数类型上
 
-        # 3. 将它们连接成 C++ 字符串 (e.g., "*&")
+            # --- 是 C-Style 函数指针 ---
+            func_sig = core_type[len("std::function<"):-1]
+            parts = func_sig.split('(', 1)
+            return_str = parts[0].strip()
+            params_str = parts[1].rsplit(')', 1)[0].strip()
+
+            remaining_suffixes = suffixes[1:]
+            remaining_suffix_str = "".join(s.getText() for s in remaining_suffixes)
+
+            # 返回 C-Style 模式
+            return f"{return_str} (*{{NAME}})({params_str}){remaining_suffix_str}"
+
+        # --- 不是 C-Style 函数指针 ---
         suffix_str = "".join(s.getText() for s in suffixes)
 
-        # 4. 返回完整类型 (e.g., "int32_t;[5]*" 或 "std::string&")
+        if (ctx.LPAREN() and ctx.nested):
+            core_type = f"({core_type})"
+
         return f"{core_type}{suffix_str}"
 
-    # [ [ 2. 替换 ] ]
-    # 'visitBaseType' 现在被大大简化了。
-    # 它不再需要处理 $。
-    #
     def visitBaseType(self, ctx: ChronoParser.BaseTypeContext):
         """
         [重构] 访问 'baseType' 规则。
@@ -278,27 +310,27 @@ class ChronoVisitor(BaseChronoVisitor):
 
     def _translate_variable_declaration(self, ctx):
         """
-        [重构] 翻译 'variableDeclaration' 及其 'no_semicolon' 版本的核心共享逻辑。
-        [BUG 修复] 确保 'auto' 类型推导能够正确识别 @make 和 @make_shared 为指针类型。
-        [BUG 修复] 移除了所有指针类型的 '_' 前缀添加逻辑。
-        [BUG 修复] 确保智能指针不使用 '= nullptr' 初始化。
+        [重构]
+        [最终方案] 识别 C-Style 函数指针模式 '(*{NAME})'。
+                 移除了 '_' 前缀。
+                 修复了 'nullptr' 初始化逻辑 (包括拼写错误)。
         """
 
         # --- 1. 确定 Const / Var ---
         is_const = bool(ctx.CONST())
         const_prefix = "const " if is_const else ""
 
-        # --- 2. 确定名称 (不再有 $) ---
+        # --- 2. 确定名称 ---
         var_name = ctx.name.text
         key = var_name
-        cpp_name = var_name  # 默认 C++ 名称
+        cpp_name = var_name
 
-        # --- 3. 确定类型 (显式或推导) ---
+        # --- 3. 确定类型 ---
         base_type_cpp = ""
         cpp_final_type = ""
 
         if ctx.typeName:
-            base_type_cpp = self.visit(ctx.typeName)
+            base_type_cpp = self.visit(ctx.typeName)  # e.g., "std::function<...>" or "int (*{NAME})(...)"
             cpp_final_type = base_type_cpp
         else:
             if not ctx.expression():
@@ -307,7 +339,7 @@ class ChronoVisitor(BaseChronoVisitor):
             base_type_cpp = "auto"
             cpp_final_type = "auto"
 
-        # --- 4. 验证 Const (如果 const 必须初始化) --
+        # --- 4. 验证 Const ---
         if is_const and not ctx.expression():
             raise Exception(
                 f"Chrono Error (Line {ctx.start.line}): Constant declaration '{var_name}' must be initialized.")
@@ -317,23 +349,24 @@ class ChronoVisitor(BaseChronoVisitor):
         is_reference = False
         is_c_array = False
 
+        is_c_style_func_ptr = "(*{NAME})" in cpp_final_type
+
         if base_type_cpp != "auto":
-            # 检查显式类型
             if base_type_cpp.endswith('*') or \
                     base_type_cpp.startswith("std::unique_ptr") or \
                     base_type_cpp.startswith("std::shared_ptr") or \
-                    base_type_cpp.startswith("std::weak_ptr"):
+                    base_type_cpp.startswith("std::weak_ptr") or \
+                    is_c_style_func_ptr:  # C-Style 指针也是指针
                 is_pointer = True
 
-            # [修复] 检查 @ 引用
             is_reference = base_type_cpp.endswith('&')
 
             if not is_pointer and not is_reference and ';[' in base_type_cpp:
                 is_c_array = True
 
-        # --- 6. 组合数组类型 (逻辑不变) ---
+        # --- 6. 组合数组类型 ---
         cpp_name_for_declaration = cpp_name
-        cpp_name_for_scope = cpp_name  # [关键] 作用域名称现在始终是原始名称
+        cpp_name_for_scope = cpp_name
 
         if is_c_array:
             parts = cpp_final_type.split(';')
@@ -345,24 +378,24 @@ class ChronoVisitor(BaseChronoVisitor):
             cpp_final_type = base_only
             cpp_name_for_declaration = f"{cpp_name}{dims_str}"
 
-        # --- 7. 确定访问器 (Accessor) ---
-        accessor = "."
+        # --- 7. 确定访问器 ---
+        accessor = "."  # 默认
+
         if is_c_array:
             accessor = "."
-        elif is_pointer:  # (来自显式类型)
+        elif is_c_style_func_ptr:
+            accessor = "."  # C-Style 指针调用是 p(..), 算作 "."
+        elif is_pointer:
             accessor = "->"
 
-        # [ [ BUG 修复： auto 推导逻辑 ] ]
+        # [ auto 推导逻辑 ]
         if base_type_cpp == "auto" and ctx.expression():
-            # 我们必须深入检查表达式的 primary
             primary_node = None
             try:
                 primary_node = ctx.expression().unaryExpression(0).simpleExpression().children[0]
             except Exception as e:
-                # 表达式不是 simpleExpression (例如 'a + b')，保持 accessor = "."
                 pass
 
-            # 检查是否为 'new', '@make', 或 '@make_shared'
             is_factory_call = False
             if primary_node and isinstance(primary_node, ChronoParser.PrimaryContext):
                 if primary_node.NEW():
@@ -374,26 +407,16 @@ class ChronoVisitor(BaseChronoVisitor):
 
             if is_factory_call:
                 is_pointer = True
-                accessor = "->"  # [关键] 必须设置 accessor
-        # [ [ 修复结束 ] ]
+                accessor = "->"
 
-        # --- 8. [约定] 为指针添加 '_' 前缀 ---
-        #
-        # [ [ [ 关键修复：已移除 ] ] ]
-        #
-        # 移除了所有自动添加 '_' 前缀的逻辑。
-        # cpp_name_for_declaration 和 cpp_name_for_scope
-        # 将始终使用在步骤 2 和 6 中设置的原始 'cpp_name'。
-        #
-
-        # --- 9. 注册到作用域栈 ---
+                # --- 9. 注册到作用域栈 ---
         self._add_variable(key, {
-            "cpp_name": cpp_name_for_scope,  # [关键] 现在始终是原始名称 (e.g., "p1")
+            "cpp_name": cpp_name_for_scope,
             "accessor": accessor,
             "cpp_type": base_type_cpp
         })
 
-        # --- 10. 确定赋值 (已合并之前的修复) ---
+        # --- 10. 确定赋值 ---
         cpp_value = ""
         if ctx.expression():
             cpp_value = f" = {self.visit(ctx.expression())}"
@@ -403,19 +426,39 @@ class ChronoVisitor(BaseChronoVisitor):
             if not (base_type_cpp.startswith("std::unique_ptr") or
                     base_type_cpp.startswith("std::shared_ptr") or
                     base_type_cpp.startswith("std::weak_ptr")):
-                # 只有非智能指针 (如 MRC 的 String*) 才会被初始化为 nullptr
+                # C-Style Ptr, MRC Ptr 等, 都会被初始化为 nullptr
                 cpp_value = " = nullptr"
 
-        # --- 11. 确定是局部还是成员 (不变) ---
+        # --- 11. 确定是局部还是成员 ---
         is_member_variable = (self._in_class or self._in_struct) and not self._in_class_method
         access = getattr(ctx, '_chrono_access', 'private')
 
         # --- 12. 返回 C++ 代码片段 ---
-        # [关键] cpp_name_for_declaration 现在始终是原始名称
-        core_cpp = f"{const_prefix}{cpp_final_type} {cpp_name_for_declaration}{cpp_value}"
+        core_cpp = ""
+
+        if is_c_style_func_ptr:
+            # 特殊 C-Style 格式化
+            cpp_type_with_name = cpp_final_type.replace("(*{NAME})", f"(*{cpp_name_for_declaration})")
+            core_cpp = f"{const_prefix}{cpp_type_with_name}{cpp_value}"
+        else:
+            # 标准格式化
+            core_cpp = f"{const_prefix}{cpp_final_type} {cpp_name_for_declaration}{cpp_value}"
 
         return (core_cpp, is_member_variable, access, cpp_final_type, cpp_name_for_scope)
 
+    def _collect_suffixes(self, ctx):
+        """
+        [新增辅助函数] 收集并按源代码顺序排序类型后缀 (* 和 &)。
+        """
+        suffixes = []
+        if ctx.STAR():
+            suffixes.extend(ctx.STAR())
+        if ctx.BIT_AND():
+            suffixes.extend(ctx.BIT_AND())
+
+        # 按它们在源代码中出现的顺序排序
+        suffixes.sort(key=lambda x: x.getSymbol().tokenIndex)
+        return suffixes
 
     def _enter_scope(self):
         """进入一个新的作用域 (例如函数体或 if 块)"""

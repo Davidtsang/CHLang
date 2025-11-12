@@ -1,0 +1,10 @@
+--- Function Pointer Test Start ---
+Test 1: Modern std::function (i32, i32) -> i32
+  [C++] global_add_func called.
+  Result A: 15
+Test 2: Raw C-Style Pointer ((i32, i32) -> i32)*
+  [C++] global_add_func called.
+  Result B: 25
+Test 3: Raw C-Style Pointer Null Init
+  PASS: Raw pointer correctly initialized to null.
+--- Function Pointer Test End ---

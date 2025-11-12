@@ -4,21 +4,36 @@
 parser grammar ChronoParser;
 options { tokenVocab = ChronoLexer; }
 
-// --- [ 1. 升级: 泛型/数组类型规则 ] ---
+
+// (在 ChronoParser.g4 中)
+// (在 ChronoParser.g4 中)
+
+// --- [ 1. 升级: 泛型/数组/函数 类型规则 ] ---
 typeSpecifier
-    : ( // 路径 A: C-Style 数组 (递归)
-        // e.g., [char; 20]
+    : ( // 路径 A: C-Style 数组 (e.g., [char; 20])
         LBRACK typeSpecifier SEMIC_TOKEN expression RBRACK
       )
-    | ( // 路径 B: 基础/泛型类型
-        // e.g., std.vector[i32] or i32
+      ( (STAR | BIT_AND) )* // 数组的后缀
+
+    | ( // 路径 B: 基础/泛型类型 (e.g., std.vector[i32] or i32)
         baseType (LBRACK typeList RBRACK)?
       )
-      ( // [ [ 新增 ] ]
-        // 允许在类型末尾添加 * 或 &
-        // e.g., i32*, String*, IShape&, i32**
-        (STAR | BIT_AND)
-      )* // 允许 0 个或多个
+      ( (STAR | BIT_AND) )* // 基础类型的后缀
+
+    | ( // [ [ [ 关键修复: 路径 C/D 合并 ] ] ]
+        //   处理所有以 '(' 开头的类型
+        LPAREN
+        (
+            // 选项 1 (Path C): 这是一个函数类型
+            // [ [ 关键变更 ] ]
+            // 现在使用 'typeList?' (只匹配类型, e.g., 'i32, i32' 或 '()')
+            (params=typeList? RPAREN ARROW returnType=typeSpecifier)
+
+            // 选项 2 (Path D): 这是一个带括号的类型
+            | (nested=typeSpecifier RPAREN)
+        )
+      )
+      ( (STAR | BIT_AND) )* // 函数/带括号类型的后缀
     ;
 
 baseType
