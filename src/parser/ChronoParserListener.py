@@ -224,6 +224,15 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#assignablePrimary.
+    def enterAssignablePrimary(self, ctx:ChronoParser.AssignablePrimaryContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#assignablePrimary.
+    def exitAssignablePrimary(self, ctx:ChronoParser.AssignablePrimaryContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#ifStatement.
     def enterIfStatement(self, ctx:ChronoParser.IfStatementContext):
         pass

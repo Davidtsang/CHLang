@@ -129,6 +129,11 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#assignablePrimary.
+    def visitAssignablePrimary(self, ctx:ChronoParser.AssignablePrimaryContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#ifStatement.
     def visitIfStatement(self, ctx:ChronoParser.IfStatementContext):
         return self.visitChildren(ctx)

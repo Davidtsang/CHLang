@@ -30,7 +30,9 @@ interface IShape {
 class Circle : ChronoObject impl ILoggable, IShape {
 
     var radius: f32;
-
+//    var radius: unique[Cat] = @make[Cat]();
+//    var radius: shared[Dog] = @make_shread[Dog];
+//    var radius: weak[Dog] = @move a;
     public init(r: f32) {
         this.radius = r;
     }

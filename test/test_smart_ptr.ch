@@ -54,7 +54,7 @@ func demo_unique_ptr() {
 
 // --- 2. 共享指针 (std::shared_ptr) ---
 func demo_shared_ptr() {
-    @cpp std::cout << "\n--- 2. std::shared_ptr Demo (共享) ---\n" << std::endl; @end
+    @cpp std::cout << "\n--- 2. std::shared_ptr Demo ---\n" << std::endl; @end
 
     // 声明一个 shared_ptr (在 main 作用域)
     var p_main: std.shared_ptr[Resource];
@@ -99,7 +99,7 @@ struct Child {
 }
 
 func demo_weak_ptr() {
-    @cpp std::cout << "\n--- 3. std::weak_ptr Demo (打破循环) ---\n" << std::endl; @end
+    @cpp std::cout << "\n--- 3. std::weak_ptr Demo ---\n" << std::endl; @end
 
     { // 创建内部作用域
         // 3a. 创建 (C++: auto p = std::make_shared<Parent>();)

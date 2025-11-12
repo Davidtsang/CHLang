@@ -2,10 +2,21 @@ import <iostream>;
 import <string>;
 import "Chrono.h";
 
-func main() -> int {
-    var s: std.string  = "Helloaaa";
+func change(s: std.string*){
 
-    s.insert(1, "bc");
+    *s = "Hbcelloaaa";
+}
+
+func change2(s: std.string&){
+
+    s = "Hbcelloaaa";
+}
+
+func main() -> int {
+
+    var s: std.string = "Hello";
+
+    change2(s);
 
     @cpp
         std::cout << s << std::endl;

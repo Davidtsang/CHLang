@@ -133,15 +133,23 @@ assignmentOperator
 
 assignment : assignableExpression assignmentOperator expression SEMIC_TOKEN ;
 
-// --- [ 2. 升级: 'assignableExpression' 规则 ] ---
-// [ [ 关键修复 ] ] ARROW 支持已保留
+// (在 ChronoParser.g4 中替换 assignableExpression)
 assignableExpression
-    : (IDENTIFIER | THIS)
+    : assignablePrimary      // 路径 A: 标识符, this, 或解引用/取地址的一元表达式
       ( // 循环处理链
-        DOT IDENTIFIER                      // 路径 A: .foo
-      | LBRACK expression RBRACK            // 路径 B: [i] (数组索引)
-      | ARROW IDENTIFIER                    // 路径 C: ->foo (已保留)
+        DOT IDENTIFIER                      // 路径 B: .foo
+      | LBRACK expression RBRACK            // 路径 C: [i] (数组索引)
+      | ARROW IDENTIFIER                    // 路径 D: ->foo 
       )*
+    ;
+
+// [新增] 允许作为赋值左值的一元表达式
+assignablePrimary
+    : IDENTIFIER 
+    | THIS
+    | STAR assignablePrimary   // [关键新增] 允许 * 解引用作为左值 (例如: **p2)
+    | BIT_AND assignablePrimary // [新增] & 操作也允许，但实际 C++ 中无效（除非用于引用）
+    | LPAREN assignableExpression RPAREN // 允许括号
     ;
 
 ifStatement
@@ -222,8 +230,10 @@ expression
     ;
 
 unaryExpression
-    : (PLUS | MINUS | NOT_OP | BIT_NOT) unaryExpression
-    | simpleExpression
+    : (PLUS | MINUS | NOT_OP | BIT_NOT) unaryExpression  // 处理 +, -, !, ~
+    | BIT_AND unaryExpression // [新增] BIT_AND (& 取地址操作符)
+    | STAR unaryExpression // [关键] STAR (* 解引用操作符)
+    | simpleExpression   // 处理普通表达式
     ;
 
 // --- [ 3. 升级: 'simpleExpression' 规则 ] ---

@@ -71,7 +71,7 @@ def run_test(test_file_path):
         # --- 步骤 3: 运行 (EXE -> Output) ---
         print(f"  [Run] {exe_output}")
         # text=True: 将输出解码为文本
-        run_result = subprocess.run([exe_output], check=True, capture_output=True, text=True)
+        run_result = subprocess.run([exe_output], check=True, capture_output=True, text=True, encoding='utf-8')
 
         # 将实际输出写入文件 (清理 \r\n 为 \n 以便比较)
         actual_content = run_result.stdout.strip().replace('\r\n', '\n')

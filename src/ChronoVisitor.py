@@ -1050,33 +1050,58 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return f"{INDENT}{target} {op_str} {value};\n"
 
+
+        # [ [ 关键替换 ] ]
     def visitAssignableExpression(self, ctx: ChronoParser.AssignableExpressionContext):
         """
         [重构] 访问 'assignableExpression' 规则。
-        [修复] 必须在作用域栈中查找 .IDENTIFIER
+        现在它首先调用 assignablePrimary，然后再处理链式调用。
         """
-        # 1. 访问第一个环节 (例如 "s", "this", "numbers")
-        if ctx.THIS():
-            primary_text = "this"
-        else:
-            primary_text = ctx.IDENTIFIER(0).getText()
+
+        # 1. 访问第一个环节 (e.g., "(*_s)", "this", "i")
+        primary_ctx = ctx.assignablePrimary()
+        current_code = self.visit(primary_ctx)
 
         # 2. 决定“第一个”访问器
-        current_accessor = None
-        variable_info = self._find_variable(primary_text)
+        # 这是一个启发式方法：我们查找最底层的标识符来确定其类型
 
-        if variable_info:
-            if '[' in variable_info["cpp_type"]:
-                current_code = primary_text  # 数组使用原始名称
+        base_ident_text = None
+        temp_node = primary_ctx
+
+        # 循环深入, 直到找到 IDENTIFIER 或 THIS
+        while True:
+            if temp_node.IDENTIFIER():
+                base_ident_text = temp_node.IDENTIFIER().getText()
+                break
+            if temp_node.THIS():
+                base_ident_text = "this"
+                break
+
+            # 向下遍历
+            if hasattr(temp_node, 'assignablePrimary') and temp_node.assignablePrimary():
+                temp_node = temp_node.assignablePrimary()
+            elif hasattr(temp_node, 'assignableExpression') and temp_node.assignableExpression():
+                temp_node = temp_node.assignableExpression().assignablePrimary()
             else:
-                current_code = variable_info["cpp_name"]  # "s" -> "_s"
-            current_accessor = variable_info["accessor"]
-        else:
-            current_code = self._chrono_to_cpp_type(primary_text)
-            current_accessor = "::"
+                break  # 到达末端
+
+        current_accessor = "."  # 默认访问器
+        if base_ident_text:
+            variable_info = self._find_variable(base_ident_text)
+            if variable_info:
+                # [修复] 如果基础是数组，访问器也是 "."
+                if '[' in variable_info["cpp_type"]:
+                    current_accessor = "."
+                else:
+                    current_accessor = variable_info["accessor"]  # "->" or "."
+
+        # [关键] 如果 primary 本身是解引用 (*s),
+        # 那么下一个访问器应该是 "." (访问值) 或 "->" (访问指针的成员)
+        # 我们的启发式方法 (查找基础 's') 已经正确设置了 current_accessor。
 
         # 3. 遍历链条 (DOT IDENTIFIER | LBRACK ... | ARROW ...)*
-        child_nodes = ctx.children[1:]
+        # [ [ 此逻辑从你的原始文件中保留 ] ]
+        child_nodes = ctx.children[1:]  # 跳过 assignablePrimary
         i = 0
         while i < len(child_nodes):
 
@@ -1088,14 +1113,11 @@ class ChronoVisitor(BaseChronoVisitor):
 
                 raw_ident_text = ident_node.getText()
 
-                # [ [ 关键修复 ] ]
-                # 我们必须在作用域栈中查找此成员
                 member_info = self._find_variable(raw_ident_text)
                 if member_info:
-                    cpp_ident = member_info["cpp_name"]  # e.g., "s" -> "_s", "val" -> "val"
+                    cpp_ident = member_info["cpp_name"]  # e.g., "s" -> "_s"
                 else:
                     cpp_ident = raw_ident_text  # Fallback
-                # [ [ 修复结束 ] ]
 
                 current_code = f"{current_code}{current_accessor}{cpp_ident}"
 
@@ -1119,7 +1141,7 @@ class ChronoVisitor(BaseChronoVisitor):
                 ident_node = child_nodes[i]
                 i += 1  # 'IDENTIFIER'
 
-                cpp_ident = ident_node.getText()  # -> 访问不剥离 $ (也不查找)
+                cpp_ident = ident_node.getText()
 
                 current_code = f"{current_code}->{cpp_ident}"
                 current_accessor = "->"
@@ -1354,34 +1376,83 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return current_code
 
+        # (在 src/ChronoVisitor.py 中替换 visitUnaryExpression)
     def visitUnaryExpression(self, ctx: ChronoParser.UnaryExpressionContext):
         """
-        [新增] 访问新的一元表达式规则 (处理 -8)
+        [修改] 访问一元表达式规则，处理 & (取地址) 和 * (解引用)
         """
         if ctx.simpleExpression():
-            # 路径 A: 这是一个没有一元运算符的常规表达式 (例如 "8")
             return self.visit(ctx.simpleExpression())
 
-        # 路径 B: 这是一个带一元运算符的表达式 (例如 "-8")
         op = ""
-        if ctx.MINUS():
+
+        # [ [ 关键新增 ] ] 处理 BIT_AND (& 取地址)
+        if ctx.BIT_AND():
+            op = "&"  # Chrono & -> C++ & (取地址操作符)
+
+        # [ [ 关键新增 ] ] 处理 STAR (* 解引用)
+        elif ctx.STAR():
+            op = "*"  # Chrono * -> C++ * (解引用操作符)
+
+        elif ctx.MINUS():
             op = "-"
         elif ctx.PLUS():
             op = "+"
-        elif ctx.NOT_OP():  # <-- [新增]
-            op = "!"  # <-- [新增]
-        elif ctx.BIT_NOT():  # <-- [新增]
-            op = "~"  # <-- [新增]
+        elif ctx.NOT_OP():
+            op = "!"
+        elif ctx.BIT_NOT():  # 假设 BIT_NOT 仍然是 ~
+            op = "~"
+
         # 递归访问操作数
         operand = self.visit(ctx.unaryExpression())
 
-        # C++ 原生支持一元 + 和 -
-        return f"{op}{operand}"  # (例如: "-8" 或 "+10")
+        if op == "*" or op == "&":
+            # 无论是取地址还是解引用，使用括号 () 封装能确保优先级
+            return f"{op}{operand}"
+        else:
+            return f"{op}{operand}"
 
     # [新增] 访问 delete 语句
     def visitDeleteStatement(self, ctx: ChronoParser.DeleteStatementContext):
         target = self.visit(ctx.expression())
         return f"{INDENT}delete {target};\n"
+
+    # (在 ChronoVisitor.py 中新增此方法，例如放在 visitAssignableExpression 附近)
+    def visitAssignablePrimary(self, ctx: ChronoParser.AssignablePrimaryContext):
+        """
+        [新增] 访问 assignablePrimary 规则，处理 * 和 & 作为左值。
+        """
+        if ctx.IDENTIFIER():
+            # 查找变量的 C++ 名称 (s -> s, _s, data[3], etc.)
+            primary_text = ctx.IDENTIFIER().getText()
+            variable_info = self._find_variable(primary_text)
+
+            # 沿用 visitAssignableExpression 的逻辑来决定是返回原始名还是 C++ 名
+            if variable_info:
+                if '[' in variable_info["cpp_type"]:
+                    return primary_text  # 数组使用原始名称
+                else:
+                    return variable_info["cpp_name"]  # 例如: "_s"
+            else:
+                return self._chrono_to_cpp_type(primary_text)  # Fallback
+
+        if ctx.THIS():
+            return "this"
+
+        # [关键] 处理一元操作符 * (STAR) 和 & (BIT_AND)
+        if ctx.STAR():
+            # 递归访问右侧，并添加 *
+            return f"(*{self.visit(ctx.assignablePrimary())})"
+
+        if ctx.BIT_AND():
+            # 递归访问右侧，并添加 &
+            return f"(&{self.visit(ctx.assignablePrimary())})"
+
+        if ctx.LPAREN():
+            return f"({self.visit(ctx.assignableExpression())})"
+
+        return ""
+
 
     def visitExpressionList(self, ctx: ChronoParser.ExpressionListContext):
         return ", ".join(self.visit(e) for e in ctx.expression())
