@@ -152,6 +152,15 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#usingAlias.
+    def enterUsingAlias(self, ctx:ChronoParser.UsingAliasContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#usingAlias.
+    def exitUsingAlias(self, ctx:ChronoParser.UsingAliasContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#functionDefinition.
     def enterFunctionDefinition(self, ctx:ChronoParser.FunctionDefinitionContext):
         pass

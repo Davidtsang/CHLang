@@ -70,6 +70,7 @@ topLevelStatement
     | structDefinition // <-- [新增]
     | functionDefinition
     | interfaceDefinition // <-- [新增]
+    | usingAlias
     ;
 
 accessModifier : PUBLIC ;
@@ -123,6 +124,9 @@ deinitBlock : DEINIT LBRACE statement* RBRACE ;
 
 importDirective
     : IMPORT path=(STRING_LITERAL | INCLUDE_PATH) (AS alias=IDENTIFIER)? SEMIC_TOKEN ;
+
+usingAlias
+    : USING name=IDENTIFIER ASSIGN typeName=typeSpecifier SEMIC_TOKEN ;
 
 functionDefinition
     : (STATIC)?

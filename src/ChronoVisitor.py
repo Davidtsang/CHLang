@@ -622,7 +622,39 @@ class ChronoVisitor(BaseChronoVisitor):
             return f'#include "{path_content}"\n'
         return f"// ERROR: Invalid import path {path_text}\n"
 
-    # [ [ 新增 ] ]
+    def visitUsingAlias(self, ctx: ChronoParser.UsingAliasContext):
+        """
+        [新增] 访问 'usingAlias' 规则。
+        e.g., using MyInt = i32;
+        e.g., using RawAdder = ((i32) -> i32)*;
+        """
+
+        # 1. 获取别名 (e.g., "MyInt" or "RawAdder")
+        chrono_name = ctx.name.text
+
+        # 2. 访问类型。这可能会返回:
+        #    - "int32_t"
+        #    - "std::function<...>"
+        #    - "int32_t (*{NAME})(int32_t)" (特殊 C-Style 模式)
+        cpp_type_pattern = self.visit(ctx.typeName)
+
+        cpp_type = ""
+
+        # 3. [ [ 关键处理 ] ]
+        #    我们必须转换 C-Style 指针的模式
+        if "(*{NAME})" in cpp_type_pattern:
+            # 模式: "int32_t (*{NAME})(int32_t)"
+            # C++ 别名语法需要: "int32_t (*)(int32_t)"
+            # 我们用 "(*)" 替换 "(*{NAME})"
+            cpp_type = cpp_type_pattern.replace("(*{NAME})", "(*)")
+        else:
+            # 标准类型 (i32, std::function<...>, std.vector[...])
+            cpp_type = cpp_type_pattern
+
+        # 4. 返回 C++ using 语句
+        return f"using {chrono_name} = {cpp_type};\n"
+
+
     def visitMethodSignature(self, ctx: ChronoParser.MethodSignatureContext):
         # 将 Chrono 方法签名翻译为 C++ 纯虚函数
 

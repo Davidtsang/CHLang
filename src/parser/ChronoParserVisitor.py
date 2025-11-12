@@ -89,6 +89,11 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#usingAlias.
+    def visitUsingAlias(self, ctx:ChronoParser.UsingAliasContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#functionDefinition.
     def visitFunctionDefinition(self, ctx:ChronoParser.FunctionDefinitionContext):
         return self.visitChildren(ctx)

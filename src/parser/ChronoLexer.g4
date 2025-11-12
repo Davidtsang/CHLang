@@ -25,7 +25,7 @@ PUBLIC  : 'public' ; // class attr access flag
 INTERFACE: 'interface' ; // <-- [新增]
 IMPL    : 'impl' ;      // <-- [新增]
 AS      : 'as' ;     // [新增] 用于 import 别名
-
+USING   : 'using' ;
 UNIQUE_KW : 'unique' ;     // [新增]
 SHARED_KW : 'shared' ;     // [新增]
 WEAK_KW   : 'weak' ;       // [新增]

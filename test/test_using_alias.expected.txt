@@ -1,0 +1,12 @@
+--- Using Alias Test Start ---
+Test 1: Simple Alias
+  MyInt x = 10
+Test 2: Generic Alias
+  names[0] = Hello Using
+Test 3: std::function Alias
+  [C++] global_add_func called.
+  AddFunc result = 10
+Test 4: C-Style Ptr Alias
+  [C++] global_add_func called.
+  RawAdder result = 40
+--- Using Alias Test End ---

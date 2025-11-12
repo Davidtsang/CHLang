@@ -12,12 +12,17 @@ struct Boy{
 
     var funcCall:((int)-> void)*;
 }
+
 func main()-> int {
 
     var boy:Boy;
 
     boy.funcCall = add ;
-    boy.funCall(6);
-    //add(5);
 
+    // [ [ 修复 ] ]
+    // 之前是: boy.funCall(6);
+    // 现在是:
+    boy.funcCall(6);
+
+    //add(5);
 }
