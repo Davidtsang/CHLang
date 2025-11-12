@@ -1,20 +1,19 @@
-// file: test/test_cpp_smart_pointers.ch
-// 目的: 验证 Chrono 语法对 C++ 原生智能指针的调用
+// file: test/test_smart_ptr.ch
+// 目的: 验证 Chrono 的新内置智能指针语法
 //
 // 验证:
-// - 泛型调用: std.make_shared[T]()
-// - 泛型类型: var p: std::shared_ptr[T];
-// - Chrono 原生 . 访问: p.use_count()
-// - Chrono 原生 -> 访问: p->member
+// - 内置泛型调用: @make[T](), @make_shared[T]()
+// - 内置泛型类型: var p: unique[T];
+// - 翻转 . 访问 (访问对象): p.member (原 p->member)
+// - 翻转 -> 访问 (访问指针): p->use_count() (原 p.use_count())
 
 import <iostream>; // 用于 @cpp std::cout
-import <memory>;   // 用于 std::make_unique, std::make_shared
-import <string>;   // 用于 std::string
-import <utility>;  // 用于 std::move
+import <memory>;   // 依赖项，保持不变
+import <string>;   // 依赖项，保持不变
+import <utility>;  // 依赖项，保持不变
 
 // --- 1. 独占指针 (std::unique_ptr) ---
 
-// 用于测试的 "哑巴" struct (非侵入式)
 struct Resource {
     var id: i32;
     init(i: i32) {
@@ -27,18 +26,18 @@ struct Resource {
 func demo_unique_ptr() {
 
     { // 创建内部作用域
-        // 1a. 创建 (C++: auto ptr1 = std::make_unique<Resource>(1);)
-        var ptr1 = std.make_unique[Resource](1);
+        // [修改] 1a. 创建 (使用 @make)
+        var ptr1 = @make[Resource](1);
 
-        // 1b. [验证 -> 访问]
-        // 使用 Chrono 的 -> 语法从智能指针读取值
-        var id_val: i32 = ptr1->id;
+        // [修改] 1b. [验证 . 访问] (访问被管理的对象)
+        var id_val: i32 = ptr1.id;
+
         @cpp
             std::cout << "  ptr1 points to Resource " << id_val << std::endl;
         @end
 
-        // 1c. 转移所有权 (C++: auto ptr2 = std::move(ptr1);)
-        var ptr2 = std.move(ptr1);
+        // [修改] 1c. 转移所有权 (使用 @move)
+        var ptr2 = @move(ptr1);
 
         // 1d. 验证 ptr1 已失效
         @cpp
@@ -56,44 +55,41 @@ func demo_unique_ptr() {
 func demo_shared_ptr() {
     @cpp std::cout << "\n--- 2. std::shared_ptr Demo ---\n" << std::endl; @end
 
-    // 声明一个 shared_ptr (在 main 作用域)
-    var p_main: std.shared_ptr[Resource];
+    // [修改] 声明一个 shared_ptr (使用内置类型)
+    var p_main: shared[Resource];
 
     { // 创建内部作用域
-        // 2a. 创建 (C++: auto p_inner = std::make_shared<Resource>(2);)
-        var p_inner = std.make_shared[Resource](2);
+        // [修改] 2a. 创建 (使用 @make_shared)
+        var p_inner = @make_shared[Resource](2);
 
-        // 2b. 共享所有权 (C++: p_main = p_inner; RC=2)
+        // 2b. 共享所有权
         p_main = p_inner;
 
-        // 2c. [验证 . 访问]
-        // 我们可以使用 Chrono 的 . 语法访问智能指针自身的方法
-        var count: i64 = p_main.use_count();
+        // [修改] 2c. [验证 -> 访问] (访问智能指针对象本身)
+        var count: i64 = p_main->use_count();
 
         @cpp std::cout << "  p_main and p_inner share Resource 2 (RC=" << count << ")." << std::endl; @end
         @cpp std::cout << "  Inner scope ending (p_inner dies)..." << std::endl; @end
     } // <-- p_inner 在此离开作用域. RC 降为 1.
-      // [关键] Resource 2 *不*应该被销毁.
 
     @cpp std::cout << "  Resource 2 is still alive (RC=1)." << std::endl; @end
     @cpp std::cout << "  demo_shared_ptr() scope ending (p_main dies)..." << std::endl; @end
-    // <-- p_main 在此离开作用域. RC 降为 0. Resource 2 应该被销毁.
 }
 
 
 // --- 3. 弱指针 (std::weak_ptr) ---
-// [前置声明] C++ 需要
 @cpp struct Parent; struct Child; @end
 
 struct Parent {
-    var child: std.shared_ptr[Child]; // Parent 强引用 Child
+    // [修改] 使用内置类型
+    var child: shared[Child];
     init() { @cpp std::cout << "  Parent created." << std::endl; @end }
     deinit { @cpp std::cout << "  Parent destroyed." << std::endl; @end }
 }
 
 struct Child {
-    // [关键] Child *弱*引用 Parent
-    var parent: std.weak_ptr[Parent];
+    // [修改] 使用内置类型
+    var parent: weak[Parent];
     init() { @cpp std::cout << "  Child created." << std::endl; @end }
     deinit { @cpp std::cout << "  Child destroyed." << std::endl; @end }
 }
@@ -102,18 +98,16 @@ func demo_weak_ptr() {
     @cpp std::cout << "\n--- 3. std::weak_ptr Demo ---\n" << std::endl; @end
 
     { // 创建内部作用域
-        // 3a. 创建 (C++: auto p = std::make_shared<Parent>();)
-        var p = std.make_shared[Parent](); // p (RC=1)
-        var c = std.make_shared[Child]();   // c (RC=1)
+        // [修改] 3a. 创建
+        var p = @make_shared[Parent]();
+        var c = @make_shared[Child]();
 
-        // 3b. [验证 -> 赋值]
-        // 我们现在可以使用 Chrono 的 -> 语法进行赋值，无需 @cpp
-        p->child = c;  // c (RC=2) (p 强引用 c)
-        c->parent = p; // p (RC=1) (c *弱*引用 p, RC 不增加!)
+        // [修改] 3b. [验证 . 赋值] (访问被管理的对象)
+        p.child = c;
+        c.parent = p;
 
         @cpp std::cout << "  Cycle created. Scopes ending..." << std::endl; @end
-    } // <-- p (RC=0) 销毁 -> Parent 销毁 -> p->child 销毁 -> c (RC=1)
-      //     c (RC=0) 销毁 -> Child 销毁
+    }
 
     @cpp std::cout << "  Both Parent and Child were destroyed (no leak)." << std::endl; @end
 }

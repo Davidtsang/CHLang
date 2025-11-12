@@ -10,10 +10,10 @@ Chrono 是一个创新的编程语言项目，其目标是成为“C++ 的 TypeS
 
 - **双重类型系统**：
   - 值类型（如 `var x: i32`）翻译为栈分配的 C++ 原生类型（如 `int32_t x`），零开销。
-  - 引用类型（如 `var $s: std.string`）翻译为堆分配的指针（如 `std::string* s`），使用 MRC 进行内存管理。
+  - 引用类型（如 `var s: String*`）翻译为堆分配的指针（如 `String* s`），使用 MRC 进行内存管理。
 - **统一的 `.` 语法**：消除 `->`，翻译器智能判断上下文（如实例调用翻译为 `->`，静态调用翻译为 `::`）。
 - **`@cpp` 逃生舱口**：允许在任何位置注入原生 C++ 代码，保证顺序输出。
-- **其他特性**：支持泛型（如 `std.vector[i32]`）、数组（如 `[char; 20]`）、流程控制（if/else/while/for）、运算符（算术、比较、位运算、复合赋值）、字面量（包括字节、浮点等），以及类、struct、接口定义。
+- **其他特性**：支持泛型（如 `std.vector[i32]`）、数组（如 `[char; 20]`）、流程控制（if/else/while/for）、运算符（算术、比较、位运算、复合赋值）、字面量（包括字节、浮点等），以及类、struct、接口定义、智能指针（unique/shared/weak）。
 
 ## 当前已实现的功能
 
@@ -21,22 +21,23 @@ Chrono 是一个创新的编程语言项目，其目标是成为“C++ 的 TypeS
 - **基础语法**：`import`（支持别名和路径）、`class`、`struct`、`func`、`var`（可变声明）、`const`（常量声明）、`init`、`deinit`、`return`、`static`、`public`、`interface`、`impl`、`as`、`new`、`delete`、`if`、`else`、`while`、`for`、`true`/`false`、`bool` 类型、比较运算符（`==`、`!=`、`<`、`>`、`<=`、`>=`）、逻辑运算符（`&&`、`||`）。
 - **面向对象**：`static func`、`init`（构造函数）、`deinit`（析构函数）、类继承（基类，使用 `:`）、接口实现（使用 `impl`）、`struct`（类似class，无继承，默认public）。
 - **表达式和链式调用**：完整的链式调用（如 `s.toUpper().length()`）、赋值（支持复合赋值如 `+=`、`-=`）、方法调用、数组索引。
-- **数据类型**：完整的整数类型（`i8/u8` 到 `i64/u64`）、浮点类型（`f32/f64`）、字符串、字节、字符字面量、数组语法（`[type; size]`）、泛型类型（支持嵌套）。
+- **数据类型**：完整的整数类型（`i8/u8` 到 `i64/u64`）、浮点类型（`f32/f64`）、字符串、字节、字符字面量、数组语法（`[type; size]`）、泛型类型（支持嵌套）、智能指针（`unique[T]`、`shared[T]`、`weak[T]` ）。
 - **运算符**：算术（`+`、`-`、`/`、`*`、`%`）、位运算（`&`、`|`、`^`、`~`、`<<`、`>>`）、复合赋值（`+=` 等）。
-- **内存管理**：MRC（手动引用计数）通过 `retain()` 和 `release()`，支持 `new`/`delete` 关键字。
+- **内存管理**：MRC（手动引用计数）通过 `retain()` 和 `release()`，支持 `new`/`delete` 关键字、智能指针工厂（`@make[T]` 、`@make_shared[T]`、`@move`）。
 - **测试套件**：Python 脚本 `run_tests.py` 用于翻译、编译、运行和比较输出，支持单个文件或全部测试。
 
 项目还包括多个测试文件（如 `test_flow_control.ch`、`test_arithmetic_ops.ch` 等），覆盖各种场景，确保翻译器的正确性。
 
 ## 语法概述
 
-Chrono 的语法基于 ANTLR4 定义，支持模块化解析。程序由顶级语句（如导入、类定义、struct定义、函数定义、接口定义）组成。文 件名扩展名为 `.ch`，编译目标为 C++17，使用 MSVC 编译器。
+Chrono 的语法基于 ANTLR4 定义，支持模块化解析。程序由顶级语句（如导入、类定义、struct定义、函数定义、接口定义）组成。文 件扩展名为 `.ch`，编译目标为 C++17，使用 MSVC 编译器。
 
 ### 关键字
 
 Chrono 的关键字（不区分大小写）包括：
 
 - **控制和声明**：`import`, `var`, `const`, `func`, `class`, `struct`, `return`, `static`, `public`, `as`, `new`, `delete`, `if`, `else`, `while`, `for`, `interface`, `impl`, `init`, `deinit`, `this`, `true`, `false`。
+- **智能指针**：`unique`, `shared`, `weak`, `@make`, `@make_shared`, `@move`。
 - **其他**：`@cpp`（切换到 C++ 模式），`@end`（结束 C++ 块）。
 
 示例：
@@ -56,9 +57,9 @@ Chrono 支持完整的类型系统，分为值类型和引用类型。类型在 
   - 布尔：`bool`。
 - **复合类型**：
   - 字符串：`std.string`（值类型，翻译为 `std::string`）。
-  - 引用类型：以 `$` 标记，如 `$String`（翻译为 `String*`）。
   - 泛型：如 `std.vector[i32]`（翻译为 `std::vector<int32_t>`），支持嵌套（如 `std.map[std.string, std.vector[i32]]`）。
   - C-Style 数组：`[char; 20]`（翻译为 `char[20]`），支持动态大小（如 `[std.string; size]`）。
+  - 智能指针：`unique[T]`（`std::unique_ptr<T>`）、`shared[T]`（`std::shared_ptr<T>`）、`weak[T]`（`std::weak_ptr<T>`） 。
 - **特殊类型**：
   - `id`：指向 `ChronoObject` 的指针，用于 MRC。
   - 字节：`u8`（与 `b'A'` 字面量结合）。
@@ -66,9 +67,10 @@ Chrono 支持完整的类型系统，分为值类型和引用类型。类型在 
 示例：
 ```chrono
 var x: i32 = 5;                // 值类型
-var $s: String = String.create("hello");  // 引用类型
+var s: String* = String.create("hello");  // 引用类型
 var v: std.vector[i32];         // 泛型
 var arr: [char; 20] = {"a", "b"};  // 数组
+var ptr: unique[Resource];      // 智能指针
 ```
 
 ### 字面量（Literals）
@@ -101,7 +103,7 @@ var arr: [i32; 3] = {1, 2, 3};  // 初始化数组
 - **比较运算符**：`==`, `!=`, `<`, `>`, `<=`, `>=`。
 - **逻辑运算符**：`&&`, `||`。
 - **位运算符**：`&`, `|`, `^`, `~`, `<<`, `>>`。
-- **赋值**：`=`，复合赋值：`+=`, `-=`, `*=`, `/=`, `%=`, `&=`, `|=`, `^=`, `<<=`, `>>=`。
+- **复合赋值**：`=`, `+=`, `-=`, `*=`, `/=`, `%=`, `&=`, `|=`, `^=`, `<<=`, `>>=`。
 - **链式调用**：`.foo()`（智能翻译为 `.` 或 `->`），支持数组索引 `[i]`。
 - **函数调用**：`funcName(args)`。
 - **优先级**：遵循标准数学规则，一元运算符优先级最高。
@@ -110,7 +112,7 @@ var arr: [i32; 3] = {1, 2, 3};  // 初始化数组
 ```chrono
 var result: i32 = a + b * 2;  // 算术
 if (x == 5) { ... }           // 比较
-var $len: Int = $s.length();  // 方法链
+var len: Int* = s.length();  // 方法链
 arr[0] = 10;                  // 数组索引
 ```
 
@@ -118,7 +120,7 @@ arr[0] = 10;                  // 数组索引
 
 语句包括声明、赋值、控制流等。
 
-- **声明**：`var/const varName: type = value;`（支持 `$` 标记引用类型，可选类型推导）。
+- **声明**：`var/const varName: type = value;`
 - **赋值**：`target op value;`（支持复合赋值）。
 - **返回**：`return expr;`。
 - **表达式语句**：`expr;`（如函数调用）。
@@ -128,6 +130,7 @@ arr[0] = 10;                  // 数组索引
   - `for (init; condition; increment) { ... }`
 - **删除**：`delete expr;`（用于手动释放非 MRC 对象）。
 - **C++ 块**：`@cpp ... @end`（嵌入原生 C++）。
+- **块语句**：`{ ... }`（独立作用域）。
 
 示例：
 ```chrono
@@ -138,7 +141,7 @@ for (var i: i32 = 0; i < 3; i += 1) { ... }
 @cpp std::cout << "native" << std::endl; @end
 ```
 
-### 类和面向对象
+### 类、Struct 和面向对象
 
 - **类定义**：`class Name : Base impl Interface1, Interface2 { ... }`（继承使用 `:`，接口使用 `impl`）。
 - **Struct 定义**：`struct Name { ... }`（无继承，默认 public）。
@@ -171,8 +174,8 @@ struct Point {
 
 - **全局函数**：`func name(params) -> returnType { ... }`（支持 `static`）。
 - **方法**：类似，但属于类，支持 `this`。
-- **参数**：`name: type`（支持 `$` 标记）。
-- **返回类型**：`-> type`（引用类型需 `$`）。
+- **参数**：`name: type`
+- **返回类型**：`-> type`。
 
 示例：
 ```chrono
@@ -199,7 +202,7 @@ import "lib/MyMath.h" as Math;   // 别名 Math
 - **作用域栈**：在 `ChronoVisitor.py` 中实现，支持嵌套作用域和变量查找。
 - **类型推导**：`var` 支持可选类型声明。
 - **常量**：`const` 用于不可变声明。
-- **内存管理**：MRC 需开发者手动管理引用类型内存。
+- **内存管理**：MRC 需开发者手动管理引用类型内存、智能指针自动管理。
 - **格式化**：可选使用 `clang-format` 美化生成代码。
 
 ## 项目结构
@@ -227,26 +230,21 @@ import "lib/MyMath.h" as Math;   // 别名 Math
 
 ## 当前状态和挑战
 
-- **已完成**：MVP 功能完整，支持复杂表达式、类、struct、接口、测试自动化。测试套件覆盖广泛，输出与预期匹配。
+- **已完成**：MVP 功能完整，支持复杂表达式、类、struct、接口、智能指针、测试自动化。测试套件覆盖广泛，输出与预期匹配。
 - **潜在问题**：
   - 作用域栈和访问器逻辑复杂，可能在嵌套上下文中出错（但测试文件显示已修复）。
   - 依赖 ANTLR4 和 MSVC，可能在其他平台（如 Linux）需要调整编译命令。
   - 泛型和数组语法新颖，但需确保与 C++ 标准兼容。
 - **性能**：翻译为纯 C++，零运行时开销（除了 MRC）。
 
-## 演示：Chrono 泛型语法
+## 演示：Chrono 智能指针语法
 
 | Chrono 语法 (新) | C++ 翻译 (目标) | 架构规则 |
 |------------------|------------------|----------|
-| `var v: std.vector[i32];` | `std::vector<int32_t> v;` | 值类型 (无 $ 变量) |
-| `var $v: std.vector[i32];` | `std::vector<int32_t>* _v;` | 指针类型 ($ 变量) |
-| `var m: std.map[std.string, i32];` | `std::map<std::string, int32_t> m;` | 值类型 (嵌套命名空间) |
-| `var $o: MyClass[$String];` | `MyClass<String*>* _o;` | 指针类型 (泛型参数是 $ 类型) |
+| `var p: unique[Resource] = @make[Resource](args);` | `std::unique_ptr<Resource> p = std::make_unique<Resource>(args);` | 独占指针 |
+| `var p: shared[Resource] = @make_shared[Resource](args);` | `std::shared_ptr<Resource> p = std::make_shared<Resource>(args);` | 共享指针 |
+| `var p2 = @move(p);` | `auto p2 = std::move(p);` | 移动语义 |
 
-## 未实现功能
-- **全面的测试**：使得健壮性能达到0.1版本发布水平。
-- **组合逻辑优化**：增强对组合这种编程模型的支持。
-- **函数指针**：计划支持类型别名或内联签名，如 `typealias OperationFunc = (i32, i32) -> i32;` 或 `var myFunc: (i32, f64) -> i32;`。
-Conversation saved to history\2025-11-10_23-06-16.html
+---
 
-C:\Users\davidzen\Chrono\gok>
+这个 README.md 全面总结了项目的当前状态，并融入了最新的语法改动。如果您需要进一步修改、添加示例或调试代码，请告诉我！

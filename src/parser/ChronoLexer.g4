@@ -25,6 +25,15 @@ PUBLIC  : 'public' ; // class attr access flag
 INTERFACE: 'interface' ; // <-- [新增]
 IMPL    : 'impl' ;      // <-- [新增]
 AS      : 'as' ;     // [新增] 用于 import 别名
+
+UNIQUE_KW : 'unique' ;     // [新增]
+SHARED_KW : 'shared' ;     // [新增]
+WEAK_KW   : 'weak' ;       // [新增]
+
+AT_MAKE_UNIQUE : '@make' ;        // [新增] 对应 @make[T]
+AT_MAKE_SHARED : '@make_shared' ; // [新增] 对应 @make_shared[T] (修正了你的 @make_shread 拼写)
+AT_MOVE        : '@move' ;       // [新增] 对应 @move(a)
+
 // BOOL_LITERAL 必须在 IDENTIFIER 之前
 BOOL_LITERAL    : 'true' | 'false' ;
 // [新增] new / delete 关键字

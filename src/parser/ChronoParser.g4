@@ -22,7 +22,10 @@ typeSpecifier
     ;
 
 baseType
-    : IDENTIFIER (DOT IDENTIFIER)*
+    : (IDENTIFIER (DOT IDENTIFIER)*)
+    | UNIQUE_KW   // [新增]
+    | SHARED_KW   // [新增]
+    | WEAK_KW     // [新增]
     ;
 
 typeList
@@ -254,9 +257,11 @@ simpleExpression
 
 primary
     : NEW baseType LPAREN expressionList? RPAREN
+    // [ [ 新增 ] ] @make[T](args) 和 @make_shared[T](args)
+    | (AT_MAKE_UNIQUE | AT_MAKE_SHARED) LBRACK typeSpecifier RBRACK LPAREN expressionList? RPAREN
     | literal
     | initializerList
-    | IDENTIFIER  // <-- [已还原]
+    | IDENTIFIER
     | THIS
     | LPAREN expression RPAREN
     ;
@@ -265,8 +270,11 @@ initializerList
     : LBRACE expressionList? RBRACE
     ;
 
-// [ [ 关键修复：已还原/取消注释 ] ]
-functionCallExpression : name=IDENTIFIER LPAREN expressionList? RPAREN ;
+// (在 ChronoParser.g4 中替换 functionCallExpression)
+functionCallExpression
+    : funcName=(IDENTIFIER | AT_MOVE) // [修改] 允许 @move 作为函数名
+    LPAREN expressionList? RPAREN
+    ;
 
 expressionList : expression (COMMA expression)* ;
 
