@@ -1,12 +1,12 @@
 // file: test/test_using_alias.ch
 // 目的: 验证 'using' 关键字是否适用于所有类型
 
-import <iostream>;
-import <functional>; // 用于 std::function
-import <cstdint>;
-import <string>;
-import <vector>;    // 用于 std::vector
-import "runtime/ChronoObject.h";
+import <iostream>
+import <functional> // 用于 std::function
+import <cstdint>
+import <string>
+import <vector>    // 用于 std::vector
+import "runtime/ChronoObject.h"
 
 @cpp
 // 目标 C++ 函数

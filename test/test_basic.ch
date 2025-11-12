@@ -1,6 +1,6 @@
-import "ChronoObject.h";
-import "ChronoInt.h";
-import "Chrono.h";
+import "ChronoObject.h"
+import "ChronoInt.h"
+import "Chrono.h"
 
 func main() -> int {
     var five: int = 5;

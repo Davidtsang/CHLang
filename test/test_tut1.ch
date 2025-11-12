@@ -1,4 +1,4 @@
-import <iostream>;
+import <iostream>
 
 func add(i: int&){
     i +=1;

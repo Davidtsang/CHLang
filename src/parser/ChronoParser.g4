@@ -123,7 +123,7 @@ initDefinition
 deinitBlock : DEINIT LBRACE statement* RBRACE ;
 
 importDirective
-    : IMPORT path=(STRING_LITERAL | INCLUDE_PATH) (AS alias=IDENTIFIER)? SEMIC_TOKEN ;
+    : IMPORT path=(STRING_LITERAL | INCLUDE_PATH) (AS alias=IDENTIFIER)?;
 
 usingAlias
     : USING name=IDENTIFIER ASSIGN typeName=typeSpecifier SEMIC_TOKEN ;

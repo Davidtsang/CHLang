@@ -1,7 +1,7 @@
 // file: test/test_access_control.ch
 // 目的: [已修复] 验证 '*' 引用标记和 public/private
 
-import "runtime/Chrono.h";
+import "runtime/Chrono.h"
 import "runtime/ChronoObject.h";
 import "runtime/ChronoString.h";
 import "runtime/ChronoInt.h";
