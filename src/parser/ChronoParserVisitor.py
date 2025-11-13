@@ -94,6 +94,11 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#typemapDefinition.
+    def visitTypemapDefinition(self, ctx:ChronoParser.TypemapDefinitionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#functionDefinition.
     def visitFunctionDefinition(self, ctx:ChronoParser.FunctionDefinitionContext):
         return self.visitChildren(ctx)

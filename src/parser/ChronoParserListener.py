@@ -161,6 +161,15 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#typemapDefinition.
+    def enterTypemapDefinition(self, ctx:ChronoParser.TypemapDefinitionContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#typemapDefinition.
+    def exitTypemapDefinition(self, ctx:ChronoParser.TypemapDefinitionContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#functionDefinition.
     def enterFunctionDefinition(self, ctx:ChronoParser.FunctionDefinitionContext):
         pass

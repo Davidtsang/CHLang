@@ -71,6 +71,7 @@ topLevelStatement
     | functionDefinition
     | interfaceDefinition // <-- [新增]
     | usingAlias
+    | typemapDefinition
     ;
 
 accessModifier : PUBLIC ;
@@ -127,6 +128,10 @@ importDirective
 
 usingAlias
     : USING name=IDENTIFIER ASSIGN typeName=typeSpecifier SEMIC_TOKEN ;
+
+// 语法: typemap <NewName> [: <HintType>] = "<LiteralString>"
+typemapDefinition
+    : TYPEMAP name=IDENTIFIER (COLON hint=typeSpecifier)? ASSIGN value=STRING_LITERAL SEMIC_TOKEN ;
 
 functionDefinition
     : (STATIC)?

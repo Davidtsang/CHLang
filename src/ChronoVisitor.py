@@ -21,6 +21,7 @@ class ChronoVisitor(BaseChronoVisitor):
         self._class_sections = {"private": "", "public": ""}
         self._alias_to_namespace_map = {}
 
+        self._literal_alias_map = {}
         # [ [ 2. 新增：我们的“作用域栈” ] ]
         # 这是一个字典的列表。
         # 栈顶 (self._scope_stack[-1]) 代表当前作用域。
@@ -115,27 +116,27 @@ class ChronoVisitor(BaseChronoVisitor):
     def visitBaseType(self, ctx: ChronoParser.BaseTypeContext):
         """
         [重构] 访问 'baseType' 规则。
-        处理:
-        1. 命名空间: "std.string" -> "std::string"
-        2. 别名: "Math.Type" -> "MyMath::Type"
-        3. 基础类型: "i32" -> "int32_t"
-
-        [移除] 不再需要处理 $
+        [ [ [ 关键修复 ] ] ]
+        确保此方法优先检查 'self._literal_alias_map'
         """
-        raw_text = ctx.getText()  # (例如 "std.string", "String", "i32")
+        raw_text = ctx.getText()  # (例如 "C_INT_WINAPI", "std.string", "i32")
 
+        # 步骤 1: 检查 'typemap' 字面量代换
+        if raw_text in self._literal_alias_map:
+            # [修复] 必须返回此字典中的值
+            return self._literal_alias_map[raw_text]
+
+        # --- (以下是现有逻辑) ---
+
+        # 步骤 2: 检查 'import as' 别名 (e.g., Chrono.log)
         parts = raw_text.split('.')
         first_part = parts[0]
-
-        # 1. 检查别名
         if first_part in self._alias_to_namespace_map:
             parts[0] = self._alias_to_namespace_map[first_part]
 
-        cpp_namespace_type = "::".join(parts)  # (例如 "std::string", "String")
+        cpp_namespace_type = "::".join(parts)
 
-        # 2. [关键简化]
-        #    我们不再检查 $。
-        #    我们只翻译基础类型 (i32 -> int32_t)
+        # 步骤 3: 翻译基础类型 (i32 -> int32_t)
         return self._chrono_to_cpp_type(cpp_namespace_type)
 
     def visitMethodDefinition(self, ctx: ChronoParser.MethodDefinitionContext):
@@ -1755,3 +1756,24 @@ class ChronoVisitor(BaseChronoVisitor):
         final_code += f"{INDENT}}}\n"
 
         return final_code
+
+    def visitTypemapDefinition(self, ctx: ChronoParser.TypemapDefinitionContext):
+        """
+        [新增] 访问 'typemap' 规则。
+        e.g., typemap C_INT_WINAPI : i32 = "int WINAPI";
+
+        这 *不* 会生成 C++ 代码，而是将 "C_INT_WINAPI" -> "int WINAPI"
+        注册到翻译器的内部代换映射 (_literal_alias_map) 中。
+
+        ': i32' (ctx.hint) 部分被翻译器完全忽略，
+        它仅用于 IDE 和静态分析器。
+        """
+
+        name = ctx.name.text
+        # 提取字符串内容 (去除首尾的 "")
+        value = ctx.value.text[1:-1]
+
+        self._literal_alias_map[name] = value
+
+        # [关键] 此语句本身不生成任何 C++
+        return ""
