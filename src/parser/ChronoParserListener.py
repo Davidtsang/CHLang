@@ -305,6 +305,33 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#caseBlock.
+    def enterCaseBlock(self, ctx:ChronoParser.CaseBlockContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#caseBlock.
+    def exitCaseBlock(self, ctx:ChronoParser.CaseBlockContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#defaultBlock.
+    def enterDefaultBlock(self, ctx:ChronoParser.DefaultBlockContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#defaultBlock.
+    def exitDefaultBlock(self, ctx:ChronoParser.DefaultBlockContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#switchStatement.
+    def enterSwitchStatement(self, ctx:ChronoParser.SwitchStatementContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#switchStatement.
+    def exitSwitchStatement(self, ctx:ChronoParser.SwitchStatementContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#deleteStatement.
     def enterDeleteStatement(self, ctx:ChronoParser.DeleteStatementContext):
         pass

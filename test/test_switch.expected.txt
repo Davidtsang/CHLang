@@ -1,0 +1,14 @@
+--- Switch Test Start ---
+--- Testing value: 1 ---
+  Case 1 executed.
+  Switch finished.
+--- Testing value: 2 ---
+  Case 2 (from typemap) executed.
+  Switch finished.
+--- Testing value: 3 ---
+  Case 3 (from typemap) executed.
+  Switch finished.
+--- Testing value: 99 ---
+  Default executed.
+  Switch finished.
+--- Switch Test End ---

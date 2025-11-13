@@ -205,8 +205,28 @@ statement : variableDeclaration
           | deleteStatement
           | forStatement
           | blockStatement  // <-- [新增]
+          | switchStatement
           ;
 blockStatement : LBRACE statement* RBRACE ;  // <-- [新增]
+
+// 匹配: case 1 { ... }
+caseBlock
+    : CASE expression LBRACE statement* RBRACE ;
+
+// 匹配: default { ... }
+defaultBlock
+    : DEFAULT LBRACE statement* RBRACE ;
+
+// 匹配: switch (expr) { case... default... }
+switchStatement
+    : SWITCH LPAREN expression RPAREN
+      LBRACE
+          ( caseBlock )* // 0 个或多个 case 块
+          ( defaultBlock )?   // 0 或 1 个 default 块
+      RBRACE
+    ;
+
+
 deleteStatement : DELETE expression SEMIC_TOKEN ;
 
 forStatement

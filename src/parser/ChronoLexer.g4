@@ -27,6 +27,11 @@ IMPL    : 'impl' ;      // <-- [新增]
 AS      : 'as' ;     // [新增] 用于 import 别名
 USING   : 'using' ;
 TYPEMAP : 'typemap' ;
+
+SWITCH  : 'switch' ;
+CASE    : 'case' ;
+DEFAULT : 'default' ;
+
 UNIQUE_KW : 'unique' ;     // [新增]
 SHARED_KW : 'shared' ;     // [新增]
 WEAK_KW   : 'weak' ;       // [新增]

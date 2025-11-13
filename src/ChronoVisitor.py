@@ -929,7 +929,7 @@ class ChronoVisitor(BaseChronoVisitor):
                 # 检查它是否是 'typemap' 定义的常量 (e.g., "C_COLOR_WINDOW")
 
                 if primary_text in self._literal_alias_map:
-                    #print("im here!")
+                    # print("im here!")
                     val_ = self._literal_alias_map[primary_text]
                     return val_
             # [ [ [ 修复结束 ] ] ]
@@ -979,6 +979,8 @@ class ChronoVisitor(BaseChronoVisitor):
             return self.visit(ctx.deleteStatement())
         if ctx.forStatement():
             return self.visit(ctx.forStatement())
+        if ctx.switchStatement():
+            return self.visit(ctx.switchStatement())
         if ctx.blockStatement():
             return self.visit(ctx.blockStatement())
         return ""
@@ -1194,7 +1196,7 @@ class ChronoVisitor(BaseChronoVisitor):
             op_str = self._get_op_string_from_token_type(op_node.getSymbol().type)
             rhs_code = self.visit(operand_nodes[i + 1])
             current_code = f"{current_code} {op_str} {rhs_code}"
-        #print(current_code)
+        # print(current_code)
         return current_code
 
     def visitUnaryExpression(self, ctx: ChronoParser.UnaryExpressionContext):
@@ -1345,3 +1347,73 @@ class ChronoVisitor(BaseChronoVisitor):
         final_code += body_code
         final_code += f"{INDENT}}}\n"
         return final_code
+
+
+    def visitSwitchStatement(self, ctx: ChronoParser.SwitchStatementContext):
+        """
+        [新增] 访问 'switchStatement' 规则
+        e.g., switch (val) { ... }
+        """
+
+        # 1. 翻译 switch (expr)
+        expr = self.visit(ctx.expression())
+
+        # 2. 翻译所有 case 块
+        case_code = "".join(self.visit(cb) for cb in ctx.caseBlock())
+
+        # 3. 翻译可选的 default 块
+        default_code = self.visit(ctx.defaultBlock()) if ctx.defaultBlock() else ""
+
+        # 4. 组装 C++
+        code = f"{INDENT}switch ({expr}) {{\n"
+        code += case_code
+        code += default_code
+        code += f"{INDENT}}}\n"
+        return code
+
+    def visitCaseBlock(self, ctx: ChronoParser.CaseBlockContext):
+        """
+        [新增] 访问 'caseBlock' 规则
+        e.g., case 1 { ... }
+        翻译器必须自动添加 'break;'
+        """
+
+        # 1. 翻译 case expr:
+        case_expr = self.visit(ctx.expression())
+
+        # 2. 翻译 { ... } 内部的语句 (带作用域)
+        self._enter_scope()
+        statements = self._safe_iterate_statements(ctx.statement())
+        body_code = "".join(self.visit(s) for s in statements)
+        self._exit_scope()
+
+        # 3. 组装 C++ (带 C++ 作用域 {} 和 隐式 break)
+        code = f"{INDENT}case {case_expr}:\n"
+        code += f"{INDENT}{{\n"
+        code += body_code
+        code += f"{INDENT}break;\n"  # <-- 自动添加 break
+        code += f"{INDENT}}}\n"
+        return code
+
+    def visitDefaultBlock(self, ctx: ChronoParser.DefaultBlockContext):
+        """
+        [新增] 访问 'defaultBlock' 规则
+        e.g., default { ... }
+        翻译器必须自动添加 'break;'
+        """
+
+        # 1. 翻译 'default:'
+
+        # 2. 翻译 { ... } 内部的语句 (带作用域)
+        self._enter_scope()
+        statements = self._safe_iterate_statements(ctx.statement())
+        body_code = "".join(self.visit(s) for s in statements)
+        self._exit_scope()
+
+        # 3. 组装 C++ (带 C++ 作用域 {} 和 隐式 break)
+        code = f"{INDENT}default:\n"
+        code += f"{INDENT}{{\n"
+        code += body_code
+        code += f"{INDENT}break;\n"  # <-- 自动添加 break
+        code += f"{INDENT}}}\n"
+        return code

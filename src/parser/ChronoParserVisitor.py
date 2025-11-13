@@ -174,6 +174,21 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#caseBlock.
+    def visitCaseBlock(self, ctx:ChronoParser.CaseBlockContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#defaultBlock.
+    def visitDefaultBlock(self, ctx:ChronoParser.DefaultBlockContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#switchStatement.
+    def visitSwitchStatement(self, ctx:ChronoParser.SwitchStatementContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#deleteStatement.
     def visitDeleteStatement(self, ctx:ChronoParser.DeleteStatementContext):
         return self.visitChildren(ctx)
