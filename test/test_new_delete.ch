@@ -1,9 +1,9 @@
 // file: test/test_new_delete.ch
 // 目的: 验证工厂模式和显式的 'new'/'delete'
 
-import "runtime/ChronoObject.h";
-import "runtime/ChronoString.h";
-import "runtime/Chrono.h"; // <-- [新增] 'print' 需要它
+import "runtime/ChronoObject.h"
+import "runtime/ChronoString.h"
+import "runtime/Chrono.h" // <-- [新增] 'print' 需要它
 
 // 1. MRC Class (使用工厂方法)
 class MRCClass : ChronoObject {

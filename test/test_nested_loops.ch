@@ -1,9 +1,9 @@
 // file: test/test_nested_flow.ch
 // 目的: 验证 if/else 和 while 嵌套流
 
-import "runtime/ChronoObject.h";
-import "runtime/ChronoString.h";
-import "runtime/Chrono.h"; // <-- [新增] 'Chrono.log' 翻译为 'Chrono::log'
+import "runtime/ChronoObject.h"
+import "runtime/ChronoString.h"
+import "runtime/Chrono.h" // <-- [新增] 'Chrono.log' 翻译为 'Chrono::log'
 
 func main() -> int {
 

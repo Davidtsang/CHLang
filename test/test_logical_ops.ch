@@ -1,8 +1,8 @@
 // file: test/test_logical_ops.ch
 // 目的: 验证逻辑运算符 (&&, ||, !) 和取模 (%)
 
-import "runtime/Chrono.h";
-import "runtime/ChronoObject.h";
+import "runtime/Chrono.h"
+import "runtime/ChronoObject.h"
 
 func main() -> int {
     Chrono.log("--- Logical/Modulo Ops Test ---");

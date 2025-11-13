@@ -2,9 +2,9 @@
 // 目的: 验证复合赋值运算符 (+=, -=, *=, /=, %=)
 // [修改] 移除 Chrono.log，使用原生 @cpp std::cout
 
-import <iostream>; // <-- [新增] 导入 C++ IO
-import "runtime/ChronoObject.h";
-// [移除] 不再需要 import "runtime/Chrono.h";
+import <iostream> // <-- [新增] 导入 C++ IO
+import "runtime/ChronoObject.h"
+// [移除] 不再需要 import "runtime/Chrono.h"
 
 func main() -> int {
     @cpp std::cout << "--- Compound Assignment Test ---" << std::endl; @end

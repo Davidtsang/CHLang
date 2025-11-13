@@ -283,6 +283,13 @@ primary
     : NEW baseType LPAREN expressionList? RPAREN
     // [ [ 新增 ] ] @make[T](args) 和 @make_shared[T](args)
     | (AT_MAKE_UNIQUE | AT_MAKE_SHARED) LBRACK typeSpecifier RBRACK LPAREN expressionList? RPAREN
+    | ( AT_MAKE_UNIQUE
+      | AT_MAKE_SHARED
+      | STATIC_CAST         // <-- [新增]
+      | REINTERPRET_CAST    // <-- [新增]
+      | CONST_CAST          // <-- [新增]
+      )
+      LBRACK typeSpecifier RBRACK LPAREN expressionList? RPAREN
     | literal
     | initializerList
     | IDENTIFIER
@@ -312,4 +319,8 @@ literal
     | STRING_LITERAL
     | BOOL_LITERAL
     | CHAR_LITERAL
+    | U8_STRING_LITERAL
+    | U_STRING_LITERAL
+    | U_STRING_LITERAL_CAP
+    | L_STRING_LITERAL_CAP
     ;

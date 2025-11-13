@@ -1,6 +1,6 @@
-import "Chrono.h";
-import "runtime/ChronoObject.h";
-import "runtime/ChronoString.h";
+import "Chrono.h"
+import "runtime/ChronoObject.h"
+import "runtime/ChronoString.h"
 
 func main() -> int {
 

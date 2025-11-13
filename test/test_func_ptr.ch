@@ -4,11 +4,11 @@
 // 1. (T...) -> R   => std::function<R(T...)>
 // 2. ((T...) -> R)* => C-Style 指针 R (*p)(T...)
 
-import <iostream>;
-import <functional>;
-import <cstdint>;
-import <string>;
-import "runtime/ChronoObject.h";
+import <iostream>
+import <functional>
+import <cstdint>
+import <string>
+import "runtime/ChronoObject.h"
 
 @cpp
 // 目标 C++ 函数

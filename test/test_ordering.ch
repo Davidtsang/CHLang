@@ -4,8 +4,8 @@
 // 是否在全局和函数作用域内按正确顺序翻译。
 
 // 1. 导入 C++ 库，为全局 @cpp 块做准备
-import <iostream>;
-import <string>;
+import <iostream>
+import <string>
 
 // 2. 一个全局 @cpp 块 (用于声明)
 // 这应该出现在所有 'func' 定义之前
@@ -15,9 +15,9 @@ import <string>;
 @end
 
 // 3. 导入 Chrono 库 (用于 'main' 函数)
-import "runtime/ChronoObject.h";
-import "runtime/ChronoString.h";
-import "runtime/Chrono.h"; // <-- [新增] 'print' 需要它
+import "runtime/ChronoObject.h"
+import "runtime/ChronoString.h"
+import "runtime/Chrono.h" // <-- [新增] 'print' 需要它
 
 // 4. 入口函数
 func main() -> int {

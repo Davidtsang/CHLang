@@ -1,10 +1,10 @@
 // file: test/test_chrono_log.ch
 // 目的: 验证 Chrono.log 运行时函数
 
-import "runtime/Chrono.h" as Chrono;
-import "runtime/ChronoObject.h";
-import "runtime/ChronoString.h";
-import "runtime/ChronoInt.h";
+import "runtime/Chrono.h" as Chrono
+import "runtime/ChronoObject.h"
+import "runtime/ChronoString.h"
+import "runtime/ChronoInt.h"
 
 func main() -> int {
 

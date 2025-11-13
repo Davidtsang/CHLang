@@ -1,7 +1,7 @@
 // test/test_multi_arrays.ch
-import <iostream>;
-import <cstdint>;
-import "runtime/ChronoObject.h";
+import <iostream>
+import <cstdint>
+import "runtime/ChronoObject.h"
 
 func main() -> int {
     @cpp std::cout << "--- Multi-Array Test Start ---" << std::endl; @end

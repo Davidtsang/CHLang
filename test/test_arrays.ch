@@ -3,13 +3,13 @@
 // [已修改] 移除 Chrono.h 依赖，所有 'print' 替换为原生 '@cpp'
 
 // 1. 导入 @cpp 块所需的原生 C++ 头文件
-import <iostream>;
-import <string>;
-import <cstdint>;
+import <iostream>
+import <string>
+import <cstdint>
 
 // 2. 导入 Chrono 运行时 (仅为 ChronoObject，如果需要的话)
-import "runtime/ChronoObject.h";
-// import "runtime/Chrono.h"; // <-- 不再需要
+import "runtime/ChronoObject.h"
+// import "runtime/Chrono.h" // <-- 不再需要
 
 // [修改] main 必须返回 'int' (C++ 原生类型)
 func main() -> int {

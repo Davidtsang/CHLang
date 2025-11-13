@@ -1,8 +1,8 @@
 // file: test/test_struct_vs_class.ch
 // 目的: 验证 struct (值类型) 和 class (引用类型) 的区别
 
-import <iostream>;
-import "runtime/ChronoObject.h"; // (用于 class)
+import <iostream>
+import "runtime/ChronoObject.h" // (用于 class)
 
 // ---
 // 1. 值类型 STRUCT

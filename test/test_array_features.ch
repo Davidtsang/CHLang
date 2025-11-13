@@ -2,9 +2,9 @@
 // 目的: 对数组语法进行压力测试 (类成员, 函数参数)
 // [已修复] - 修正了 @cpp 块内部的 C++ 语法 (this.data -> this->data)
 
-import <iostream>;
-import <cstdint>;
-import "runtime/ChronoObject.h";
+import <iostream>
+import <cstdint>
+import "runtime/ChronoObject.h"
 
 // ---
 // 场景 1: 数组作为函数参数

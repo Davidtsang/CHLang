@@ -1,11 +1,11 @@
 // file: test/test_class_members.ch
 // 目的: 验证 'public', 'static func', 构造器调用, 和默认 private
 
-import "runtime/ChronoObject.h";
-import "runtime/ChronoString.h";
-import "runtime/ChronoInt.h";
-import "runtime/Chrono.h";
-import <iostream>; // C++ 库
+import "runtime/ChronoObject.h"
+import "runtime/ChronoString.h"
+import "runtime/ChronoInt.h"
+import "runtime/Chrono.h"
+import <iostream> // C++ 库
 
 class MemberTest : ChronoObject {
 

@@ -30,6 +30,7 @@ typemap C_INT:int = "int";
 // (只用于纯 Chrono 类型)
 // (这些行是导致 C2039 错误的原因)
 using MyInt = i32;
+
 using AddFunc = (i32) -> i32;
 using IntVector = std.vector[i32];
 

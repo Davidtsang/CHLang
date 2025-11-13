@@ -1,7 +1,7 @@
-import "Chrono.h";
-import "ChronoObject.h";
-import "ChronoString.h";
-import "ChronoInt.h";
+import "Chrono.h"
+import "ChronoObject.h"
+import "ChronoString.h"
+import "ChronoInt.h"
 
 func main() -> int {
     // [修复] 必须使用 '$' 标记并显式调用 'String.create'

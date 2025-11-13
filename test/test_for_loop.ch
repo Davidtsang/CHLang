@@ -1,9 +1,9 @@
 // file: test/test_for_loop.ch
 // 目的: 验证 C-Style for 循环的实现
 
-import <iostream>;
-import <cstdint>;
-import "runtime/ChronoObject.h"; // (用于 main 函数)
+import <iostream>
+import <cstdint>
+import "runtime/ChronoObject.h" // (用于 main 函数)
 
 func main() -> int {
 

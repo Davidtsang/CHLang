@@ -1,5 +1,5 @@
-import "ChronoObject.h";
-import <iostream>; // 用于 std::cout
+import "ChronoObject.h"
+import <iostream> // 用于 std::cout
 
 func main() -> int {
     

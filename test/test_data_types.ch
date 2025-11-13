@@ -2,13 +2,13 @@
 // 目的: 验证所有新的基本数据类型、字面量和 C++ 交互
 
 // 1. 导入 @cpp 块所需的原生 C++ 头文件
-import <iostream>;
-import <string>;
-import <cstdint>; // <-- [关键] 确保 (u)int8_t 可用于 @cpp
+import <iostream>
+import <string>
+import <cstdint> // <-- [关键] 确保 (u)int8_t 可用于 @cpp
 
 // 2. 导入 Chrono 运行时 (为了 main)
-import "runtime/ChronoObject.h";
-import "runtime/Chrono.h"; // (虽然不用 print, 但导入是好习惯)
+import "runtime/ChronoObject.h"
+import "runtime/Chrono.h" // (虽然不用 print, 但导入是好习惯)
 
 func main() -> Int {
 

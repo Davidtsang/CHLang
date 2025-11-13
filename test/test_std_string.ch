@@ -1,6 +1,6 @@
-import <iostream>;
-import <string>;
-import "Chrono.h";
+import <iostream>
+import <string>
+import "Chrono.h"
 
 func change(s: std.string*){
 

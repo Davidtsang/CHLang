@@ -1,10 +1,10 @@
 // file: test/test_chaining.ch
 // 目的: 验证 'public' 关键字, '$' 标记和链式调用
 
-import "runtime/ChronoObject.h";
-import "runtime/ChronoString.h";
-import "runtime/ChronoInt.h";
-import "runtime/Chrono.h"; // <-- [新增]
+import "runtime/ChronoObject.h"
+import "runtime/ChronoString.h"
+import "runtime/ChronoInt.h"
+import "runtime/Chrono.h" // <-- [新增]
 
 // 1. 定义一个用于 'this' 链测试的类
 class Wrapper : ChronoObject {

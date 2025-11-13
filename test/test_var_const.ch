@@ -1,8 +1,8 @@
 // file: test/test_var_const.ch
 // 目的: 验证 var/const/auto 声明
 
-import <iostream>;
-import "runtime/ChronoObject.h";
+import <iostream>
+import "runtime/ChronoObject.h"
 
 struct TestStruct {
     // 1. 成员变量 (显式, 可变)

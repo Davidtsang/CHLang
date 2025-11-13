@@ -1,14 +1,14 @@
 // file: test/test_namespace_import.ch
 // 目的: 验证 'import as' 和 C++ 原生打印
 
-import "runtime/ChronoObject.h";
-import <iostream>; // [新增] 导入 C++ 原生打印
+import "runtime/ChronoObject.h"
+import <iostream> // [新增] 导入 C++ 原生打印
 
 // [测试 1: 自动别名]
-import "lib/MyMath.h";
+import "lib/MyMath.h"
 
 // [测试 2: 自定义别名]
-import "lib/MyMath.h" as Math;
+import "lib/MyMath.h" as Math
 
 func main() -> int {
 

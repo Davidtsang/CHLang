@@ -5,9 +5,9 @@
 // 1. 验证 'std.make_shared[People](...)' 语法
 // 2. 验证 'visitSimpleExpression' 的新 'DOT IDENTIFIER [typeList] (params)' 逻辑
 
-import <iostream>; // 用于 @cpp std::cout
-import <memory>;   // 用于 std::make_shared
-import <string>;   // 用于 std::string
+import <iostream> // 用于 @cpp std::cout
+import <memory>   // 用于 std::make_shared
+import <string>   // 用于 std::string
 
 // 1. 定义一个用于测试的 "哑巴" struct
 //    (它不需要继承任何东西)

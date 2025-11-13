@@ -1,10 +1,10 @@
 // file: test/test_while_loop.ch
 // 目的: 验证 while 循环, 赋值, 和 i32 比较
 
-import "runtime/ChronoObject.h";
-import "runtime/ChronoString.h";
-import "runtime/ChronoInt.h";
-import "runtime/Chrono.h"; // <-- [新增] 'print' 需要它
+import "runtime/ChronoObject.h"
+import "runtime/ChronoString.h"
+import "runtime/ChronoInt.h"
+import "runtime/Chrono.h" // <-- [新增] 'print' 需要它
 
 func main() -> int {
 

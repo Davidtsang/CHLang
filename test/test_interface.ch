@@ -1,9 +1,9 @@
 // file: test/test_interface.ch
 // 目的: 验证 'interface' 和 'impl' 关键字
 
-import <iostream>;
-import <string>;
-import "runtime/ChronoObject.h";
+import <iostream>
+import <string>
+import "runtime/ChronoObject.h"
 
 // ---
 // 1. 接口定义

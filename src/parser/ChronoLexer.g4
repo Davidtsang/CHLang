@@ -35,6 +35,10 @@ AT_MAKE_UNIQUE : '@make' ;        // [新增] 对应 @make[T]
 AT_MAKE_SHARED : '@make_shared' ; // [新增] 对应 @make_shared[T] (修正了你的 @make_shread 拼写)
 AT_MOVE        : '@move' ;       // [新增] 对应 @move(a)
 
+STATIC_CAST      : 'static_cast' ;
+REINTERPRET_CAST : 'reinterpret_cast' ;
+CONST_CAST       : 'const_cast' ;
+
 // BOOL_LITERAL 必须在 IDENTIFIER 之前
 BOOL_LITERAL    : 'true' | 'false' ;
 // [新增] new / delete 关键字
@@ -123,6 +127,18 @@ DECIMAL_LITERAL : [0-9]+ ;
 // [新增] 3. BYTE_LITERAL (例如 b'A')
 // 必须在 CHAR_LITERAL 之前
 BYTE_LITERAL    : 'b' '\'' ( ~['\\] | '\\' . ) '\'' ;
+
+// C++11 UTF-8 string (e.g., u8"hello")
+U8_STRING_LITERAL : 'u8' '"' ( ~["\\] | '\\' . )* '"' ;
+
+// C++11 UTF-16 string (e.g., u"hello")
+U_STRING_LITERAL  : 'u'  '"' ( ~["\\] | '\\' . )* '"' ;
+
+// C++11 UTF-32 string (e.g., U"hello")
+U_STRING_LITERAL_CAP : 'U'  '"' ( ~["\\] | '\\' . )* '"' ;
+
+// Win32 Wide string (e.g., L"hello")
+L_STRING_LITERAL_CAP : 'L'  '"' ( ~["\\] | '\\' . )* '"' ;
 
 // --- 通用规则 (必须在最后) ---
 IDENTIFIER : [a-zA-Z_] [a-zA-Z0-9_]* ;

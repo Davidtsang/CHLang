@@ -1,7 +1,7 @@
-import <iostream>;
-import <functional>;
-import <cstdint>;
-import <string>;
+import <iostream>
+import <functional>
+import <cstdint>
+import <string>
 
 
 func add(i:int) -> void {

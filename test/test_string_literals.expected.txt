@@ -1,0 +1,6 @@
+--- C++ String Literals Test ---
+Test 1 (L"..."): Hello Wide
+Test 2 (u8"..."): Hello UTF-8
+Test 5 ("..."): Hello Standard
+Test 3/4 (u"..."/U"..."): Types asserted at compile time.
+--- Test Passed ---

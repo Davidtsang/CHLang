@@ -3,9 +3,9 @@
 // [已修正] 增加了括号 ( ) 来强制执行我们想要测试的优先级，
 // 因为 C++ 默认的 '+' 优先级高于 '<<'。
 
-import <iostream>;
-import <cstdint>; // For int32_t
-import "runtime/ChronoObject.h";
+import <iostream>
+import <cstdint> // For int32_t
+import "runtime/ChronoObject.h"
 
 func main() -> int {
     @cpp std::cout << "--- Bitwise Ops Test ---" << std::endl; @end

@@ -2,14 +2,14 @@
 // 目的: 验证新的泛型和命名空间类型语法
 
 // 1. 导入 @cpp 块所需的原生 C++ 头文件
-import <iostream>;
-import <vector>;
-import <string>;
-import <map>; // 用于测试嵌套泛型
+import <iostream>
+import <vector>
+import <string>
+import <map> // 用于测试嵌套泛型
 
 // 2. 导入 Chrono 运行时
-import "runtime/ChronoObject.h";
-import "runtime/Chrono.h"; // 'print' 函数需要它
+import "runtime/ChronoObject.h"
+import "runtime/Chrono.h" // 'print' 函数需要它
 
 func main() -> Int {
 

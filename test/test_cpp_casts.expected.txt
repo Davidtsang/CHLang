@@ -1,0 +1,6 @@
+--- C++ Casts Test ---
+Test 1 (static_cast[f32]): 10
+Test 2 (static_cast[C_HBRUSH]): (Compiled)
+Test 3 (reinterpret_cast): (Compiled)
+Test 4 (const_cast): New value at *y = 100
+--- Test Passed ---
