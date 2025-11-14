@@ -58,7 +58,9 @@ def translate(input_file, output_file):
             # -i (in-place) 原地修改文件
             # -style=LLVM (一个常见的默认风格，如果 .clang-format 文件不存在)
             #   (或者使用 -style=file 来自动查找 .clang-format 配置文件)
-            format_cmd = ["clang-format", "-i", "-style=LLVM", output_file]
+            #format_cmd = ["clang-format", "-i", "-style=LLVM", output_file]
+            style_override = "{BasedOnStyle: LLVM, SortIncludes: false}"
+            format_cmd = ["clang-format", "-i", f"-style={style_override}", output_file]
 
             # check=True 会在 clang-format 失败时抛出异常
             subprocess.run(format_cmd, check=True, capture_output=True, text=True)

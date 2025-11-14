@@ -7,5 +7,7 @@ gok/
 *.pyc
 *.interp
 *.tokens
+*.pdb
+*.ilk
 
 gen/

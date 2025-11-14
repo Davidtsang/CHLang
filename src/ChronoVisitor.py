@@ -521,14 +521,17 @@ class ChronoVisitor(BaseChronoVisitor):
 
     # --- 顶层规则 ---
     def visitProgram(self, ctx: ChronoParser.ProgramContext):
-        all_code = "".join(self.visit(stmt) for stmt in ctx.topLevelStatement())
+        all_code = ""
+        for stmt in ctx.topLevelStatement():
+            all_code += self.visit(stmt)
         return all_code
 
     def visitImportDirective(self, ctx: ChronoParser.ImportDirectiveContext):
         path_text = ctx.path.text
+
         base_name = os.path.basename(path_text.strip('\"<>'))
         true_namespace, _ = os.path.splitext(base_name)
-        alias_name = ""
+
         if ctx.alias:
             alias_name = ctx.alias.text
         else:
@@ -1348,7 +1351,6 @@ class ChronoVisitor(BaseChronoVisitor):
         final_code += f"{INDENT}}}\n"
         return final_code
 
-
     def visitSwitchStatement(self, ctx: ChronoParser.SwitchStatementContext):
         """
         [新增] 访问 'switchStatement' 规则
@@ -1375,7 +1377,8 @@ class ChronoVisitor(BaseChronoVisitor):
         """
         [新增] 访问 'caseBlock' 规则
         e.g., case 1 { ... }
-        翻译器必须自动添加 'break;'
+        [ [ [ 关键修复 ] ] ]
+        如果块的最后一条语句是 'return', 则不再自动添加 'break;'
         """
 
         # 1. 翻译 case expr:
@@ -1387,11 +1390,19 @@ class ChronoVisitor(BaseChronoVisitor):
         body_code = "".join(self.visit(s) for s in statements)
         self._exit_scope()
 
-        # 3. 组装 C++ (带 C++ 作用域 {} 和 隐式 break)
+        # 3. [ [ 修复 ] ] 检查最后一条语句
+        ends_with_return = False
+        if statements:  # 确保语句列表不为空
+
+            if statements[-1].returnStatement():
+                ends_with_return = True
+
+        # 4. 组装 C++
         code = f"{INDENT}case {case_expr}:\n"
         code += f"{INDENT}{{\n"
         code += body_code
-        code += f"{INDENT}break;\n"  # <-- 自动添加 break
+        if not ends_with_return:
+            code += f"{INDENT}break;\n"  # <-- [修复] 只有在需要时才添加
         code += f"{INDENT}}}\n"
         return code
 
@@ -1399,7 +1410,8 @@ class ChronoVisitor(BaseChronoVisitor):
         """
         [新增] 访问 'defaultBlock' 规则
         e.g., default { ... }
-        翻译器必须自动添加 'break;'
+        [ [ [ 关键修复 ] ] ]
+        如果块的最后一条语句是 'return', 则不再自动添加 'break;'
         """
 
         # 1. 翻译 'default:'
@@ -1410,10 +1422,17 @@ class ChronoVisitor(BaseChronoVisitor):
         body_code = "".join(self.visit(s) for s in statements)
         self._exit_scope()
 
-        # 3. 组装 C++ (带 C++ 作用域 {} 和 隐式 break)
+        # 3. [ [ 修复 ] ] 检查最后一条语句
+        ends_with_return = False
+        if statements:  # 确保语句列表不为空
+            if isinstance(statements[-1], ChronoParser.ReturnStatementContext):
+                ends_with_return = True
+
+        # 4. 组装 C++
         code = f"{INDENT}default:\n"
         code += f"{INDENT}{{\n"
         code += body_code
-        code += f"{INDENT}break;\n"  # <-- 自动添加 break
+        if not ends_with_return:
+            code += f"{INDENT}break;\n"  # <-- [修复] 只有在需要时才添加
         code += f"{INDENT}}}\n"
         return code
