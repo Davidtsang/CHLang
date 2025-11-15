@@ -12,6 +12,7 @@ CONST   : 'const';   // <-- [新增]
 
 RETURN  : 'return' ;
 CLASS   : 'class' ;
+IMPLEMENT: 'implement'; //
 STRUCT  : 'struct' ; // <-- [新增]
 INIT    : 'init' ;    // <-- [ 新增 ]
 DEINIT  : 'deinit' ; 
@@ -27,10 +28,13 @@ IMPL    : 'impl' ;      // <-- [新增]
 AS      : 'as' ;     // [新增] 用于 import 别名
 USING   : 'using' ;
 TYPEMAP : 'typemap' ;
-
+NAMESPACE : 'namespace';
 SWITCH  : 'switch' ;
 CASE    : 'case' ;
 DEFAULT : 'default' ;
+
+HASH_LBRACK : '#[';
+HASH : '#';
 
 UNIQUE_KW : 'unique' ;     // [新增]
 SHARED_KW : 'shared' ;     // [新增]

@@ -9,24 +9,40 @@ import "runtime/Chrono.h" // <-- [新增] 'print' 需要它
 class MRCClass : ChronoObject {
 
     // init 默认是 private
+    init() ;
+
+    deinit;
+
+    // [更改] 返回类型必须标记为 $
+    public static func create() -> MRCClass*;
+}
+
+implement MRCClass{
     init() { Chrono.log("MRC Init"); }
 
     deinit { Chrono.log("MRC Deinit"); }
 
     // [更改] 返回类型必须标记为 $
-    public static func create() -> MRCClass* {
+    func create() -> MRCClass* {
         return new MRCClass();
     }
-}
 
+}
 // 2. Native Class (测试 new/delete 的目标)
 class NativeClass {
 
     // init 默认是 private
+    init();
+
+    // [更改] 返回类型必须标记为 $
+    public static func create() -> NativeClass* ;
+}
+
+implement NativeClass{
     init() { Chrono.log("Native Init"); }
 
     // [更改] 返回类型必须标记为 $
-    public static func create() -> NativeClass* {
+    func create() -> NativeClass* {
         return new NativeClass();
     }
 }

@@ -16,17 +16,24 @@ struct People {
     var age: i32;
 
     // 公共构造函数 (C++: public init)
-    public init(n: std.string, a: i32) {
+    public init(n: std.string, a: i32) ;
+
+    // 公共方法 (C++: public func)
+    public func print() ;
+}
+
+implement People{
+    // 公共构造函数 (C++: public init)
+    init(n: std.string, a: i32) {
         this.name = n;
         this.age = a;
     }
 
     // 公共方法 (C++: public func)
-    public func print() {
+    func print() {
         @cpp std::cout << "  People(Name=" << this->name << ", Age=" << this->age << ")" << std::endl; @end
     }
 }
-
 // 2. Main
 func main() -> int {
     @cpp std::cout << "--- Generic Call Test ---" << std::endl; @end

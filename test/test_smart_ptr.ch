@@ -16,6 +16,11 @@ import <utility>  // 依赖项，保持不变
 
 struct Resource {
     var id: i32;
+    init(i: i32) ;
+    deinit ;
+}
+
+implement Resource{
     init(i: i32) {
         this.id = i;
      }
@@ -83,13 +88,24 @@ func demo_shared_ptr() {
 struct Parent {
     // [修改] 使用内置类型
     var child: shared[Child];
+    init();
+    deinit;
+}
+
+implement Parent{
     init() { @cpp std::cout << "  Parent created." << std::endl; @end }
     deinit { @cpp std::cout << "  Parent destroyed." << std::endl; @end }
 }
 
+
 struct Child {
     // [修改] 使用内置类型
     var parent: weak[Parent];
+    init();
+    deinit;
+}
+
+implement Child{
     init() { @cpp std::cout << "  Child created." << std::endl; @end }
     deinit { @cpp std::cout << "  Child destroyed." << std::endl; @end }
 }

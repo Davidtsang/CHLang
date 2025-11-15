@@ -59,32 +59,56 @@ templateArgument
     | literal
     ;
 
+// 匹配: Framework, 或 Framework.UI, 或 Framework.UI.Window
+qualifiedIdentifier
+    : IDENTIFIER (DOT IDENTIFIER)*
+    ;
+
+// 匹配: namespace Framework.UI;
+namespaceStatement
+    : NAMESPACE name=qualifiedIdentifier SEMIC_TOKEN
+    ;
+
 
 // --- Top Level Rules ---
-program : topLevelStatement+ EOF ;
+program : (namespaceStatement)? topLevelStatement* EOF ;
 
 topLevelStatement
     : importDirective
     | cppBlock
     | classDefinition
-    | structDefinition // <-- [新增]
+    | structDefinition
     | functionDefinition
-    | interfaceDefinition // <-- [新增]
+    | functionSignature
+    | implementationBlock // [ [ [ 修正：添加此行 ] ] ]
+    | interfaceDefinition
     | usingAlias
+    | variableDeclaration
     | typemapDefinition
     ;
 
 accessModifier : PUBLIC ;
 
+// 匹配: init(params);
+initSignature
+    : INIT LPAREN parameters RPAREN SEMIC_TOKEN
+    ;
+
+// 匹配: deinit;
+deinitSignature
+    : DEINIT SEMIC_TOKEN
+    ;
+
 classBodyStatement
-    : (accessModifier)? variableDeclaration // <-- [修改]
-    | ( (STATIC (accessModifier)?)
-      | (accessModifier (STATIC)?)
-      ) methodDefinition
-    | (accessModifier)? initDefinition
-    | methodDefinition
-    | deinitBlock
+    : (accessModifier)? variableDeclaration
+    | ( (accessModifier)? (STATIC)? | (STATIC)? (accessModifier)? ) functionSignature // 允许 'public static func'
+    | (accessModifier)? initSignature
+    | (accessModifier)? deinitSignature // <--- 修复 'publicdeinit' 错误
+    | functionSignature   // (用于私有 func)
+    | initSignature     // (用于私有 init)
+    | deinitSignature   // (用于私有 deinit)
     | cppBlock
+    // | rawCppDirective // (如果我们保留了 # 指令)
     ;
 
 classDefinition
@@ -93,6 +117,17 @@ classDefinition
       (IMPL interfaces=typeList)? // [新增] 接口：可选，可以是一个列表
       LBRACE
           (classBodyStatement)*
+      RBRACE
+    ;
+
+// [ [ [ 1. 新增：实现块 (用于 .ch 文件) ] ] ]
+implementationBlock
+    : IMPLEMENT name=IDENTIFIER LBRACE
+        ( methodDefinition  // 方法实现
+        | initDefinition    // 构造函数实现
+        | deinitBlock       // 析构函数实现
+        // | rawCppDirective   // (如果我们保留了 # 指令)
+        )*
       RBRACE
     ;
 
@@ -107,10 +142,21 @@ structDefinition
 // structBodyStatement 规则
 structBodyStatement
     : (accessModifier)? variableDeclaration
-    | (accessModifier)? methodDefinition
-    | (accessModifier)? initDefinition
-    | deinitBlock // deinit 总是 public
+    | (accessModifier)? functionSignature // (Struct 不支持 static func)
+    | (accessModifier)? initSignature
+    | (accessModifier)? deinitSignature // <--- 修复 'publicdeinit' 错误
+    | functionSignature   // (用于私有 func)
+    | initSignature     // (用于私有 init)
+    | deinitSignature   // (用于私有 deinit)
     | cppBlock
+    // | rawCppDirective
+    ;
+
+// [ [ [ 1. 新增：全局/类 函数声明 (用于 .h.ch) ] ] ]
+functionSignature
+    : (STATIC)?
+    FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)?
+    SEMIC_TOKEN // <-- 关键区别：分号，而不是 LBRACE ... RBRACE
     ;
 
 methodDefinition

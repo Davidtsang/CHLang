@@ -34,6 +34,31 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#qualifiedIdentifier.
+    def visitQualifiedIdentifier(self, ctx:ChronoParser.QualifiedIdentifierContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#namespaceStatement.
+    def visitNamespaceStatement(self, ctx:ChronoParser.NamespaceStatementContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#compilerDirective.
+    def visitCompilerDirective(self, ctx:ChronoParser.CompilerDirectiveContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#buildOption.
+    def visitBuildOption(self, ctx:ChronoParser.BuildOptionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#rawCppDirective.
+    def visitRawCppDirective(self, ctx:ChronoParser.RawCppDirectiveContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#program.
     def visitProgram(self, ctx:ChronoParser.ProgramContext):
         return self.visitChildren(ctx)
@@ -49,6 +74,16 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#initSignature.
+    def visitInitSignature(self, ctx:ChronoParser.InitSignatureContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#deinitSignature.
+    def visitDeinitSignature(self, ctx:ChronoParser.DeinitSignatureContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#classBodyStatement.
     def visitClassBodyStatement(self, ctx:ChronoParser.ClassBodyStatementContext):
         return self.visitChildren(ctx)
@@ -59,6 +94,11 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#implementationBlock.
+    def visitImplementationBlock(self, ctx:ChronoParser.ImplementationBlockContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#structDefinition.
     def visitStructDefinition(self, ctx:ChronoParser.StructDefinitionContext):
         return self.visitChildren(ctx)
@@ -66,6 +106,11 @@ class ChronoParserVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by ChronoParser#structBodyStatement.
     def visitStructBodyStatement(self, ctx:ChronoParser.StructBodyStatementContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#functionSignature.
+    def visitFunctionSignature(self, ctx:ChronoParser.FunctionSignatureContext):
         return self.visitChildren(ctx)
 
 

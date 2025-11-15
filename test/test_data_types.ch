@@ -10,7 +10,7 @@ import <cstdint> // <-- [关键] 确保 (u)int8_t 可用于 @cpp
 import "runtime/ChronoObject.h"
 import "runtime/Chrono.h" // (虽然不用 print, 但导入是好习惯)
 
-func main() -> Int {
+func main() -> int {
 
     @cpp
         std::cout << "--- Data Types Test Start ---" << std::endl;

@@ -11,7 +11,7 @@ import <map> // 用于测试嵌套泛型
 import "runtime/ChronoObject.h"
 import "runtime/Chrono.h" // 'print' 函数需要它
 
-func main() -> Int {
+func main() -> int {
 
     //print("--- Generics Test Start ---");
 

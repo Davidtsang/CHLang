@@ -24,7 +24,15 @@ class ArrayTester : ChronoObject {
     var data: [i32; 3];
     var matrix: [[i32; 2]; 2];
 
-    public init() {
+    public init();
+
+    public func printMemberData() ;
+
+    public func testParamPassing();
+}
+
+implement ArrayTester{
+    init() {
         @cpp std::cout << "ArrayTester Init" << std::endl; @end
 
         // (由 Visitor 正确翻译为 this->data)
@@ -35,7 +43,7 @@ class ArrayTester : ChronoObject {
         this.matrix[1][1] = 99;
     }
 
-    public func printMemberData() {
+    func printMemberData() {
         @cpp
             std::cout << "Test 2 (Class Member Access):" << std::endl;
             // [ [ 关键修复 ] ]
@@ -45,13 +53,13 @@ class ArrayTester : ChronoObject {
         @end
     }
 
-    public func testParamPassing() {
+    func testParamPassing() {
         @cpp std::cout << "Test 3 (Passing 'this.data' to func):" << std::endl; @end
         // (由 Visitor 正确翻译为 printSum(this->data))
         printSum(this.data);
     }
-}
 
+}
 // ---
 // 主函数
 // ---

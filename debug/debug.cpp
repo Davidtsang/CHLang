@@ -1,55 +1,50 @@
-﻿#include "ChronoObject.h"
-#include <cstdint>
-#include <iostream>
-#include <type_traits>
-#include <windows.h>
+﻿#include "Chrono.h"
+#include "ChronoObject.h"
+#include "ChronoString.h"
+#include "ChronoInt.h"
 
-int main() {
+class AccessTest : public ChronoObject {
+private:
+  int32_t val;
+  String *name = nullptr;
+  AccessTest(int32_t v, String *n);
+  virtual int32_t doInternalCalc();
 
-  // --- @cpp Block Start ---
-  std::cout << "--- C++ Casts Test ---" << std::endl;
-  // --- @cpp Block End ---
+public:
+  virtual ~AccessTest();
+  virtual Int *getCalculatedValue();
+  virtual AccessTest *create(int32_t v, String *n);
+};
 
-  auto f = static_cast<float>(10);
+AccessTest::AccessTest(int32_t v, String *n) {
+  Chrono::log("Init (Private)");
+  this.val = v;
+  this.name = n;
+  this.name.retain();
+}
 
-  // --- @cpp Block Start ---
-  std::cout << "Test 1 (static_cast[f32]): " << f << std::endl;
-  static_assert(std::is_same_v<decltype(f), float>, "static_cast[f32] failed");
-  // --- @cpp Block End ---
+AccessTest::~AccessTest() {
+  // --- Chrono Deinit Block ---
+  Chrono::log("Deinit (Public)");
+  this.name.release();
+  // --- Deinit End ---
+}
 
-  auto h = static_cast<HBRUSH>(C_COLOR_WINDOW + 1);
+int32_t AccessTest::doInternalCalc() {
+  Chrono::log("Private Method: doInternalCalc()");
+  return this.val * 2;
+  // --- Method End ---
+}
 
-  // --- @cpp Block Start ---
-  std::cout << "Test 2 (static_cast[C_HBRUSH]): (Compiled)" << std::endl;
-  // [ [ [ 修复 2 ] ] ]
-  // 在 @cpp 块内部, 我们 *必须* 使用 C++ 的真实类型
-  static_assert(std::is_same_v<decltype(h), HBRUSH>,
-                "static_cast<C_HBRUSH> failed");
-  // --- @cpp Block End ---
+Int *AccessTest::getCalculatedValue() {
+  Chrono::log("Public Method: getCalculatedValue()");
+  int32_t result = this.doInternalCalc();
+  return Int::create(result);
+  // --- Method End ---
+}
 
-  int32_t i = 12345;
-  auto p = reinterpret_cast<intptr_t>(&i);
-
-  // --- @cpp Block Start ---
-  std::cout << "Test 3 (reinterpret_cast): (Compiled)" << std::endl;
-  // [ [ [ 修复 3 ] ] ]
-  // 必须使用 C++ 的 intptr_t, 而不是 Chrono 的 C_INT_PTR
-  static_assert(std::is_same_v<decltype(p), intptr_t>,
-                "reinterpret_cast failed");
-  // --- @cpp Block End ---
-
-  const int32_t x = 50;
-  auto y = const_cast<int32_t *>(&x);
-  (*y) = 100;
-
-  // --- @cpp Block Start ---
-  std::cout << "Test 4 (const_cast): New value at *y = " << *y << std::endl;
-  static_assert(std::is_same_v<decltype(y), int32_t *>, "const_cast failed");
-  // --- @cpp Block End ---
-
-  // --- @cpp Block Start ---
-  std::cout << "--- Test Passed ---" << std::endl;
-  // --- @cpp Block End ---
-
-  return 0;
+AccessTest *AccessTest::create(int32_t v, String *n) {
+  Chrono::log("Public Static: create()");
+  return new AccessTest(v, n);
+  // --- Method End ---
 }

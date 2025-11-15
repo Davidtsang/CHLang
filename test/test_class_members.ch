@@ -8,6 +8,7 @@ import "runtime/Chrono.h"
 import <iostream> // C++ 库
 
 
+
 class MemberTest : ChronoObject {
 
     // -------------------------------------------
@@ -22,11 +23,27 @@ class MemberTest : ChronoObject {
     // -------------------------------------------
 
     // 构造函数 (init)
+    init(val: i32, str: String*) ;
+
+    // 析构函数 (deinit)
+    deinit;
+
+    // [关键] 必须标记为 'public' 才能被 'main' 调用
+    public func printAll();
+
+    // (默认 private)
+    func getName() -> String*;
+
+    // [关键] 必须标记为 'public' 才能被 'main' 调用
+    public static func create(val: i32, str: String*) -> MemberTest*;
+}
+
+implement MemberTest{
     init(val: i32, str: String*) {
-        this.x = val;
-        this.s = str;   // <-- [已修复] 必须使用 $s
-        this.s.retain(); // <-- [已修复] 必须使用 $s
-    }
+            this.x = val;
+            this.s = str;   // <-- [已修复] 必须使用 $s
+            this.s.retain(); // <-- [已修复] 必须使用 $s
+        }
 
     // 析构函数 (deinit)
     deinit {
@@ -37,7 +54,7 @@ class MemberTest : ChronoObject {
     }
 
     // [关键] 必须标记为 'public' 才能被 'main' 调用
-    public func printAll() {
+    func printAll() {
         Chrono.log(this.x);
         Chrono.log(this.s);  // <-- [已修复] 必须使用 $s
     }
@@ -48,11 +65,10 @@ class MemberTest : ChronoObject {
     }
 
     // [关键] 必须标记为 'public' 才能被 'main' 调用
-    public static func create(val: i32, str: String*) -> MemberTest* {
+    func create(val: i32, str: String*) -> MemberTest* {
         return new MemberTest(val, str);
     }
 }
-
 // -------------------------------------------
 // 全局 Main
 // -------------------------------------------

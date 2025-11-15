@@ -11,6 +11,18 @@ class Wrapper : ChronoObject {
     var s: String*; // <-- [更改] 's' 是一个指针 ($)
 
     // 默认 private (只能被 'create' 调用)
+    init(str: String*);
+
+    deinit;
+
+    // [关键] 必须是 public 才能被 'main' 调用
+    public static func create(str: String*) -> Wrapper* ;
+
+    // [关键] 必须是 public 才能被 'main' 调用
+    public func getUpperLength() -> Int* ;
+}
+
+implement Wrapper{
     init(str: String*) { // <-- [更改] 'str' 是一个指针 ($)
         this.s = str;   // <-- [更改]
         this.s.retain(); // <-- [更改]
@@ -21,12 +33,12 @@ class Wrapper : ChronoObject {
     }
 
     // [关键] 必须是 public 才能被 'main' 调用
-    public static func create(str: String*) -> Wrapper* { // <-- [更改]
+    func create(str: String*) -> Wrapper* { // <-- [更改]
         return new Wrapper(str); // <-- [更改] 'new' 和 ';'
     }
 
     // [关键] 必须是 public 才能被 'main' 调用
-    public func getUpperLength() -> Int* { // <-- [更改]
+    func getUpperLength() -> Int* { // <-- [更改]
         // [ 测试点 A ] 'this.member.method().method()'
         return this.s.toUpper().length(); // <-- [更改]
     }

@@ -53,6 +53,51 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#qualifiedIdentifier.
+    def enterQualifiedIdentifier(self, ctx:ChronoParser.QualifiedIdentifierContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#qualifiedIdentifier.
+    def exitQualifiedIdentifier(self, ctx:ChronoParser.QualifiedIdentifierContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#namespaceStatement.
+    def enterNamespaceStatement(self, ctx:ChronoParser.NamespaceStatementContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#namespaceStatement.
+    def exitNamespaceStatement(self, ctx:ChronoParser.NamespaceStatementContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#compilerDirective.
+    def enterCompilerDirective(self, ctx:ChronoParser.CompilerDirectiveContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#compilerDirective.
+    def exitCompilerDirective(self, ctx:ChronoParser.CompilerDirectiveContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#buildOption.
+    def enterBuildOption(self, ctx:ChronoParser.BuildOptionContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#buildOption.
+    def exitBuildOption(self, ctx:ChronoParser.BuildOptionContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#rawCppDirective.
+    def enterRawCppDirective(self, ctx:ChronoParser.RawCppDirectiveContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#rawCppDirective.
+    def exitRawCppDirective(self, ctx:ChronoParser.RawCppDirectiveContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#program.
     def enterProgram(self, ctx:ChronoParser.ProgramContext):
         pass
@@ -80,6 +125,24 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#initSignature.
+    def enterInitSignature(self, ctx:ChronoParser.InitSignatureContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#initSignature.
+    def exitInitSignature(self, ctx:ChronoParser.InitSignatureContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#deinitSignature.
+    def enterDeinitSignature(self, ctx:ChronoParser.DeinitSignatureContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#deinitSignature.
+    def exitDeinitSignature(self, ctx:ChronoParser.DeinitSignatureContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#classBodyStatement.
     def enterClassBodyStatement(self, ctx:ChronoParser.ClassBodyStatementContext):
         pass
@@ -98,6 +161,15 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#implementationBlock.
+    def enterImplementationBlock(self, ctx:ChronoParser.ImplementationBlockContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#implementationBlock.
+    def exitImplementationBlock(self, ctx:ChronoParser.ImplementationBlockContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#structDefinition.
     def enterStructDefinition(self, ctx:ChronoParser.StructDefinitionContext):
         pass
@@ -113,6 +185,15 @@ class ChronoParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by ChronoParser#structBodyStatement.
     def exitStructBodyStatement(self, ctx:ChronoParser.StructBodyStatementContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#functionSignature.
+    def enterFunctionSignature(self, ctx:ChronoParser.FunctionSignatureContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#functionSignature.
+    def exitFunctionSignature(self, ctx:ChronoParser.FunctionSignatureContext):
         pass
 
 

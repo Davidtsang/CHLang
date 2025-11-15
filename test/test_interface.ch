@@ -33,27 +33,38 @@ class Circle : ChronoObject impl ILoggable, IShape {
 //    var radius: unique[Cat] = @make[Cat]();
 //    var radius: shared[Dog] = @make_shread[Dog];
 //    var radius: weak[Dog] = @move a;
-    public init(r: f32) {
+    public init(r: f32) ;
+
+    // 实现 ILoggable
+    public func logMessage() -> void ;
+
+    // 实现 IShape
+    public func getName() -> std.string ;
+
+    public func getArea() -> f32 ;
+}
+
+implement Circle{
+    init(r: f32) {
         this.radius = r;
     }
 
     // 实现 ILoggable
-    public func logMessage() -> void {
+    func logMessage() -> void {
         @cpp
             std::cout << "Log: Circle (r=" << this->radius << ")" << std::endl;
         @end
     }
 
     // 实现 IShape
-    public func getName() -> std.string {
+    func getName() -> std.string {
         return "Circle";
     }
 
-    public func getArea() -> f32 {
+    func getArea() -> f32 {
         return 3.14159 * this.radius * this.radius;
     }
 }
-
 // 类 B: "Square"
 // - 继承自 ChronoObject (用于 MRC)
 // - 只实现 IShape
@@ -61,19 +72,26 @@ class Square : ChronoObject impl IShape {
 
     var side: f32;
 
-    public init(s: f32) {
+    public init(s: f32);
+
+    // 实现 IShape
+    public func getName() -> std.string ;
+    public func getArea() -> f32 ;
+}
+
+implement Square{
+    init(s: f32) {
         this.side = s;
     }
 
     // 实现 IShape
-    public func getName() -> std.string {
+    func getName() -> std.string {
         return "Square";
     }
-    public func getArea() -> f32 {
+    func getArea() -> f32 {
         return this.side * this.side;
     }
 }
-
 // ---
 // 3. 多态性测试函数
 // ---
