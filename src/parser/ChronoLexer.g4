@@ -29,12 +29,10 @@ AS      : 'as' ;     // [新增] 用于 import 别名
 USING   : 'using' ;
 TYPEMAP : 'typemap' ;
 NAMESPACE : 'namespace';
+END_NAMESPACE : 'endnamespace' ;
 SWITCH  : 'switch' ;
 CASE    : 'case' ;
 DEFAULT : 'default' ;
-
-HASH_LBRACK : '#[';
-HASH : '#';
 
 UNIQUE_KW : 'unique' ;     // [新增]
 SHARED_KW : 'shared' ;     // [新增]
@@ -155,6 +153,7 @@ IDENTIFIER : [a-zA-Z_] [a-zA-Z0-9_]* ;
 STRING_LITERAL  : '"' ( ~["\\] | '\\' . )* '"' ; 
 CHAR_LITERAL    : '\'' ( ~['\\] | '\\' . ) '\'' ; // 匹配单引号字符 (例如 'a', '\n')
 
+CPP_DIRECTIVE : '#' ~[\r\n]* ;
 // --- 跳过 (Skipped) ---
 LINE_COMMENT : '//' ~[\r\n]* -> skip ;
 WHITESPACE : [ \t\r\n\u00A0]+ -> skip ;

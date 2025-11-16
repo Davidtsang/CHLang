@@ -71,11 +71,15 @@ namespaceStatement
 
 
 // --- Top Level Rules ---
-program : (namespaceStatement)? topLevelStatement* EOF ;
+program : (topLevelImport)* (namespaceStatement)? topLevelStatement* EOF ;
+
+topLevelImport
+    : importDirective
+    | CPP_DIRECTIVE
+    ;
 
 topLevelStatement
-    : importDirective
-    | cppBlock
+    : cppBlock
     | classDefinition
     | structDefinition
     | functionDefinition
@@ -85,9 +89,13 @@ topLevelStatement
     | usingAlias
     | variableDeclaration
     | typemapDefinition
+    | CPP_DIRECTIVE
+    | endNamespaceStatement
     ;
 
 accessModifier : PUBLIC ;
+
+endNamespaceStatement : END_NAMESPACE SEMIC_TOKEN ;
 
 // 匹配: init(params);
 initSignature
@@ -108,7 +116,7 @@ classBodyStatement
     | initSignature     // (用于私有 init)
     | deinitSignature   // (用于私有 deinit)
     | cppBlock
-    // | rawCppDirective // (如果我们保留了 # 指令)
+    | CPP_DIRECTIVE
     ;
 
 classDefinition
@@ -149,7 +157,7 @@ structBodyStatement
     | initSignature     // (用于私有 init)
     | deinitSignature   // (用于私有 deinit)
     | cppBlock
-    // | rawCppDirective
+    | CPP_DIRECTIVE
     ;
 
 // [ [ [ 1. 新增：全局/类 函数声明 (用于 .h.ch) ] ] ]
@@ -252,6 +260,7 @@ statement : variableDeclaration
           | forStatement
           | blockStatement  // <-- [新增]
           | switchStatement
+          | CPP_DIRECTIVE
           ;
 blockStatement : LBRACE statement* RBRACE ;  // <-- [新增]
 

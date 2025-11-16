@@ -6,19 +6,16 @@
 // 1. 导入 C++ 库，为全局 @cpp 块做准备
 import <iostream>
 import <string>
-
+// 3. 导入 Chrono 库 (用于 'main' 函数)
+import "runtime/ChronoObject.h"
+import "runtime/ChronoString.h"
+import "runtime/Chrono.h" // <-- [新增] 'print' 需要它
 // 2. 一个全局 @cpp 块 (用于声明)
 // 这应该出现在所有 'func' 定义之前
 @cpp
     // 声明一个 C++ 原生全局变量
     std::string global_test_string = "Global C++ Variable";
 @end
-
-// 3. 导入 Chrono 库 (用于 'main' 函数)
-import "runtime/ChronoObject.h"
-import "runtime/ChronoString.h"
-import "runtime/Chrono.h" // <-- [新增] 'print' 需要它
-
 // 4. 入口函数
 func main() -> int {
 

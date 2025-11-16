@@ -1,0 +1,5 @@
+--- Namespace Test Start ---
+  (globalFunc in Test::Internal)
+  (MyClass::testMethod)
+130
+--- Namespace Test End ---

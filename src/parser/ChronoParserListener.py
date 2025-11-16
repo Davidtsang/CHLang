@@ -71,39 +71,21 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ChronoParser#compilerDirective.
-    def enterCompilerDirective(self, ctx:ChronoParser.CompilerDirectiveContext):
-        pass
-
-    # Exit a parse tree produced by ChronoParser#compilerDirective.
-    def exitCompilerDirective(self, ctx:ChronoParser.CompilerDirectiveContext):
-        pass
-
-
-    # Enter a parse tree produced by ChronoParser#buildOption.
-    def enterBuildOption(self, ctx:ChronoParser.BuildOptionContext):
-        pass
-
-    # Exit a parse tree produced by ChronoParser#buildOption.
-    def exitBuildOption(self, ctx:ChronoParser.BuildOptionContext):
-        pass
-
-
-    # Enter a parse tree produced by ChronoParser#rawCppDirective.
-    def enterRawCppDirective(self, ctx:ChronoParser.RawCppDirectiveContext):
-        pass
-
-    # Exit a parse tree produced by ChronoParser#rawCppDirective.
-    def exitRawCppDirective(self, ctx:ChronoParser.RawCppDirectiveContext):
-        pass
-
-
     # Enter a parse tree produced by ChronoParser#program.
     def enterProgram(self, ctx:ChronoParser.ProgramContext):
         pass
 
     # Exit a parse tree produced by ChronoParser#program.
     def exitProgram(self, ctx:ChronoParser.ProgramContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#topLevelImport.
+    def enterTopLevelImport(self, ctx:ChronoParser.TopLevelImportContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#topLevelImport.
+    def exitTopLevelImport(self, ctx:ChronoParser.TopLevelImportContext):
         pass
 
 
@@ -122,6 +104,15 @@ class ChronoParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by ChronoParser#accessModifier.
     def exitAccessModifier(self, ctx:ChronoParser.AccessModifierContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#endNamespaceStatement.
+    def enterEndNamespaceStatement(self, ctx:ChronoParser.EndNamespaceStatementContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#endNamespaceStatement.
+    def exitEndNamespaceStatement(self, ctx:ChronoParser.EndNamespaceStatementContext):
         pass
 
 

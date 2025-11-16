@@ -13,9 +13,9 @@ import <vector>     // [ [ [ 修复 2 ] ] ] (解决 'std::vector' 错误)
 import "runtime/ChronoObject.h" // (用于 main)
 
 // --- 2. 链接 Win32 库 (如果需要调用 API) ---
-@cpp
+
 #pragma comment(lib, "Kernel32.lib")
-@end
+
 
 // --- 3. 使用 'typemap' (字面量代换) ---
 // (用于 C++ 互操作性)

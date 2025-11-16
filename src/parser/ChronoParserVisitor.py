@@ -44,23 +44,13 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ChronoParser#compilerDirective.
-    def visitCompilerDirective(self, ctx:ChronoParser.CompilerDirectiveContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ChronoParser#buildOption.
-    def visitBuildOption(self, ctx:ChronoParser.BuildOptionContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by ChronoParser#rawCppDirective.
-    def visitRawCppDirective(self, ctx:ChronoParser.RawCppDirectiveContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by ChronoParser#program.
     def visitProgram(self, ctx:ChronoParser.ProgramContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#topLevelImport.
+    def visitTopLevelImport(self, ctx:ChronoParser.TopLevelImportContext):
         return self.visitChildren(ctx)
 
 
@@ -71,6 +61,11 @@ class ChronoParserVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by ChronoParser#accessModifier.
     def visitAccessModifier(self, ctx:ChronoParser.AccessModifierContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#endNamespaceStatement.
+    def visitEndNamespaceStatement(self, ctx:ChronoParser.EndNamespaceStatementContext):
         return self.visitChildren(ctx)
 
 

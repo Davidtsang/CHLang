@@ -2,27 +2,25 @@
 // 目的: 完整的 GDI+ 演示程序 (Chrono 版本)
 // [最终方案] "typemap" 只用于 Chrono 解析器无法处理的 C++ 语法。
 //           "WM_PAINT", "NULL" 等宏常量 *不* 需要 typemap。
-@cpp
 #define UNICODE
 #define _UNICODE
-@end
+
 // --- 1. 包含核心头文件 ---
 import <windows.h>
 import <gdiplus.h>
 import <cstdint>
 // --- 2. 链接 GDI+ 库 ---
-@cpp
+
 #pragma comment(lib, "gdi32.lib")
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "gdiplus.lib")
 
+@cpp
 // --- 3. 使用 Gdiplus 命名空间 ---
 using namespace Gdiplus;
-
-// --- 4. 全局变量 ---
-ULONG_PTR g_gdiplusToken;
 @end
 
+var g_gdiplusToken: ULONG_PTR;
 // --- 5. [typemap] C++ 互操作性映射 ---
 // [关键] 我们只映射 Chrono 解析器无法识别的 "多词" 或 "带属性" 的类型。
 typemap C_LRESULT_CALLBACK = "LRESULT CALLBACK";
@@ -51,8 +49,6 @@ func WindowProc(
     switch (uMsg) {
 
         case WM_PAINT {
-
-
 
             var ps: PAINTSTRUCT;
             var hdc: HDC = BeginPaint(hWnd, &ps);
