@@ -1,0 +1,5 @@
+{
+    "src_dir": "src",
+    "out_dir": "build/src",
+    "transpiler_script": "src/transpiler.py"
+}

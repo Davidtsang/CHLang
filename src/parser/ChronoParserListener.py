@@ -476,6 +476,15 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#baseInitializer.
+    def enterBaseInitializer(self, ctx:ChronoParser.BaseInitializerContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#baseInitializer.
+    def exitBaseInitializer(self, ctx:ChronoParser.BaseInitializerContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#expression.
     def enterExpression(self, ctx:ChronoParser.ExpressionContext):
         pass

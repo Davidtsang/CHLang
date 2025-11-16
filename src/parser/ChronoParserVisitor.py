@@ -269,6 +269,11 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#baseInitializer.
+    def visitBaseInitializer(self, ctx:ChronoParser.BaseInitializerContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#expression.
     def visitExpression(self, ctx:ChronoParser.ExpressionContext):
         return self.visitChildren(ctx)

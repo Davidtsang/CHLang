@@ -173,7 +173,10 @@ methodDefinition
       statement* RBRACE ;
 
 initDefinition
-    : INIT LPAREN parameters RPAREN LBRACE statement* RBRACE ;
+    : INIT LPAREN parameters RPAREN
+      (COLON baseInit=baseInitializer)? // <-- [ [ [ 新增 ] ] ]
+      LBRACE statement* RBRACE
+    ;
 
 deinitBlock : DEINIT LBRACE statement* RBRACE ;
 
@@ -320,6 +323,12 @@ variableDeclaration_no_semicolon
 
 assignment_no_semicolon
     : assignableExpression assignmentOperator expression
+    ;
+
+// [ [ [ 新增：基类初始化器规则 ] ] ]
+// 匹配: Window(arg1, arg2)
+baseInitializer
+    : name=IDENTIFIER LPAREN args=expressionList? RPAREN
     ;
 
 // --- Expressions ---

@@ -695,6 +695,17 @@ class ChronoVisitor(BaseChronoVisitor):
         return ""
         # [ [ [ 新增结束 ] ] ]
 
+    # [ [ [ 新增：访问基类初始化器 ] ] ]
+    def visitBaseInitializer(self, ctx: ChronoParser.BaseInitializerContext):
+        """
+        访问 'baseInitializer' 规则 (例如 : Window(args) )
+        并将其翻译为 C++ 字符串 "Window(args)"
+        """
+        base_name = ctx.name.text
+        args_code = self.visit(ctx.args) if ctx.args else ""
+        return f"{base_name}({args_code})"
+
+
     def visitMethodSignature(self, ctx: ChronoParser.MethodSignatureContext):
         func_name = ctx.name.text
         cpp_func_name = func_name
@@ -873,31 +884,33 @@ class ChronoVisitor(BaseChronoVisitor):
         self._enter_scope()
 
         # [ [ [ 修复 B-2: 加载 'this' 和所有成员到作用域 ] ] ]
-
-        # 1. 确定 'this' 的访问器 (-> 或 .)
+        # ( ... 您现有的加载 'this' 和成员的代码 ... )
         accessor = "->"
         if self._in_struct:
-            accessor = "."  # Struct 内部 'this.x' -> 'this.x'
-
+            accessor = "."
         cpp_type = f"{self._current_class_name}*"
-
         self._add_variable("this", {
             "cpp_name": "this",
-            "accessor": accessor,  # <--- 关键: '.' (struct) or '->' (class)
+            "accessor": accessor,
             "cpp_type": cpp_type
         })
-
-        # 2. 将所有类/struct成员 (例如 's') 加载到当前作用域
         for member_name, metadata in self._current_class_members.items():
             self._add_variable(member_name, metadata)
-
         # [ [ [ 修复结束 ] ] ]
 
         cpp_func_name = self._current_class_name
 
+        # [ [ [ 新增：处理基类初始化 ] ] ]
+        base_init_code = ""
+        if ctx.baseInit:
+            # ctx.baseInit 是 BaseInitializerContext
+            # visit(ctx.baseInit) 将返回 "Window(L\"My Chrono GDI+ Window\", app)"
+            base_init_code = f" : {self.visit(ctx.baseInit)}"
+        # [ [ [ 新增结束 ] ] ]
+
         # [ [ [ 检查 'implement' 块 ] ] ]
         if self._in_implementation_block:
-            # [ [ [ 修复 A-4: 移除 'implement' 块中的命名空间前缀 ] ] ]
+            # [修复 A-4]
             cpp_func_name = f"{self._current_class_name}::{self._current_class_name}"
         else:
             access = getattr(ctx, '_chrono_access', 'private')
@@ -909,7 +922,8 @@ class ChronoVisitor(BaseChronoVisitor):
 
         init_code = (
             f"{line_comment}\n{INDENT if not self._in_implementation_block else ''}"
-            f"{cpp_func_name}({params_code}) {{\n"
+            # [ [ [ 修改：插入 base_init_code ] ] ]
+            f"{cpp_func_name}({params_code}){base_init_code} {{\n"
             f"{body_code}"
             f"{INDENT if not self._in_implementation_block else ''}}}\n"
         )

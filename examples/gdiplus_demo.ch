@@ -15,10 +15,7 @@ import <cstdint>
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "gdiplus.lib")
 
-@cpp
-// --- 3. 使用 Gdiplus 命名空间 ---
-using namespace Gdiplus;
-@end
+@cpp using namespace Gdiplus; @end
 
 var g_gdiplusToken: ULONG_PTR;
 // --- 5. [typemap] C++ 互操作性映射 ---
