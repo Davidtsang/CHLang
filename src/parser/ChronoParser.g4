@@ -10,30 +10,25 @@ options { tokenVocab = ChronoLexer; }
 
 // --- [ 1. 升级: 泛型/数组/函数 类型规则 ] ---
 typeSpecifier
-    : ( // 路径 A: C-Style 数组 (e.g., [char; 20])
+    : ( // 路径 A: C-Style 数组 [type; size] (保持不变，Rust 风格)
         LBRACK typeSpecifier SEMIC_TOKEN expression RBRACK
       )
-      ( (STAR | BIT_AND) )* // 数组的后缀
+      ( (STAR | BIT_AND) )*
 
-    | ( // 路径 B: 基础/泛型类型 (e.g., std.vector[i32] or i32)
-        baseType (LBRACK typeList RBRACK)?
+    | ( // 路径 B: 基础/泛型类型 (e.g., std.vector<i32> or i32)
+        // [关键修改] LBRACK -> LT, RBRACK -> GT
+        baseType (LT typeList GT)?
       )
-      ( (STAR | BIT_AND) )* // 基础类型的后缀
+      ( (STAR | BIT_AND) )*
 
-    | ( // [ [ [ 关键修复: 路径 C/D 合并 ] ] ]
-        //   处理所有以 '(' 开头的类型
+    | ( // 路径 C/D: 函数类型或括号类型
         LPAREN
         (
-            // 选项 1 (Path C): 这是一个函数类型
-            // [ [ 关键变更 ] ]
-            // 现在使用 'typeList?' (只匹配类型, e.g., 'i32, i32' 或 '()')
             (params=typeList? RPAREN ARROW returnType=typeSpecifier)
-
-            // 选项 2 (Path D): 这是一个带括号的类型
             | (nested=typeSpecifier RPAREN)
         )
       )
-      ( (STAR | BIT_AND) )* // 函数/带括号类型的后缀
+      ( (STAR | BIT_AND) )*
     ;
 
 baseType
@@ -180,8 +175,20 @@ initDefinition
 
 deinitBlock : DEINIT LBRACE statement* RBRACE ;
 
+includeHeaderContent
+    : (IDENTIFIER | DOT | SLASH | MINUS | PLUS | DECIMAL_LITERAL)+
+    ;
+
+// 2. 修改 importDirective
+// 以前是: IMPORT path=(STRING_LITERAL | INCLUDE_PATH) ...
+// 现在改为:
 importDirective
-    : IMPORT path=(STRING_LITERAL | INCLUDE_PATH) (AS alias=IDENTIFIER)?;
+    : IMPORT
+      ( pathStr=STRING_LITERAL              // 匹配 "path/to/file.ch"
+      | (LT pathSeq=includeHeaderContent GT) // 匹配 <vector> 或 <sys/stat.h>
+      )
+      (AS alias=IDENTIFIER)?
+    ;
 
 usingAlias
     : USING name=IDENTIFIER ASSIGN typeName=typeSpecifier SEMIC_TOKEN ;
@@ -350,30 +357,37 @@ unaryExpression
 // --- [ 3. 升级: 'simpleExpression' 规则 ] ---
 // [ [ 关键修复：已还原为无歧义的原始结构 ] ]
 simpleExpression
-    : ( primary | functionCallExpression )  // <-- [已还原]
-      ( // 循环处理链式调用
+    : ( primary | functionCallExpression )
+      ( // 循环处理链
 
-        // 路径 A: .foo, .foo(), .foo[int], .foo[int]()
-        DOT IDENTIFIER (LBRACK typeList RBRACK)? (LPAREN expressionList? RPAREN)?
+        // 路径 A: 泛型方法调用 .foo<T>() 或 .foo<T>
+        // [关键修改] 使用 LT/GT，明确这是泛型
+        DOT IDENTIFIER (LT typeList GT)? (LPAREN expressionList? RPAREN)?
 
-      | LBRACK expression RBRACK            // 路径 B: [i] (数组索引)
+      | // 路径 B: 数组索引 [i]
+        // [明确语义] 只有这里使用 LBRACK，不再有歧义
+        LBRACK expression RBRACK
 
-      // 路径 C: ->foo() 或 ->foo
-      | ARROW IDENTIFIER (LPAREN expressionList? RPAREN)? // <-- [ -> 支持已保留]
+      | // 路径 C: 指针调用 ->foo()
+        ARROW IDENTIFIER (LPAREN expressionList? RPAREN)?
 
       )* ;
 
 primary
     : NEW baseType LPAREN expressionList? RPAREN
-    // [ [ 新增 ] ] @make[T](args) 和 @make_shared[T](args)
-    | (AT_MAKE_UNIQUE | AT_MAKE_SHARED) LBRACK typeSpecifier RBRACK LPAREN expressionList? RPAREN
+
+    // [关键修改] @make<T>(...)
+    | (AT_MAKE_UNIQUE | AT_MAKE_SHARED) LT typeSpecifier GT LPAREN expressionList? RPAREN
+
+    // [关键修改] static_cast<T>(...)
     | ( AT_MAKE_UNIQUE
       | AT_MAKE_SHARED
-      | STATIC_CAST         // <-- [新增]
-      | REINTERPRET_CAST    // <-- [新增]
-      | CONST_CAST          // <-- [新增]
+      | STATIC_CAST
+      | REINTERPRET_CAST
+      | CONST_CAST
       )
-      LBRACK typeSpecifier RBRACK LPAREN expressionList? RPAREN
+      LT typeSpecifier GT LPAREN expressionList? RPAREN
+
     | literal
     | initializerList
     | IDENTIFIER

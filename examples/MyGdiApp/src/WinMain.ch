@@ -1,18 +1,20 @@
 // file: framework/WinMain.ch
 #define UNICODE
 #define _UNICODE
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX // [New] Prevent min/max macro conflicts
 
-// --- 1. 包含核心头文件 ---
+// [Critical] Include order is vital here.
+import <algorithm> // often needed to prevent min/max issues
 import <windows.h>
-import <gdiplus.h> // [ [ [ 修复 1 ] ] ]
+import <objidl.h>  // sometimes needed for GDI+
+import <gdiplus.h>
 import <cstdint>
-import "WinMain"
 
-// --- 2. 链接库 ---
+// ... (rest of the file: pragmas, @cpp using namespace Gdiplus, etc.)
 #pragma comment(lib, "gdi32.lib")
 #pragma comment(lib, "user32.lib")
-#pragma comment(lib, "gdiplus.lib") // [ [ [ 修复 1 ] ] ]
-
+#pragma comment(lib, "gdiplus.lib")
 @cpp using namespace Gdiplus; @end
 
 // --- 3. typemaps (来自 gdiplus_demo) ---

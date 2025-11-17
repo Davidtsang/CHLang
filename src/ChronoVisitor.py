@@ -92,8 +92,10 @@ class ChronoVisitor(BaseChronoVisitor):
         # --- 路径 B: 基础/泛型类型 ---
         elif ctx.baseType():
             base = self.visit(ctx.baseType())
-            if ctx.typeList():
+            # [关键修改] 检查 LT 和 GT
+            if ctx.LT() and ctx.typeList():
                 args = self.visit(ctx.typeList())
+                # 直接生成 C++ 的 <>
                 core_type = f"{base}<{args}>"
             else:
                 core_type = base
@@ -650,11 +652,26 @@ class ChronoVisitor(BaseChronoVisitor):
 
         line_comment = f"\n// Line {ctx.start.line} \n"
 
-        path_text = ctx.path.text
+        # --- [关键修复] 路径重建逻辑 ---
+        # 因为我们从 Lexer 删除了 INCLUDE_PATH，现在需要在 Visitor 里还原路径字符串
+
+        path_text = ""
+        is_system_header = False
+
+        if ctx.pathStr:
+            # 情况 A: import "foo.ch"
+            path_text = ctx.pathStr.text
+        else:
+            # 情况 B: import <vector> 或 import <sys/stat.h>
+            # ANTLR 将其拆分为了 LT, IDENTIFIER(sys), SLASH, IDENTIFIER(stat), DOT, IDENTIFIER(h), GT
+            # 我们需要获取 pathSeq 对应的完整原始文本
+            raw_seq = ctx.pathSeq.getText()  # getText() 会自动拼接子节点文本
+            path_text = f"<{raw_seq}>"
+            is_system_header = True
 
         # --- 智能导入逻辑 ---
         # 如果是用户导入 ("...")，尝试加载它以获取 typemaps
-        if path_text.startswith('"') and self.import_loader_callback:
+        if not is_system_header and self.import_loader_callback:
             raw_path = path_text[1:-1]  # 去除引号
             # 触发回调，扫描目标文件
             self.import_loader_callback(raw_path)
@@ -669,18 +686,18 @@ class ChronoVisitor(BaseChronoVisitor):
             alias_name = true_namespace
         if alias_name and true_namespace:
             self._alias_to_namespace_map[alias_name] = true_namespace
-        if path_text.startswith('<'):
+
+        if is_system_header:
             return f"#include {path_text}\n"
-        elif path_text.startswith('\"'):
+        else:
             # 用户头文件
-            path_content = path_text[1:-1]
+            path_content = path_text[1:-1]  # 去引号
 
             # 1. 处理 runtime 路径修正 (保留现有逻辑)
             if path_content.startswith('runtime/'):
                 path_content = path_content.replace('runtime/', '')
 
             # 2. [ [ [ 修复 ] ] ] 自动追加 .h 后缀
-            # 如果路径没有后缀 (例如 "framework/Window")，则认为是导入头文件
             root, ext = os.path.splitext(path_content)
             if not ext:
                 path_content += ".h"
@@ -993,29 +1010,40 @@ class ChronoVisitor(BaseChronoVisitor):
         i += 1
         if i >= len(child_nodes):
             return current_code, i, current_accessor, current_type
+
         ident_node = child_nodes[i]
         i += 1
         raw_ident_text = ident_node.getText()
+
+        # 变量查找
         member_info = self._find_variable(raw_ident_text)
         if member_info:
             cpp_ident = member_info["cpp_name"]
         else:
             cpp_ident = raw_ident_text
+
         accessor_to_use = "."
         if access_token_type == ChronoParser.DOT:
             accessor_to_use = current_accessor
         elif access_token_type == ChronoParser.ARROW:
-            accessor_to_use = "."
+            accessor_to_use = "."  # -> 已经被处理在 current_code 中了，或者我们在构建 ->
+
+        # [关键修复] 处理泛型 vs 数组索引的歧义
         template_args_str = ""
-        if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LBRACK:
-            i += 1
+        if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LT:
+            i += 1  # 跳过 <
             if i < len(child_nodes) and isinstance(child_nodes[i], ChronoParser.TypeListContext):
                 template_args_str = self.visit(child_nodes[i])
                 i += 1
-            if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.RBRACK:
-                i += 1
+            if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.GT:
+                i += 1  # 跳过 >
+
+        # 生成代码
         if template_args_str:
-            cpp_ident = f"{cpp_ident}<{template_args_str}>"
+            # 生成数组索引语法: .m_lookup[id]
+            cpp_ident = f"{cpp_ident}[{template_args_str}]"
+
+        # 处理函数调用 (...)
         if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LPAREN:
             i += 1
             args = ""
@@ -1028,14 +1056,12 @@ class ChronoVisitor(BaseChronoVisitor):
         else:
             new_code = f"{current_code}{accessor_to_use}{cpp_ident}"
 
-        # [ [ [ 修复 B-2: 访问器查找 ] ] ]
-        # 查找下一个成员 (例如 s.x 中的 x) 的信息，以决定下一个访问器
-        new_accessor = "->"  # 默认下一个是
-
-        next_member_info = self._find_variable(cpp_ident)
+        # 决定下一个访问器
+        new_accessor = "->"  # 默认
+        next_member_info = self._find_variable(raw_ident_text)  # 使用原始名查找
         if next_member_info:
             new_accessor = next_member_info["accessor"]
-        elif cpp_ident and cpp_ident[0].isupper():
+        elif raw_ident_text and raw_ident_text[0].isupper():
             new_accessor = "::"
 
         return new_code, i, new_accessor, "unknown"
@@ -1198,9 +1224,7 @@ class ChronoVisitor(BaseChronoVisitor):
         # e.g., static_cast[C_HBRUSH](value)
         # e.g., @make[Resource](args)
 
-        if ctx.LBRACK():  # 检查是否是 'func[Type](args)' 结构
-
-            # 1. 确定 C++ 中的函数名
+        if ctx.LT():
             cpp_func_name = ""
             if ctx.AT_MAKE_UNIQUE():
                 cpp_func_name = "std::make_unique"
@@ -1208,22 +1232,15 @@ class ChronoVisitor(BaseChronoVisitor):
                 cpp_func_name = "std::make_shared"
             elif ctx.STATIC_CAST():
                 cpp_func_name = "static_cast"
-                print(ctx.expressionList())
-
-
             elif ctx.REINTERPRET_CAST():
                 cpp_func_name = "reinterpret_cast"
             elif ctx.CONST_CAST():
                 cpp_func_name = "const_cast"
 
-            # 2. 访问 Chrono 的 [Type] (e.g., "C_HBRUSH")
             target_type = self.visit(ctx.typeSpecifier())
-
-            # 3. 访问 Chrono 的 (args) (e.g., "C_COLOR_WINDOW + 1")
 
             args = self.visit(ctx.expressionList()) if ctx.expressionList() else ""
 
-            # 4. 组装 *C++* 语法 (使用 C++ 的 <...>)
             return f"{cpp_func_name}<{target_type}>({args})"
 
         # [ [ [ 转换逻辑结束 ] ] ]

@@ -1,8 +1,17 @@
 // file: project/MyWindow.h.ch
 #pragma once
-import "Window.h"
-import "Application.h"
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+
+// [Critical Fix]
+// Ensure windows.h is included BEFORE gdiplus.h
+// AND ensure we don't have macro conflicts.
+import <windows.h>
 import <gdiplus.h>
+
+import "Window"
+import "Application"
+
 @cpp using namespace Gdiplus; @end
 
 class MyWindow : Window {

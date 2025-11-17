@@ -1,5 +1,5 @@
 // file: project/MyWindow.cpp.ch
-import "MyWindow.h"
+import "MyWindow"
 
 implement MyWindow {
 

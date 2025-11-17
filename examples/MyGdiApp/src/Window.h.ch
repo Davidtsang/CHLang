@@ -1,10 +1,15 @@
 // file: framework/Window.h.ch
-#define UNICODE     // <--- [ [ [ 修复 ] ] ] 添加此行
-#define _UNICODE    // <--- [ [ [ 修复 ] ] ] 添加此行
+#define UNICODE
+#define _UNICODE
+#define WIN32_LEAN_AND_MEAN
 
 #pragma once
 import <windows.h>
-import "Application" // 必须导入
+import <vector>  // [新增]
+import <map>     // [新增]
+import <memory>  // [新增]
+import "Application"
+import "Widget"
 
 // 从 gdiplus_demo.ch 导入 C++ 回调签名
 typemap C_LRESULT_CALLBACK = "LRESULT CALLBACK";
@@ -15,16 +20,24 @@ extern func GlobalWindowProc(
 ) -> C_LRESULT_CALLBACK;
 
 class Window{
-    // 成员
     public var m_hWnd: HWND;
-    var m_app: Application*; // [ [ [ 改进 3: 保存 App 指针 ] ] ]
+    var m_app: Application*;
 
-    // API
+    // [新增] 子控件管理
+    // 1. 所有权管理 (vector<unique_ptr>)
+    var m_children: std.vector[unique[Widget]];
+    // 2. 快速查找 (map<id, Widget*>)
+    var m_lookup: std.map[int, Widget*];
+    // 3. ID 计数器
+    var m_nextId: int;
+
     public init(title: LPCWSTR, app: Application*);
-    public deinit; // [ [ [ 修复 2: 虚拟析构函数 ] ] ]
+    public deinit;
     public func show();
 
-    // 核心：OOP 消息处理器 (必须是 virtual)
+    // [新增] 添加子控件 API
+    public func addChild(widget: unique[Widget]);
+
     public func handleMessage(
         uMsg: UINT, wParam: WPARAM, lParam: LPARAM
     ) -> LRESULT;

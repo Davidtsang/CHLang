@@ -100,11 +100,6 @@ BIT_OR  : '|' ;
 BIT_XOR : '^' ;
 BIT_NOT : '~' ;
 
-// INCLUDE_PATH 现在在 LT/GT 之后，但只在 import 语句中使用
-// 我们在 Parser 中处理这个上下文
-INCLUDE_PATH
-    : '<' [a-zA-Z_0-9./]+ '>'
-    ;
 
 SEMIC_TOKEN : ';' ;
 LPAREN  : '(' ; 

@@ -215,6 +215,15 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#includeHeaderContent.
+    def enterIncludeHeaderContent(self, ctx:ChronoParser.IncludeHeaderContentContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#includeHeaderContent.
+    def exitIncludeHeaderContent(self, ctx:ChronoParser.IncludeHeaderContentContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#importDirective.
     def enterImportDirective(self, ctx:ChronoParser.ImportDirectiveContext):
         pass

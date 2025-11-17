@@ -1,20 +1,28 @@
-// file: project/app.ch
-
-// --- 1. 导入框架和您自己的窗口 ---
-import "Application.h"
-import "MyWindow.h"
+import "Application"
+import "Button" // 导入按钮
+import "MyWindow"
 import <memory>
-// --- 2. 实现 Chrono 入口点 ---
+import <iostream> // 用于打印
+
+// 回调函数
+func onBtnClicked() {
+    @cpp std::cout << ">>> Button Clicked! Hello form Chrono!" << std::endl; @end
+}
+
 func CHMain() -> int {
-
-    // --- 3. 创建核心对象 ---
     var app: unique[Application] = @make[Application]();
-    var window: unique[MyWindow] = @make[MyWindow](app->get()); // [ [ 修正: 传递 app 指针 ] ]
+    var window: unique[MyWindow] = @make[MyWindow](app->get());
 
-    // --- 4. 运行应用 ---
+    // 1. 创建按钮
+    var btn: unique[Button] = @make[Button]("Click Me!");
+
+    // 2. 设置回调
+    btn.setOnClick(onBtnClicked);
+
+    // 3. 添加到窗口 (转移所有权)
+    window.addChild(@move(btn));
+
     window.show();
-    var exit_code: int = app.exec();
 
-    // --- 5. 返回退出码 ---
-    return exit_code;
+    return app.exec();
 }

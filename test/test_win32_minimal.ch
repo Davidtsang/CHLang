@@ -32,7 +32,7 @@ typemap C_INT:int = "int";
 using MyInt = i32;
 
 using AddFunc = (i32) -> i32;
-using IntVector = std.vector[i32];
+using IntVector = std.vector<i32>;
 
 // --- 5. 编写 Chrono 函数 (100% 干净) ---
 

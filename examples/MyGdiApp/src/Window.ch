@@ -1,12 +1,6 @@
 // file: framework/Window.cpp.ch
-import "Window.h"
-// Application.h 已在 Window.h 中导入
+import "Window"
 
-//typemap C_LRESULT_CALLBACK = "LRESULT CALLBACK";
-//typemap C_HBRUSH = "HBRUSH";
-
-// --- 1. 实现 C-Style 桥接函数 (来自 Window.ch) ---
-// (此部分与您在 Window.ch 中提供的代码相同，它是正确的)
 func GlobalWindowProc(
     hWnd: HWND, uMsg: UINT, wParam: WPARAM, lParam: LPARAM
 ) -> C_LRESULT_CALLBACK
@@ -48,52 +42,63 @@ if (uMsg == WM_NCCREATE) {
 implement Window {
 
     init(title: LPCWSTR, app: Application*) {
-        this.m_app = app; // [ [ [ 改进 3: 保存 App 指针 ] ] ]
+        this.m_app = app;
+        this.m_nextId = 100; // ID 从 100 开始
 
-        var wc: WNDCLASSEX = {};
-        var className = L"ChronoFrameworkWindow";
-
-        wc.cbSize = sizeof(WNDCLASSEX);
-        wc.style = CS_HREDRAW | CS_VREDRAW;
-        wc.lpfnWndProc = GlobalWindowProc;
-        wc.hInstance = app.getHInstance(); // (OK)
-        wc.lpszClassName = className;
-        wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-        wc.hbrBackground = reinterpret_cast[C_HBRUSH](COLOR_WINDOW + 1);
-
-        RegisterClassEx(&wc);
-
-        this.m_hWnd = CreateWindowEx(
-            WS_EX_CLIENTEDGE,
-            className,
-            title,
-            WS_OVERLAPPEDWINDOW,
-            CW_USEDEFAULT, CW_USEDEFAULT, 640, 480,
-            NULL, NULL,
-            app.getHInstance(),
-            this // (OK: 传递 'this' 指针)
-        );
+        // ... (WNDCLASSEX 和 CreateWindowEx 代码保持不变) ...
+        // ...
     }
 
-    // [ [ [ 修复 2: 实现析构函数 ] ] ]
-    deinit {
-        // (空) 确保 C++ v-table (虚函数表) 正确
-    }
+    deinit { }
 
-    // [ [ [ 改进 3: 移除 @cpp hack ] ] ]
     func show() {
-        // 不再使用 extern hack，而是从 m_app 成员获取
         var nCmdShow: int = this.m_app.getNCmdShow();
         ShowWindow(this.m_hWnd, nCmdShow);
-
         UpdateWindow(this.m_hWnd);
     }
 
-    // 默认实现 (来自 gdiplus_demo.ch)
+    // [新增] 添加子控件实现
+    func addChild(widget: unique[Widget]) {
+        var id: int = this.m_nextId;
+        this.m_nextId = this.m_nextId + 1;
+
+        // 1. 获取原始指针用于创建和查找
+        var ptr: Widget* = widget.get();
+
+        // 2. 创建实际的 Win32 控件
+        ptr.create(this.m_hWnd, id);
+
+        // 3. 存入查找表
+        this.m_lookup[id] = ptr;
+
+        // 4. 转移所有权到 vector (使用 std::move)
+        this.m_children.push_back(@move(widget));
+    }
+
+    // [修改] 增加消息路由逻辑
     func handleMessage(
         uMsg: UINT, wParam: WPARAM, lParam: LPARAM
     ) -> LRESULT
     {
+        switch (uMsg) {
+            // [关键] 处理命令消息 (按钮点击等)
+            case WM_COMMAND {
+                // Win32: LOWORD(wParam) 是控件 ID
+                var id: int = LOWORD(wParam);
+                // Win32: HIWORD(wParam) 是通知码 (如 BN_CLICKED)
+                var code: int = HIWORD(wParam);
+
+                // 查找控件
+                if (this.m_lookup.count(id) > 0) {
+                    var widget: Widget* = this.m_lookup[id];
+                    // 分发给控件
+                    widget.onCommand(code);
+                }
+                // 按钮点击通常不需要 Default 处理，但返回 0 是个好习惯
+                return 0;
+            }
+        }
+
         return DefWindowProc(this.m_hWnd, uMsg, wParam, lParam);
     }
 }

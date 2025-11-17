@@ -124,6 +124,11 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#includeHeaderContent.
+    def visitIncludeHeaderContent(self, ctx:ChronoParser.IncludeHeaderContentContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#importDirective.
     def visitImportDirective(self, ctx:ChronoParser.ImportDirectiveContext):
         return self.visitChildren(ctx)
