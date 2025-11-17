@@ -672,10 +672,21 @@ class ChronoVisitor(BaseChronoVisitor):
         if path_text.startswith('<'):
             return f"#include {path_text}\n"
         elif path_text.startswith('\"'):
+            # 用户头文件
             path_content = path_text[1:-1]
+
+            # 1. 处理 runtime 路径修正 (保留现有逻辑)
             if path_content.startswith('runtime/'):
                 path_content = path_content.replace('runtime/', '')
+
+            # 2. [ [ [ 修复 ] ] ] 自动追加 .h 后缀
+            # 如果路径没有后缀 (例如 "framework/Window")，则认为是导入头文件
+            root, ext = os.path.splitext(path_content)
+            if not ext:
+                path_content += ".h"
+
             return f'{line_comment}#include "{path_content}"\n'
+
         return f"// ERROR: Invalid import path {path_text}\n"
 
     def visitUsingAlias(self, ctx: ChronoParser.UsingAliasContext):

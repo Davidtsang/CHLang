@@ -6,7 +6,7 @@
 import <windows.h>
 import <gdiplus.h> // [ [ [ 修复 1 ] ] ]
 import <cstdint>
-import "WinMain.h"
+import "WinMain"
 
 // --- 2. 链接库 ---
 #pragma comment(lib, "gdi32.lib")

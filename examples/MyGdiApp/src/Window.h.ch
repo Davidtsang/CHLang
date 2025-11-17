@@ -4,7 +4,7 @@
 
 #pragma once
 import <windows.h>
-import "Application.h" // 必须导入
+import "Application" // 必须导入
 
 // 从 gdiplus_demo.ch 导入 C++ 回调签名
 typemap C_LRESULT_CALLBACK = "LRESULT CALLBACK";

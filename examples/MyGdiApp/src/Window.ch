@@ -12,17 +12,30 @@ func GlobalWindowProc(
 ) -> C_LRESULT_CALLBACK
 {
     var pWindow: Window* = NULL;
-    if (uMsg == WM_NCCREATE) {
-        @cpp
-            CREATESTRUCT* pCreate = (CREATESTRUCT*)lParam;
-            pWindow = (Window*)pCreate->lpCreateParams;
-            SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)pWindow);
-        @end
+if (uMsg == WM_NCCREATE) {
+        // [纯 Chrono 实现]
+
+        // 1. 将 lParam (LPARAM/long) 强转为 CREATESTRUCT 指针
+        var pCreate: CREATESTRUCT* = reinterpret_cast[CREATESTRUCT*](lParam);
+
+        // 2. 获取创建时传入的 'this' 指针 (在 lpCreateParams 中)
+        //    注意：这里使用 '.'，翻译器会自动翻译成 C++ 的 '->'
+        pWindow = reinterpret_cast[Window*](pCreate.lpCreateParams);
+
+        // 3. 将指针存入窗口的 UserData 中
+        //    SetWindowLongPtr 需要 LONG_PTR 类型，所以进行强转
+        SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast[LONG_PTR](pWindow));
+
+        // 4. 保存 hWnd
         pWindow.m_hWnd = hWnd;
+
     } else {
-        @cpp
-            pWindow = (Window*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-        @end
+        // [纯 Chrono 实现]
+
+        // 5. 从 UserData 取回指针
+        //    GetWindowLongPtr 返回 LONG_PTR，强转回 Window*
+        var ptrVal: LONG_PTR = GetWindowLongPtr(hWnd, GWLP_USERDATA);
+        pWindow = reinterpret_cast[Window*](ptrVal);
     }
 
     if (pWindow != NULL) {
