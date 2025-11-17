@@ -30,6 +30,7 @@ USING   : 'using' ;
 TYPEMAP : 'typemap' ;
 NAMESPACE : 'namespace';
 END_NAMESPACE : 'endnamespace' ;
+EXTERN : 'extern';
 SWITCH  : 'switch' ;
 CASE    : 'case' ;
 DEFAULT : 'default' ;

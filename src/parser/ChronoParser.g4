@@ -48,7 +48,7 @@ typeList
     ;
 
 variableDeclaration
-    : (CONST | VAR) name=IDENTIFIER       // 必须以 'const' 或 'var' 开头
+    : (EXTERN)? (CONST | VAR) name=IDENTIFIER       // 必须以 'const' 或 'var' 开头
       (COLON typeName=typeSpecifier)? // [修改] 类型 (e.g., : i32) 现在是可选的
       (ASSIGN expression)?            // [修改] 赋值 (e.g., = 10) 也是可选的
       SEMIC_TOKEN
@@ -162,7 +162,7 @@ structBodyStatement
 
 // [ [ [ 1. 新增：全局/类 函数声明 (用于 .h.ch) ] ] ]
 functionSignature
-    : (STATIC)?
+    : (EXTERN)? (STATIC)?
     FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)?
     SEMIC_TOKEN // <-- 关键区别：分号，而不是 LBRACE ... RBRACE
     ;
@@ -191,7 +191,7 @@ typemapDefinition
     : TYPEMAP name=IDENTIFIER (COLON hint=typeSpecifier)? ASSIGN value=STRING_LITERAL SEMIC_TOKEN ;
 
 functionDefinition
-    : (STATIC)?
+    : (EXTERN)? (STATIC)?
     FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)?
       LBRACE
           statement* RBRACE ;
@@ -316,7 +316,7 @@ interfaceDefinition
     ;
 
 variableDeclaration_no_semicolon
-    : (CONST | VAR) name=IDENTIFIER
+    : (EXTERN)? (CONST | VAR) name=IDENTIFIER
       (COLON typeName=typeSpecifier)?
       (ASSIGN expression)?
     ;

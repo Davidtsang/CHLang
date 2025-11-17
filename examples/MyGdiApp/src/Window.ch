@@ -2,8 +2,8 @@
 import "Window.h"
 // Application.h 已在 Window.h 中导入
 
-typemap C_LRESULT_CALLBACK = "LRESULT CALLBACK";
-typemap C_HBRUSH = "HBRUSH";
+//typemap C_LRESULT_CALLBACK = "LRESULT CALLBACK";
+//typemap C_HBRUSH = "HBRUSH";
 
 // --- 1. 实现 C-Style 桥接函数 (来自 Window.ch) ---
 // (此部分与您在 Window.ch 中提供的代码相同，它是正确的)

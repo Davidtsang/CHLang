@@ -1,6 +1,6 @@
 ﻿# src/ChronoVisitor.py
 import os
-from antlr4 import *
+from CompileContext import CompileContext
 
 from parser.ChronoParser import ChronoParser
 from parser.ChronoParserVisitor import ChronoParserVisitor as BaseChronoVisitor
@@ -11,21 +11,24 @@ INDENT = "    "
 
 class ChronoVisitor(BaseChronoVisitor):
 
-    def __init__(self):
+    def __init__(self, context: CompileContext = None, import_loader_callback=None):
         super().__init__()
 
-        # [ [ [ 恢复为简单状态 ] ] ]
-        # (我们回到了您最初  的简单 Visitor)
+        # 上下文与回调 (用于智能导入)
+        self.context = context if context else CompileContext()
+        self.import_loader_callback = import_loader_callback
+
+        # (我们回到了您最初的简单 Visitor)
         self._in_class_method = False
         self._in_class = False
         self._in_struct = False
         self._current_class_name = None
         self._class_sections = {"private": "", "public": ""}
         self._alias_to_namespace_map = {}
-        self._literal_alias_map = {}
+        # self._literal_alias_map = {} # <--- [删除] 改用 self.context
         self._scope_stack = [{}]
         self._namespace_is_open = False
-        # [ [ [ 新增 ] ] ]
+
         # 这个新状态用于跟踪我们是否在 'implement' 块中
         self._in_implementation_block = False
         self._current_namespace_str = ""  # 用于 C++ 作用域
@@ -128,10 +131,15 @@ class ChronoVisitor(BaseChronoVisitor):
         """
         raw_text = ctx.getText()  # (例如 "C_INT_WINAPI", "std.string", "i32")
 
-        # 步骤 1: 检查 'typemap' 字面量代换
-        if raw_text in self._literal_alias_map:
-            # [修复] 必须返回此字典中的值
-            return self._literal_alias_map[raw_text]
+        # 步骤 1: 检查全局 typemap 注册表
+        mapped_val = self.context.get_typemap(raw_text)
+        if mapped_val:
+            return mapped_val
+
+        # # 步骤 1: 检查 'typemap' 字面量代换
+        # if raw_text in self._literal_alias_map:
+        #     # [修复] 必须返回此字典中的值
+        #     return self._literal_alias_map[raw_text]
 
         # --- (以下是现有逻辑) ---
         parts = raw_text.split('.')
@@ -209,7 +217,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         self._add_variable("this", {
             "cpp_name": "this",
-            "accessor": accessor,  # <--- 关键: '.' (struct) or '->' (class)
+            "accessor": accessor,  # ←-- 关键: '.' (struct) or '→' (class)
             "cpp_type": cpp_type
         })
 
@@ -292,7 +300,7 @@ class ChronoVisitor(BaseChronoVisitor):
         # 直接构建并返回 C++ 代码字符串，不再委托给 visitMethodDefinition
         func_def_code = (
             f"{line_comment}"
-            f"\n{static_prefix}{return_type} {cpp_func_name}({params_code}) {{\n"
+            f"{static_prefix}{return_type} {cpp_func_name}({params_code}) {{\n"
             f"{body_code}"
             f"{INDENT}// --- Function End ---\n"
             f"}}\n"
@@ -644,6 +652,14 @@ class ChronoVisitor(BaseChronoVisitor):
 
         path_text = ctx.path.text
 
+        # --- 智能导入逻辑 ---
+        # 如果是用户导入 ("...")，尝试加载它以获取 typemaps
+        if path_text.startswith('"') and self.import_loader_callback:
+            raw_path = path_text[1:-1]  # 去除引号
+            # 触发回调，扫描目标文件
+            self.import_loader_callback(raw_path)
+        # --------------------
+
         base_name = os.path.basename(path_text.strip('\"<>'))
         true_namespace, _ = os.path.splitext(base_name)
 
@@ -680,20 +696,11 @@ class ChronoVisitor(BaseChronoVisitor):
 
     # [ [ [ 新增 ] ] ]
     def visitTypemapDefinition(self, ctx: ChronoParser.TypemapDefinitionContext):
-        """
-        [新增] 访问 'typemap' 规则。
-        e.g., typemap C_INT_WINAPI : i32 = "int WINAPI";
-
-        这 *不* 会生成 C++ 代码，而是将 "C_INT_WINAPI" -> "int WINAPI"
-        注册到翻译器的内部代换映射 (_literal_alias_map) 中。
-
-        ': i32' (ctx.hint) 部分被翻译器完全忽略。
-        """
         name = ctx.name.text
-        value = ctx.value.text[1:-1]  # [修复] 使用 .text
-        self._literal_alias_map[name] = value
-        return ""
-        # [ [ [ 新增结束 ] ] ]
+        value = ctx.value.text[1:-1]
+        # 再次注册也无妨，或者忽略
+        self.context.register_typemap(name, value)
+        return ""  # 不生成 C++ 代码
 
     # [ [ [ 新增：访问基类初始化器 ] ] ]
     def visitBaseInitializer(self, ctx: ChronoParser.BaseInitializerContext):
@@ -704,7 +711,6 @@ class ChronoVisitor(BaseChronoVisitor):
         base_name = ctx.name.text
         args_code = self.visit(ctx.args) if ctx.args else ""
         return f"{base_name}({args_code})"
-
 
     def visitMethodSignature(self, ctx: ChronoParser.MethodSignatureContext):
         func_name = ctx.name.text
@@ -756,9 +762,11 @@ class ChronoVisitor(BaseChronoVisitor):
             return ""
         else:
             # 全局函数签名 (不在类中)
+            is_extern = bool(ctx.EXTERN())
             is_static = bool(ctx.STATIC())  # <--- [修正] 全局函数签名也需要正确检查
             static_prefix = "static " if is_static else ""
-            return f"{line_comment}{static_prefix}{return_type} {self._current_namespace_str}{func_name}({params_code});\n"
+            extern_prefix = "extern " if is_extern else ""
+            return f"{line_comment}{extern_prefix}{static_prefix}{return_type} {self._current_namespace_str}{func_name}({params_code});\n"
 
     def visitInitSignature(self, ctx: ChronoParser.InitSignatureContext):
         line_comment = f"\n// Line {ctx.start.line} \n"
@@ -943,10 +951,11 @@ class ChronoVisitor(BaseChronoVisitor):
         """
 
         # 步骤 1: 检查 'typemap' 字面量代换
-        if raw_primary_text in self._literal_alias_map:
+        mapped_val = self.context.get_typemap(raw_primary_text)
+        if mapped_val:
             # 这是一个原始文本代换 (e.g., "COLOR_WINDOW")
             # 它没有访问器，所以我们返回它自己，accessor 为 "."
-            return self._literal_alias_map[raw_primary_text], ".", "literal"
+            return mapped_val, ".", "literal"
 
         # 步骤 2: 检查 'var' 变量
         variable_info = self._find_variable(raw_primary_text)
@@ -1049,7 +1058,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         self._add_variable("this", {
             "cpp_name": "this",
-            "accessor": accessor,  # <--- 关键: '.' (struct) or '->' (class)
+            "accessor": accessor,  # 关键: '.' (struct) or '→' (class)
             "cpp_type": cpp_type
         })
 
@@ -1224,10 +1233,9 @@ class ChronoVisitor(BaseChronoVisitor):
             if not variable_info:
                 # 检查它是否是 'typemap' 定义的常量 (e.g., "C_COLOR_WINDOW")
 
-                if primary_text in self._literal_alias_map:
-                    # print("im here!")
-                    val_ = self._literal_alias_map[primary_text]
-                    return val_
+                mapped_val = self.context.get_typemap(primary_text)
+                if mapped_val:
+                    return mapped_val
             # [ [ [ 修复结束 ] ] ]
 
             if variable_info:
@@ -1655,6 +1663,9 @@ class ChronoVisitor(BaseChronoVisitor):
     def visitVariableDeclaration(self, ctx: ChronoParser.VariableDeclarationContext):
         line_comment = f"{INDENT}// Line {ctx.start.line}\n"
 
+        is_extern = bool(ctx.EXTERN())
+        extern_prefix = "extern " if is_extern else ""
+
         core_cpp, is_member_variable, access, cpp_final_type, cpp_name = self._translate_variable_declaration(ctx)
 
         if is_member_variable:
@@ -1670,7 +1681,7 @@ class ChronoVisitor(BaseChronoVisitor):
             self._class_sections[access] += declaration_line
             return ""
         else:
-            return f"{line_comment}{INDENT}{core_cpp};\n"
+            return f"{line_comment}{INDENT}{extern_prefix}{core_cpp};\n"
 
     def visitVariableDeclaration_no_semicolon(self, ctx: ChronoParser.VariableDeclaration_no_semicolonContext):
         core_cpp, _, _, _, _ = self._translate_variable_declaration(ctx)

@@ -10,7 +10,7 @@ import "Application.h" // 必须导入
 typemap C_LRESULT_CALLBACK = "LRESULT CALLBACK";
 typemap C_HBRUSH = "HBRUSH"; //
 // 声明我们的 C-style 桥接函数
-func GlobalWindowProc(
+extern func GlobalWindowProc(
     hWnd: HWND, uMsg: UINT, wParam: WPARAM, lParam: LPARAM
 ) -> C_LRESULT_CALLBACK;
 
