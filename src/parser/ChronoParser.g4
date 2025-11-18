@@ -32,10 +32,12 @@ typeSpecifier
     ;
 
 baseType
-    : (IDENTIFIER (DOT IDENTIFIER)*)
-    | UNIQUE_KW   // [新增]
-    | SHARED_KW   // [新增]
-    | WEAK_KW     // [新增]
+    : UNIQUE_KW
+    | SHARED_KW
+    | WEAK_KW
+    // [修改] 允许 IDENTIFIER 后跟 . 或 ::
+    // (为了兼容性保留 DOT，但推荐使用 COLON_COLON)
+    | IDENTIFIER ( (DOT | COLON_COLON) IDENTIFIER )*
     ;
 
 typeList
@@ -84,8 +86,14 @@ topLevelStatement
     | usingAlias
     | variableDeclaration
     | typemapDefinition
+    | forwardDeclaration // [新增]
     | CPP_DIRECTIVE
     | endNamespaceStatement
+    ;
+
+// [新语法] 匹配: type Child : struct;
+forwardDeclaration
+    : TYPE name=IDENTIFIER COLON (kind=CLASS | kind=STRUCT) SEMIC_TOKEN
     ;
 
 accessModifier : PUBLIC ;
@@ -226,11 +234,12 @@ assignment : assignableExpression assignmentOperator expression SEMIC_TOKEN ;
 
 // (在 ChronoParser.g4 中替换 assignableExpression)
 assignableExpression
-    : assignablePrimary      // 路径 A: 标识符, this, 或解引用/取地址的一元表达式
+    : assignablePrimary
       ( // 循环处理链
-        DOT IDENTIFIER                      // 路径 B: .foo
-      | LBRACK expression RBRACK            // 路径 C: [i] (数组索引)
-      | ARROW IDENTIFIER                    // 路径 D: ->foo 
+        DOT IDENTIFIER                      // 路径 A: .foo
+      | ARROW IDENTIFIER                    // 路径 B: ->foo
+      | COLON_COLON IDENTIFIER              // 路径 C: ::foo [新增]
+      | LBRACK expression RBRACK            // 路径 D: [i]
       )*
     ;
 
@@ -358,19 +367,11 @@ unaryExpression
 // [ [ 关键修复：已还原为无歧义的原始结构 ] ]
 simpleExpression
     : ( primary | functionCallExpression )
-      ( // 循环处理链
+      (
+        // [修改] 显式匹配三种访问符
+        (DOT | ARROW | COLON_COLON) IDENTIFIER (LT typeList GT)? (LPAREN expressionList? RPAREN)?
 
-        // 路径 A: 泛型方法调用 .foo<T>() 或 .foo<T>
-        // [关键修改] 使用 LT/GT，明确这是泛型
-        DOT IDENTIFIER (LT typeList GT)? (LPAREN expressionList? RPAREN)?
-
-      | // 路径 B: 数组索引 [i]
-        // [明确语义] 只有这里使用 LBRACK，不再有歧义
-        LBRACK expression RBRACK
-
-      | // 路径 C: 指针调用 ->foo()
-        ARROW IDENTIFIER (LPAREN expressionList? RPAREN)?
-
+      | LBRACK expression RBRACK
       )* ;
 
 primary

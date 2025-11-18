@@ -98,6 +98,15 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#forwardDeclaration.
+    def enterForwardDeclaration(self, ctx:ChronoParser.ForwardDeclarationContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#forwardDeclaration.
+    def exitForwardDeclaration(self, ctx:ChronoParser.ForwardDeclarationContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#accessModifier.
     def enterAccessModifier(self, ctx:ChronoParser.AccessModifierContext):
         pass

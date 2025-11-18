@@ -40,28 +40,28 @@ class MemberTest : ChronoObject {
 
 implement MemberTest{
     init(val: i32, str: String*) {
-            this.x = val;
-            this.s = str;   // <-- [已修复] 必须使用 $s
-            this.s.retain(); // <-- [已修复] 必须使用 $s
+            this->x = val;
+            this->s = str;   // <-- [已修复] 必须使用 $s
+            this->s->retain(); // <-- [已修复] 必须使用 $s
         }
 
     // 析构函数 (deinit)
     deinit {
-        @cpp
-            std::cout << "DEINIT" << std::endl;
-        @end
-        this.s.release(); // <-- [已修复] 必须使用 $s
+
+        std::cout << "DEINIT" << std::endl;
+
+        this->s->release(); // <-- [已修复] 必须使用 $s
     }
 
     // [关键] 必须标记为 'public' 才能被 'main' 调用
     func printAll() {
-        Chrono.log(this.x);
-        Chrono.log(this.s);  // <-- [已修复] 必须使用 $s
+        Chrono::log(this->x);
+        Chrono::log(this->s);  // <-- [已修复] 必须使用 $s
     }
 
     // (默认 private)
     func getName() -> String* {
-        return this.name;     // <-- [已修复] 必须使用 $name
+        return this->name;     // <-- [已修复] 必须使用 $name
     }
 
     // [关键] 必须标记为 'public' 才能被 'main' 调用
@@ -74,19 +74,19 @@ implement MemberTest{
 // -------------------------------------------
 func main() -> int {
     // a. 创建参数 (RC=1)
-    var s: String* = String.create("Hello");
+    var s: String* = String::create("Hello");
 
     // b. 创建对象 (RC=1)
-    var obj: MemberTest* = MemberTest.create(100, s);
+    var obj: MemberTest* = MemberTest::create(100, s);
 
-    // c. 调用 'this.method()'
-    obj.printAll(); // 输出 100, "Hello"
+    // c. 调用 'this->method()'
+    obj->printAll(); // 输出 100, "Hello"
 
     // d. 释放 'obj' (RC=0)
-    obj.release();
+    obj->release();
 
     // e. 释放 's' (RC=0)
-    s.release();
+    s->release();
     
     return 0;
 }

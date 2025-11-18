@@ -18,9 +18,9 @@ class MRCClass : ChronoObject {
 }
 
 implement MRCClass{
-    init() { Chrono.log("MRC Init"); }
+    init() { Chrono::log("MRC Init"); }
 
-    deinit { Chrono.log("MRC Deinit"); }
+    deinit { Chrono::log("MRC Deinit"); }
 
     // [更改] 返回类型必须标记为 $
     func create() -> MRCClass* {
@@ -39,7 +39,7 @@ class NativeClass {
 }
 
 implement NativeClass{
-    init() { Chrono.log("Native Init"); }
+    init() { Chrono::log("Native Init"); }
 
     // [更改] 返回类型必须标记为 $
     func create() -> NativeClass* {
@@ -49,24 +49,24 @@ implement NativeClass{
 
 func main() -> int {
 
-    Chrono.log("--- Test Start ---");
+    Chrono::log("--- Test Start ---");
 
     // SCENARIO A: 安全的 MRC 模式 (通过工厂调用)
-    var objA: MRCClass* = MRCClass.create();
-    Chrono.log("A: MRC object created (Factory).");
-    objA.release(); // 自动调用 deinit
+    var objA: MRCClass* = MRCClass::create();
+    Chrono::log("A: MRC object created (Factory).");
+    objA->release(); // 自动调用 deinit
 
     // SCENARIO B: 手动 NEW/DELETE 模式 (通过工厂调用)
 
     // [KEY TEST 1] 使用工厂方法创建对象
-    var objB: NativeClass* = NativeClass.create();
-    Chrono.log("B: Native object created (Factory).");
+    var objB: NativeClass* = NativeClass::create();
+    Chrono::log("B: Native object created (Factory).");
 
     // [KEY TEST 2] 使用 DELETE 关键字释放对象
     delete objB; // 手动调用 delete
-    Chrono.log("B: Native object deleted (explicit DELETE).");
+    Chrono::log("B: Native object deleted (explicit DELETE).");
 
-    Chrono.log("--- Test End ---");
+    Chrono::log("--- Test End ---");
 
     return 0;
 }

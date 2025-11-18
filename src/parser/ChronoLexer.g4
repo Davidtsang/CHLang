@@ -35,6 +35,8 @@ SWITCH  : 'switch' ;
 CASE    : 'case' ;
 DEFAULT : 'default' ;
 
+TYPE : 'type';
+
 UNIQUE_KW : 'unique' ;     // [新增]
 SHARED_KW : 'shared' ;     // [新增]
 WEAK_KW   : 'weak' ;       // [新增]
@@ -65,7 +67,8 @@ AT_CPP  : '@cpp' -> pushMode(INSIDE_CPP_BLOCK);
 EQ      : '==' ;
 NEQ     : '!=' ;
 LTE     : '<=' ; 
-GTE     : '>=' ; 
+GTE     : '>=' ;
+COLON_COLON : '::' ; // [新增] 支持 C++ 作用域解析符
 ARROW   : '->' ;
 AND_OP  : '&&' ; // <-- [新增]
 OR_OP   : '||' ; // <-- [新增]

@@ -19,7 +19,7 @@ func main() -> int {
 
     // --- Test 1: static_cast (安全) ---
     // (int -> float 是合法的 static_cast)
-    var f = static_cast[f32](10);
+    var f = static_cast<f32>(10);
     @cpp
         std::cout << "Test 1 (static_cast[f32]): " << f << std::endl;
         static_assert(std::is_same_v<decltype(f), float>, "static_cast[f32] failed");
@@ -31,7 +31,7 @@ func main() -> int {
     //
     // 之前是: var h = static_cast[C_HBRUSH](...)
     // 现在是:
-    var h = reinterpret_cast[C_HBRUSH](C_COLOR_WINDOW + 1);
+    var h = reinterpret_cast<C_HBRUSH>(C_COLOR_WINDOW + 1);
 
     @cpp
         // (我们仍然可以称之为 "Test 2" 用于 expected.txt)
@@ -43,7 +43,7 @@ func main() -> int {
     // --- Test 3: reinterpret_cast (指针) ---
     // (这个已经是正确的)
     var i: i32 = 12345;
-    var p = reinterpret_cast[C_INT_PTR](&i);
+    var p = reinterpret_cast<C_INT_PTR>(&i);
 
     @cpp
         std::cout << "Test 3 (reinterpret_cast): (Compiled)" << std::endl;
@@ -53,7 +53,7 @@ func main() -> int {
     // --- Test 4: const_cast (移除 const) ---
     // (这个已经是正确的)
     const x: i32 = 50;
-    var y = const_cast[i32*](&x);
+    var y = const_cast<i32*>(&x);
 
     *y = 100;
 

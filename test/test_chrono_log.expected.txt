@@ -1,4 +1,4 @@
---- Chrono.log Test Start ---
+--- Chrono::log Test Start ---
 Test 1 (i32):
 123
 Test 2 (bool):
@@ -9,4 +9,4 @@ Test 4 (String):
 MRC String
 Test 5 (Int):
 456
---- Chrono.log Test End ---
+--- Chrono::log Test End ---

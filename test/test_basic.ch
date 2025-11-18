@@ -4,6 +4,6 @@ import "Chrono.h"
 
 func main() -> int {
     var five: int = 5;
-    Chrono.log(five);
+    Chrono::log(five);
     return 0;
 }

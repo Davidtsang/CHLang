@@ -16,7 +16,7 @@ interface ILoggable {
 
 // 接口 II: 形状接口，返回一个值
 interface IShape {
-    func getName() -> std.string;
+    func getName() -> std::string;
     func getArea() -> f32;
 }
 
@@ -39,14 +39,14 @@ class Circle : ChronoObject impl ILoggable, IShape {
     public func logMessage() -> void ;
 
     // 实现 IShape
-    public func getName() -> std.string ;
+    public func getName() -> std::string ;
 
     public func getArea() -> f32 ;
 }
 
 implement Circle{
     init(r: f32) {
-        this.radius = r;
+        this->radius = r;
     }
 
     // 实现 ILoggable
@@ -57,12 +57,12 @@ implement Circle{
     }
 
     // 实现 IShape
-    func getName() -> std.string {
+    func getName() -> std::string {
         return "Circle";
     }
 
     func getArea() -> f32 {
-        return 3.14159 * this.radius * this.radius;
+        return 3.14159 * this->radius * this->radius;
     }
 }
 // 类 B: "Square"
@@ -75,21 +75,21 @@ class Square : ChronoObject impl IShape {
     public init(s: f32);
 
     // 实现 IShape
-    public func getName() -> std.string ;
+    public func getName() -> std::string ;
     public func getArea() -> f32 ;
 }
 
 implement Square{
     init(s: f32) {
-        this.side = s;
+        this->side = s;
     }
 
     // 实现 IShape
-    func getName() -> std.string {
+    func getName() -> std::string {
         return "Square";
     }
     func getArea() -> f32 {
-        return this.side * this.side;
+        return this->side * this->side;
     }
 }
 // ---
@@ -99,8 +99,8 @@ implement Square{
 // 函数 1: 接受任何实现了 IShape 的对象
 // [关键] 接口作为参数，必须使用 $ 引用类型
 func printShapeDetails(s: IShape*) {
-    var name: std.string = s.getName();
-    var area: f32 = s.getArea();
+    var name: std::string = s->getName();
+    var area: f32 = s->getArea();
 
     @cpp
         std::cout << "  Detail: Name=" << name << ", Area=" << area << std::endl;
@@ -110,7 +110,7 @@ func printShapeDetails(s: IShape*) {
 // 函数 2: 接受任何实现了 ILoggable 的对象
 func triggerLog(l: ILoggable*) {
     @cpp std::cout << "  Log Trigger:" << std::endl; @end
-    l.logMessage(); // 调用接口方法
+    l->logMessage(); // 调用接口方法
 }
 
 
@@ -144,8 +144,8 @@ func main() -> int {
     // (Square 没有实现 ILoggable，所以 triggerLog($s) 会导致编译失败, 这是正确的)
 
     // 清理
-    c.release();
-    s.release();
+    c->release();
+    s->release();
 
     @cpp std::cout << "--- Interface Test End ---" << std::endl; @end
     return 0;

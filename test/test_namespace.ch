@@ -33,7 +33,7 @@ class MyClass : ChronoObject {
 // 5. 命名空间中的 Global Function
 // (C++: namespace Test { namespace Internal { void globalFunc() { ... } } })
 func globalFunc() {
-    Chrono.log("  (globalFunc in Test::Internal)");
+    Chrono::log("  (globalFunc in Test::Internal)");
 }
 
 // 6. 命名空间中的 Class 实现
@@ -41,16 +41,16 @@ func globalFunc() {
 implement MyClass {
     init() {
         // Line 48
-        this.s.x = 123;
+        this->s.x = 123;
     }
 
     func testMethod(val: i32) {
         // Line 53
-        Chrono.log("  (MyClass::testMethod)");
+        Chrono::log("  (MyClass::testMethod)");
         // Line 55
-        this.s.x = this.s.x + val;
+        this->s.x = this->s.x + val;
         // Line 57
-        Chrono.log(this.s.x);
+        Chrono::log(this->s.x);
     }
 }
 
@@ -60,29 +60,29 @@ endnamespace;
 // (C++: int main() { ... } -- 必须在全局!)
 func main() -> int {
     // Line 65
-    Chrono.log("--- Namespace Test Start ---");
+    Chrono::log("--- Namespace Test Start ---");
 
     // 调用全局 namespaced 函数
     // (C++: Test::Internal::globalFunc();)
     // Line 70
-    Test.Internal.globalFunc();
+    Test::Internal::globalFunc();
 
     // 访问 namespaced class
     // (C++: Test::Internal::MyClass* c = new Test::Internal::MyClass();)
     // Line 75
-    var c: Test.Internal.MyClass* = new Test.Internal.MyClass();
+    var c: Test::Internal::MyClass* = new Test::Internal::MyClass();
 
     // 调用
     // (C++: c->testMethod(7);)
     // Line 80
-    c.testMethod(7); // 123 + 7 = 130
+    c->testMethod(7); // 123 + 7 = 130
 
     // 释放
     // Line 84
-    c.release();
+    c->release();
 
     // Line 87
-    Chrono.log("--- Namespace Test End ---");
+    Chrono::log("--- Namespace Test End ---");
     // Line 89
     return 0;
 }

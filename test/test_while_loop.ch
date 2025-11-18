@@ -11,7 +11,7 @@ func main() -> int {
     // --- 场景 1: 简单的 while 循环 (使用 bool) ---
     var keep_looping: bool = true;
     while (keep_looping) {
-        Chrono.log("Test 1: Loop executing...");
+        Chrono::log("Test 1: Loop executing...");
         keep_looping = false; // 赋值
     }
 
@@ -19,18 +19,18 @@ func main() -> int {
     // [修改] 已取消注释，因为 < 和 + 运算符现在受支持
     var count: i32 = 0;
     while (count < 3) {
-        Chrono.log("Test 2: Count:");
-        // [修改] Chrono.log(i32) 是支持的，不需要 Int::create
-        Chrono.log(count);
+        Chrono::log("Test 2: Count:");
+        // [修改] Chrono::log(i32) 是支持的，不需要 Int::create
+        Chrono::log(count);
         count = count + 1;
     }
 
     // --- 场景 3: 永不执行的 while 循环 ---
     while (false) {
-        Chrono.log("Test 3: (This should not print)");
+        Chrono::log("Test 3: (This should not print)");
     }
 
-    Chrono.log("Test 4: Loop finished.");
+    Chrono::log("Test 4: Loop finished.");
 
     return 0;
 }

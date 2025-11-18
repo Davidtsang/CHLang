@@ -1,6 +1,6 @@
 // file: test/test_array_features.ch
 // 目的: 对数组语法进行压力测试 (类成员, 函数参数)
-// [已修复] - 修正了 @cpp 块内部的 C++ 语法 (this.data -> this->data)
+// [已修复] - 修正了 @cpp 块内部的 C++ 语法 (this->data -> this->data)
 
 import <iostream>
 import <cstdint>
@@ -11,9 +11,9 @@ import "runtime/ChronoObject.h"
 // ---
 func printSum(arr: [i32; 3]) {
     var sum: i32 = arr[0] + arr[1] + arr[2];
-    @cpp
-        std::cout << "  Func Param Sum: " << sum << std::endl;
-    @end
+
+    std::cout << "  Func Param Sum: " << sum << std::endl;
+
 }
 
 // ---
@@ -33,14 +33,14 @@ class ArrayTester : ChronoObject {
 
 implement ArrayTester{
     init() {
-        @cpp std::cout << "ArrayTester Init" << std::endl; @end
+        std::cout << "ArrayTester Init" << std::endl; 
 
         // (由 Visitor 正确翻译为 this->data)
-        this.data[0] = 10;
-        this.data[1] = 20;
-        this.data[2] = 30;
-        this.matrix[0][0] = 1;
-        this.matrix[1][1] = 99;
+        this->data[0] = 10;
+        this->data[1] = 20;
+        this->data[2] = 30;
+        this->matrix[0][0] = 1;
+        this->matrix[1][1] = 99;
     }
 
     func printMemberData() {
@@ -48,15 +48,15 @@ implement ArrayTester{
             std::cout << "Test 2 (Class Member Access):" << std::endl;
             // [ [ 关键修复 ] ]
             // 在 C++ 中, 'this' 是一个指针, 必须使用 '->'
-            std::cout << "  this.data[1]: " <<  this->data[1]  << std::endl; // 预期: 20
-            std::cout << "  this.matrix[1][1]: " <<  this->matrix[1][1] << std::endl; // 预期: 99
+            std::cout << "  this->data[1]: " <<  this->data[1]  << std::endl; // 预期: 20
+            std::cout << "  this->matrix[1][1]: " <<  this->matrix[1][1] << std::endl; // 预期: 99
         @end
     }
 
     func testParamPassing() {
-        @cpp std::cout << "Test 3 (Passing 'this.data' to func):" << std::endl; @end
+        std::cout << "Test 3 (Passing 'this->data' to func):" << std::endl; 
         // (由 Visitor 正确翻译为 printSum(this->data))
-        printSum(this.data);
+        printSum(this->data);
     }
 
 }
@@ -64,19 +64,19 @@ implement ArrayTester{
 // 主函数
 // ---
 func main() -> int {
-    @cpp std::cout << "--- Array Features Test Start ---" << std::endl; @end
+    std::cout << "--- Array Features Test Start ---" << std::endl; 
 
     // --- Test 1: 局部数组 (复习) ---
     var localArr: [i32; 3] = {1, 2, 3};
-    @cpp std::cout << "Test 1 (Local Array Param):" << std::endl; @end
+    std::cout << "Test 1 (Local Array Param):" << std::endl; 
     printSum(localArr);
 
     // --- Test 2 & 3: 类实例 ---
     var tester: ArrayTester* = new ArrayTester();
-    tester.printMemberData();
-    tester.testParamPassing();
-    tester.release();
+    tester->printMemberData();
+    tester->testParamPassing();
+    tester->release();
 
-    @cpp std::cout << "--- Array Features Test End ---" << std::endl; @end
+    std::cout << "--- Array Features Test End ---" << std::endl; 
     return 0;
 }

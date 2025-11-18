@@ -59,6 +59,11 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#forwardDeclaration.
+    def visitForwardDeclaration(self, ctx:ChronoParser.ForwardDeclarationContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#accessModifier.
     def visitAccessModifier(self, ctx:ChronoParser.AccessModifierContext):
         return self.visitChildren(ctx)

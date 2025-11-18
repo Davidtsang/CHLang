@@ -126,31 +126,25 @@ class ChronoVisitor(BaseChronoVisitor):
         return f"{core_type}{suffix_str}"
 
     def visitBaseType(self, ctx: ChronoParser.BaseTypeContext):
-        """
-        [重构]
-        [ [ [ 关键修复 ] ] ]
-        确保此方法优先检查 'self._literal_alias_map'
-        """
-        raw_text = ctx.getText()  # (例如 "C_INT_WINAPI", "std.string", "i32")
+        raw_text = ctx.getText()
 
-        # 步骤 1: 检查全局 typemap 注册表
+        # 1. 检查 Typemap
         mapped_val = self.context.get_typemap(raw_text)
-        if mapped_val:
-            return mapped_val
+        if mapped_val: return mapped_val
 
-        # # 步骤 1: 检查 'typemap' 字面量代换
-        # if raw_text in self._literal_alias_map:
-        #     # [修复] 必须返回此字典中的值
-        #     return self._literal_alias_map[raw_text]
+        # 2. 直接替换 :: (如果是新语法) 或者 . (如果是旧语法) 为 ::
+        # 如果用户写 std::vector，raw_text 就是 std::vector
+        # 如果用户写 std.vector，raw_text 就是 std.vector
+        # 我们统一转换为 ::
+        cpp_type = raw_text.replace('.', '::')
 
-        # --- (以下是现有逻辑) ---
-        parts = raw_text.split('.')
-        first_part = parts[0]
-        if first_part in self._alias_to_namespace_map:
-            parts[0] = self._alias_to_namespace_map[first_part]
+        # 处理别名 (例如 IO.cout -> IO::cout)
+        parts = cpp_type.split('::')
+        if parts[0] in self._alias_to_namespace_map:
+            parts[0] = self._alias_to_namespace_map[parts[0]]
 
-        cpp_namespace_type = "::".join(parts)
-        return self._chrono_to_cpp_type(cpp_namespace_type)
+        final_type = "::".join(parts)
+        return self._chrono_to_cpp_type(final_type)
 
     def visitNamespaceStatement(self, ctx: ChronoParser.NamespaceStatementContext):
         # [ [ [ 关键修复 ] ] ]
@@ -1007,6 +1001,10 @@ class ChronoVisitor(BaseChronoVisitor):
             return translated_primary_code, ".", "literal"
 
     def _process_dot_chain_step(self, child_nodes, i, current_code, current_accessor, current_type, access_token_type):
+        """
+        [重构] 纯净版：不猜测，用户写什么就翻译什么。
+        access_token_type: ChronoParser.DOT, ARROW, 或 COLON_COLON
+        """
         i += 1
         if i >= len(child_nodes):
             return current_code, i, current_accessor, current_type
@@ -1015,33 +1013,32 @@ class ChronoVisitor(BaseChronoVisitor):
         i += 1
         raw_ident_text = ident_node.getText()
 
-        # 变量查找
+        # 依然尝试查找变量名以获取正确的 C++ 名称 (e.g. map key to value)
+        # 但不再用它来决定访问器
         member_info = self._find_variable(raw_ident_text)
-        if member_info:
-            cpp_ident = member_info["cpp_name"]
-        else:
-            cpp_ident = raw_ident_text
+        cpp_ident = member_info["cpp_name"] if member_info else raw_ident_text
 
-        accessor_to_use = "."
+        # [核心逻辑] 直接映射 Token 到 C++ 操作符
+        accessor_str = ""
         if access_token_type == ChronoParser.DOT:
-            accessor_to_use = current_accessor
+            accessor_str = "."
         elif access_token_type == ChronoParser.ARROW:
-            accessor_to_use = "."  # -> 已经被处理在 current_code 中了，或者我们在构建 ->
+            accessor_str = "->"
+        elif access_token_type == ChronoParser.COLON_COLON:
+            accessor_str = "::"
 
-        # [关键修复] 处理泛型 vs 数组索引的歧义
+        # 处理泛型 <T>
         template_args_str = ""
         if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LT:
-            i += 1  # 跳过 <
+            i += 1  # skip <
             if i < len(child_nodes) and isinstance(child_nodes[i], ChronoParser.TypeListContext):
                 template_args_str = self.visit(child_nodes[i])
                 i += 1
             if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.GT:
-                i += 1  # 跳过 >
+                i += 1  # skip >
 
-        # 生成代码
         if template_args_str:
-            # 生成数组索引语法: .m_lookup[id]
-            cpp_ident = f"{cpp_ident}[{template_args_str}]"
+            cpp_ident = f"{cpp_ident}<{template_args_str}>"
 
         # 处理函数调用 (...)
         if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LPAREN:
@@ -1052,19 +1049,14 @@ class ChronoVisitor(BaseChronoVisitor):
                 i += 1
             if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.RPAREN:
                 i += 1
-            new_code = f"{current_code}{accessor_to_use}{cpp_ident}({args})"
+            # 生成代码
+            new_code = f"{current_code}{accessor_str}{cpp_ident}({args})"
         else:
-            new_code = f"{current_code}{accessor_to_use}{cpp_ident}"
+            # 生成代码
+            new_code = f"{current_code}{accessor_str}{cpp_ident}"
 
-        # 决定下一个访问器
-        new_accessor = "->"  # 默认
-        next_member_info = self._find_variable(raw_ident_text)  # 使用原始名查找
-        if next_member_info:
-            new_accessor = next_member_info["accessor"]
-        elif raw_ident_text and raw_ident_text[0].isupper():
-            new_accessor = "::"
-
-        return new_code, i, new_accessor, "unknown"
+        # 不需要再返回 next_accessor，因为我们不预测下一步，下一步完全取决于下一个 Token
+        return new_code, i, None, "unknown"
 
     def _process_array_chain_step(self, child_nodes, i, current_code, current_accessor):
         i += 1
@@ -1151,60 +1143,43 @@ class ChronoVisitor(BaseChronoVisitor):
         return f"{{{args_code}}}"
 
     def visitSimpleExpression(self, ctx: ChronoParser.SimpleExpressionContext):
-        """
-        [重构]
-        [ [ [ 关键修复 ] ] ]
-        不再调用 primary_ctx.getText()。
-        而是将 'translated_primary' 同时用作 "raw_text" 和 "translated_code"
-        传递给 _determine_initial_accessor。
-        """
-
-        # 1. 确定初始部分
+        # 1. 初始部分 (同前)
         translated_primary = ""
-
         if ctx.primary():
-            primary_ctx = ctx.primary()
-            # [修复] 这是唯一一次我们调用 visit(primary)
-            translated_primary = self.visit(primary_ctx)
-            # [修复] 删除了 'raw_primary_text = primary_ctx.getText()'
-
+            translated_primary = self.visit(ctx.primary())
         elif ctx.functionCallExpression():
             translated_primary = self.visit(ctx.functionCallExpression())
         else:
             return ""
 
-        # 2. 确定初始访问器 (和类型)
-        # [ [ [ 关键修复 ] ] ]
-        # 我们现在将 "已翻译的" 值 (e.g., "COLOR_WINDOW")
-        # 作为 'raw_primary_text' 传递，以便 _determine_initial_accessor
-        # (即使是旧版本) 也能正确处理它。
-        # (我们新的 _determine_initial_accessor 也会正确处理它)
-        current_code, current_accessor, current_type = self._determine_initial_accessor(
-            translated_primary, translated_primary
-        )
+        current_code = translated_primary
 
-        # 3. 遍历链条 (此逻辑不变)
+        # [修改] 初始访问器逻辑现在主要用于处理 import 别名等
+        # _determine_initial_accessor 仍然有用 (例如将 'std' 映射为 'std')
+        # 但在纯净模式下，primary 已经决定了第一部分。
+        # 如果 primary 是 'std'，它返回 'std'，code 就是 'std'。
+
         child_nodes = ctx.children[1:]
         i = 0
         while i < len(child_nodes):
             token_type = child_nodes[i].getSymbol().type
-            if token_type == ChronoParser.DOT:
-                current_code, i, current_accessor, current_type = self._process_dot_chain_step(
-                    child_nodes, i, current_code, current_accessor, current_type, ChronoParser.DOT
+
+            # [关键] 显式分发
+            if token_type in [ChronoParser.DOT, ChronoParser.ARROW, ChronoParser.COLON_COLON]:
+                current_code, i, _, _ = self._process_dot_chain_step(
+                    child_nodes, i, current_code, None, None, token_type
                 )
+
             elif token_type == ChronoParser.LBRACK:
-                current_code, i, current_accessor = self._process_array_chain_step(
-                    child_nodes, i, current_code, current_accessor
-                )
-                current_type = "unknown"
-            elif token_type == ChronoParser.ARROW:
-                current_code, i, current_accessor, current_type = self._process_dot_chain_step(
-                    child_nodes, i, current_code, current_accessor, current_type, ChronoParser.ARROW
+                # 数组索引
+                current_code, i, _ = self._process_array_chain_step(
+                    child_nodes, i, current_code, None
                 )
             else:
                 i += 1
 
         return current_code
+
 
     def visitPrimary(self, ctx: ChronoParser.PrimaryContext):
         """
@@ -1253,27 +1228,27 @@ class ChronoVisitor(BaseChronoVisitor):
 
         if ctx.IDENTIFIER():
             primary_text = ctx.IDENTIFIER().getText()
+
+            # 1. 优先查找变量 (局部变量、成员变量)
             variable_info = self._find_variable(primary_text)
-
-            # [ [ [ 关键修复：C_COLOR_WINDOW 问题的修复点 ] ] ]
-            #
-            # 如果 'IDENTIFIER' 不是一个已知变量 (e.g., "myVar")
-            if not variable_info:
-                # 检查它是否是 'typemap' 定义的常量 (e.g., "C_COLOR_WINDOW")
-
-                mapped_val = self.context.get_typemap(primary_text)
-                if mapped_val:
-                    return mapped_val
-            # [ [ [ 修复结束 ] ] ]
-
             if variable_info:
-                # [修复] 移除了旧的 .lstrip('$') 逻辑
                 if '[' in variable_info["cpp_type"]:
-                    return primary_text  # 数组
-                return variable_info["cpp_name"]
-            else:
-                # 最后的兜底
-                return primary_text
+                    return primary_text
+                else:
+                    return variable_info["cpp_name"]
+
+            # 2. [关键修复] 查找 Import 别名 (Namespace Alias)
+            # 如果 primary_text 是 "Math"，且在 map 中映射为 "MyMath"
+            if primary_text in self._alias_to_namespace_map:
+                return self._alias_to_namespace_map[primary_text]
+
+            # 3. 查找 Typemap (宏定义/常量)
+            mapped_val = self.context.get_typemap(primary_text)
+            if mapped_val:
+                return mapped_val
+
+            # 4. 最后的兜底 (原样输出)
+            return primary_text
 
         if ctx.THIS():
             return "this"
@@ -1343,72 +1318,38 @@ class ChronoVisitor(BaseChronoVisitor):
         return f"{line_comment}{INDENT}{target} {op_str} {value};\n"
 
     def visitAssignableExpression(self, ctx: ChronoParser.AssignableExpressionContext):
+        # ... (primary 处理同前) ...
         primary_ctx = ctx.assignablePrimary()
         current_code = self.visit(primary_ctx)
-        base_ident_text = None
-        temp_node = primary_ctx
-        while True:
-            if temp_node.IDENTIFIER():
-                base_ident_text = temp_node.IDENTIFIER().getText()
-                break
-            if temp_node.THIS():
-                base_ident_text = "this"
-                break
-            if hasattr(temp_node, 'assignablePrimary') and temp_node.assignablePrimary():
-                temp_node = temp_node.assignablePrimary()
-            elif hasattr(temp_node, 'assignableExpression') and temp_node.assignableExpression():
-                temp_node = temp_node.assignableExpression().assignablePrimary()
-            else:
-                break
-        current_accessor = "."
-        current_type = "value"
-        if base_ident_text:
-            variable_info = self._find_variable(base_ident_text)
-            if variable_info:
-                current_type = variable_info["cpp_type"]
-                current_accessor = variable_info["accessor"]
-            elif base_ident_text == "std" or base_ident_text in self._alias_to_namespace_map:
-                current_accessor = "::"
-                current_type = "namespace"
+
         child_nodes = ctx.children[1:]
         i = 0
         while i < len(child_nodes):
             token_type = child_nodes[i].getSymbol().type
-            accessor_to_use = current_accessor
-            if token_type == ChronoParser.DOT:
-                accessor_to_use = current_accessor
-            elif token_type == ChronoParser.ARROW:
-                accessor_to_use = "."
-            if token_type == ChronoParser.DOT or token_type == ChronoParser.ARROW:
-                i += 1
+
+            if token_type in [ChronoParser.DOT, ChronoParser.ARROW, ChronoParser.COLON_COLON]:
+                i += 1  # Skip operator
                 ident_node = child_nodes[i]
                 i += 1
                 raw_ident_text = ident_node.getText()
+
+                # 简单的变量名映射 (s -> s, string -> string)
                 member_info = self._find_variable(raw_ident_text)
-                if member_info:
-                    cpp_ident = member_info["cpp_name"]
-                else:
-                    cpp_ident = raw_ident_text
-                current_code = f"{current_code}{accessor_to_use}{cpp_ident}"
+                cpp_ident = member_info["cpp_name"] if member_info else raw_ident_text
 
-                # [ [ [ 修复 B-2: 访问器查找 ] ] ]
-                # 查找下一个成员 (例如 s.x 中的 x) 的信息
-                new_accessor = "->"
-                next_member_info = self._find_variable(cpp_ident)
-                if next_member_info:
-                    new_accessor = next_member_info["accessor"]
-                elif cpp_ident and cpp_ident[0].isupper():
-                    new_accessor = "::"
+                op_str = "."
+                if token_type == ChronoParser.ARROW:
+                    op_str = "->"
+                elif token_type == ChronoParser.COLON_COLON:
+                    op_str = "::"
 
-                current_accessor = new_accessor
-                current_type = "unknown"
+                current_code = f"{current_code}{op_str}{cpp_ident}"
 
             elif token_type == ChronoParser.LBRACK:
                 i += 1
                 index_expr = self.visit(child_nodes[i])
                 i += 2
                 current_code = f"{current_code}[{index_expr}]"
-                pass
             else:
                 i += 1
         return current_code
@@ -1840,3 +1781,18 @@ class ChronoVisitor(BaseChronoVisitor):
         # (重要) 返回一个空字符串，而不是 node.getText()，
         # 否则我们可能会意外地打印出 'EOF' 或其他词元。
         return ""
+
+    def visitForwardDeclaration(self, ctx: ChronoParser.ForwardDeclarationContext):
+        # 1. 获取名字
+        name = ctx.name.text
+
+        # 2. 获取种类 (class 或 struct)
+        kind_keyword = ""
+        if ctx.kind.type == ChronoParser.CLASS:
+            kind_keyword = "class"
+        elif ctx.kind.type == ChronoParser.STRUCT:
+            kind_keyword = "struct"
+
+        # 3. 生成 C++ 代码 (struct Child;)
+        line_comment = f"\n// Line {ctx.start.line} (forward decl)\n"
+        return f"{line_comment}{kind_keyword} {name};\n"
