@@ -10,18 +10,19 @@ options { tokenVocab = ChronoLexer; }
 
 // --- [ 1. 升级: 泛型/数组/函数 类型规则 ] ---
 typeSpecifier
-    : ( // 路径 A: C-Style 数组 [type; size] (保持不变，Rust 风格)
+    : ( // 路径 A: C-Style 数组 [type; size]
         LBRACK typeSpecifier SEMIC_TOKEN expression RBRACK
       )
       ( (STAR | BIT_AND) )*
 
-    | ( // 路径 B: 基础/泛型类型 (e.g., std.vector<i32> or i32)
-        // [关键修改] LBRACK -> LT, RBRACK -> GT
-        baseType (LT typeList GT)?
+    | ( // 路径 B: 基础/泛型类型/C++函数类型
+        baseType
+        (LT typeList GT)?           // 泛型 <T>
+        (LPAREN typeList? RPAREN)?  // [新增] C++函数类型 (Args...)，例如 void()
       )
-      ( (STAR | BIT_AND) )*
+      ( (STAR | BIT_AND) )* // 指针/引用后缀
 
-    | ( // 路径 C/D: 函数类型或括号类型
+    | ( // 路径 C: Chrono 闭包/函数指针类型 (Params) -> Ret
         LPAREN
         (
             (params=typeList? RPAREN ARROW returnType=typeSpecifier)
@@ -85,7 +86,6 @@ topLevelStatement
     | interfaceDefinition
     | usingAlias
     | variableDeclaration
-    | typemapDefinition
     | forwardDeclaration // [新增]
     | CPP_DIRECTIVE
     | endNamespaceStatement
@@ -200,10 +200,6 @@ importDirective
 
 usingAlias
     : USING name=IDENTIFIER ASSIGN typeName=typeSpecifier SEMIC_TOKEN ;
-
-// 语法: typemap <NewName> [: <HintType>] = "<LiteralString>"
-typemapDefinition
-    : TYPEMAP name=IDENTIFIER (COLON hint=typeSpecifier)? ASSIGN value=STRING_LITERAL SEMIC_TOKEN ;
 
 functionDefinition
     : (EXTERN)? (STATIC)?

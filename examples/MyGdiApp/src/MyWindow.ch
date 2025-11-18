@@ -18,16 +18,19 @@ implement MyWindow {
 
             case WM_PAINT {
                 var ps: PAINTSTRUCT;
-                var hdc: HDC = BeginPaint(this.m_hWnd, &ps);
+                // [重构] this->m_hWnd
+                var hdc: HDC = BeginPaint(this->m_hWnd, &ps);
 
                 var graphics = Graphics(hdc);
-                var pen = Pen(Color(255, 255, 0, 0), static_cast[f32](3.0));
+                // [重构] static_cast<f32>
+                var pen = Pen(Color(255, 255, 0, 0), static_cast<f32>(3.0));
                 var brush = SolidBrush(Color(128, 0, 0, 255));
 
+                // [重构] graphics 是栈对象，使用 .
                 graphics.FillRectangle(&brush, 10, 10, 300, 200);
                 graphics.DrawEllipse(&pen, 10, 10, 300, 200);
 
-                EndPaint(this.m_hWnd, &ps);
+                EndPaint(this->m_hWnd, &ps);
                 return 0;
             }
 
@@ -37,8 +40,7 @@ implement MyWindow {
             }
         }
 
-        // [ [ [ 修复: 调用基类 ] ] ]
-        // 假设 'Window.handleMessage' 是调用基类方法的 Chrono 语法
-        return Window.handleMessage(uMsg, wParam, lParam);
+        // [重构] 显式调用基类方法使用 ::
+        return Window::handleMessage(uMsg, wParam, lParam);
     }
 }

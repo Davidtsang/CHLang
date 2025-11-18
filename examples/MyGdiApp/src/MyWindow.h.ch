@@ -3,9 +3,8 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 
-// [Critical Fix]
-// Ensure windows.h is included BEFORE gdiplus.h
-// AND ensure we don't have macro conflicts.
+// [关键修复] 必须在 gdiplus.h 之前包含 objidl.h
+import <objidl.h>
 import <windows.h>
 import <gdiplus.h>
 

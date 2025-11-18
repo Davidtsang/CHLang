@@ -1,14 +1,17 @@
-import "Widget.h"
+// file: src/Widget.ch
+import "Widget"
 
 implement Widget {
     init() {
-        this.m_hWnd = NULL;
-        this.m_id = 0;
+        // [重构] 类内部 this 是指针，使用 ->
+        this->m_hWnd = NULL;
+        this->m_id = 0;
     }
 
     deinit {
-        if (this.m_hWnd != NULL) {
-            DestroyWindow(this.m_hWnd);
+        // [重构] 使用 ->
+        if (this->m_hWnd != NULL) {
+            DestroyWindow(this->m_hWnd);
         }
     }
 
@@ -17,7 +20,7 @@ implement Widget {
         return false;
     }
 
-    // create 是纯虚的，这里可以留空或抛错，但在 Chrono 需提供空实现以通过编译
+    // create 是纯虚的，在 C++ 中通常不提供实现，但 Chrono 翻译器可能需要空体
     func create(parent: HWND, id: int) {
     }
 }

@@ -12,7 +12,7 @@ from parser.ChronoParser import ChronoParser
 
 # 导入我们的新组件
 from ChronoVisitor import ChronoVisitor
-from TypemapScanner import TypemapScanner
+# from TypemapScanner import TypemapScanner
 from CompileContext import CompileContext
 
 # 全局上下文 (在单次 transpiler 运行期间保持活跃)
@@ -27,49 +27,6 @@ global_context = CompileContext()
 class ChronoErrorListener(ErrorListener):
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
         raise Exception(f"NO OK! ANTLR Parse Error at Line {line}:{column} - {msg}")
-
-
-def scan_file_for_typemaps(file_path):
-    """
-    解析文件并提取 typemap，但不生成代码。
-    """
-    # 规范化路径以避免重复 (e.g., ./A.ch vs A.ch)
-    abs_path = os.path.abspath(file_path)
-
-    if global_context.is_scanned(abs_path):
-        return
-
-    if not os.path.exists(abs_path):
-        # 可能是系统文件或路径错误，忽略
-        # print(f"  [Scanner] 跳过 (未找到): {file_path}")
-        return
-
-    # print(f"  [Scanner] 正在扫描头文件: {os.path.basename(file_path)}")
-
-    try:
-        with open(abs_path, 'r', encoding='utf-8-sig') as f:
-            data = f.read()
-
-        input_stream = InputStream(data)
-        lexer = ChronoLexer(input_stream)
-        stream = CommonTokenStream(lexer)
-        parser = ChronoParser(stream)
-
-        # 使用静默监听器，避免扫描时的语法错误干扰主流程
-        # (或者我们希望头文件必须语法正确？这里假设必须正确)
-        parser.removeErrorListeners()
-        parser.addErrorListener(ChronoErrorListener())
-
-        tree = parser.program()
-
-        # 运行扫描器
-        scanner = TypemapScanner(global_context)
-        scanner.visit(tree)
-
-        global_context.mark_as_scanned(abs_path)
-
-    except Exception as e:
-        print(f"  [警告] 扫描导入文件失败 {os.path.basename(file_path)}: {e}")
 
 
 def resolve_and_load_import(import_path, current_file_dir):
@@ -121,7 +78,8 @@ def resolve_and_load_import(import_path, current_file_dir):
         # *改进*: 如果需要深层递归 typemap，TypemapScanner 也需要处理 import。
         # 目前我们假设只有一层或用户显式导入。
 
-        scan_file_for_typemaps(found_path)
+        #scan_file_for_typemaps(found_path)
+        pass
     else:
         # 找不到文件，可能是 C++ 系统头文件 (<windows.h>)，忽略
         pass
@@ -146,7 +104,7 @@ def translate(input_file, output_file):
         current_dir = os.path.dirname(os.path.abspath(input_file))
 
         def import_callback(path):
-            resolve_and_load_import(path, current_dir)
+            pass
 
         # 3. 运行主 Visitor
         # 传入 global_context (可能已包含之前扫描的内容) 和 回调

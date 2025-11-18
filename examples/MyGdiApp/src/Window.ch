@@ -1,104 +1,119 @@
-// file: framework/Window.cpp.ch
 import "Window"
 
+// 全局窗口过程函数
 func GlobalWindowProc(
     hWnd: HWND, uMsg: UINT, wParam: WPARAM, lParam: LPARAM
 ) -> C_LRESULT_CALLBACK
 {
     var pWindow: Window* = NULL;
-if (uMsg == WM_NCCREATE) {
-        // [纯 Chrono 实现]
 
-        // 1. 将 lParam (LPARAM/long) 强转为 CREATESTRUCT 指针
-        var pCreate: CREATESTRUCT* = reinterpret_cast[CREATESTRUCT*](lParam);
+    if (uMsg == WM_NCCREATE) {
+        // 1. 获取创建参数中的 this 指针
+        var pCreate: CREATESTRUCT* = reinterpret_cast<CREATESTRUCT*>(lParam);
+        pWindow = reinterpret_cast<Window*>(pCreate->lpCreateParams);
 
-        // 2. 获取创建时传入的 'this' 指针 (在 lpCreateParams 中)
-        //    注意：这里使用 '.'，翻译器会自动翻译成 C++ 的 '->'
-        pWindow = reinterpret_cast[Window*](pCreate.lpCreateParams);
-
-        // 3. 将指针存入窗口的 UserData 中
-        //    SetWindowLongPtr 需要 LONG_PTR 类型，所以进行强转
-        SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast[LONG_PTR](pWindow));
-
-        // 4. 保存 hWnd
-        pWindow.m_hWnd = hWnd;
-
+        // 2. 保存 this 指针到窗口句柄
+        SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWindow));
+        pWindow->m_hWnd = hWnd;
     } else {
-        // [纯 Chrono 实现]
-
-        // 5. 从 UserData 取回指针
-        //    GetWindowLongPtr 返回 LONG_PTR，强转回 Window*
+        // 3. 取回 this 指针
         var ptrVal: LONG_PTR = GetWindowLongPtr(hWnd, GWLP_USERDATA);
-        pWindow = reinterpret_cast[Window*](ptrVal);
+        pWindow = reinterpret_cast<Window*>(ptrVal);
     }
 
     if (pWindow != NULL) {
-        return pWindow.handleMessage(uMsg, wParam, lParam);
+        return pWindow->handleMessage(uMsg, wParam, lParam);
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-// --- 2. 实现 Window 类的成员 ---
 implement Window {
 
     init(title: LPCWSTR, app: Application*) {
-        this.m_app = app;
-        this.m_nextId = 100; // ID 从 100 开始
+        this->m_app = app;
+        this->m_nextId = 100;
 
-        // ... (WNDCLASSEX 和 CreateWindowEx 代码保持不变) ...
-        // ...
+        // [调试]
+        std::cout << "[Window] Registering Class..." << std::endl;
+
+        // --- 1. 注册窗口类 ---
+        var wc: WNDCLASSEX = {};
+        wc.cbSize = sizeof(WNDCLASSEX);
+        wc.style = CS_HREDRAW | CS_VREDRAW;
+        wc.lpfnWndProc = GlobalWindowProc; // 指向全局转发函数
+        wc.hInstance = app->getHInstance();
+        wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+        wc.lpszClassName = L"ChronoWindowClass";
+        wc.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
+
+        // 注册失败不一定是错误（可能已注册），但为了调试我们打印一下
+        if (RegisterClassEx(&wc) == 0) {
+             std::cout << "[Window] Warning: RegisterClassEx failed (or already registered)." << std::endl;
+        }
+
+        std::cout << "[Window] Creating Window..." << std::endl;
+
+        // --- 2. 创建窗口 (补全部分) ---
+        this->m_hWnd = CreateWindowExW(
+            0,
+            L"ChronoWindowClass", // 必须与上面的类名一致
+            title,
+            WS_OVERLAPPEDWINDOW,
+            CW_USEDEFAULT, CW_USEDEFAULT, 800, 600,
+            NULL,
+            NULL,
+            app->getHInstance(),
+            this // [关键] 将 'this' 传入，以便 GlobalWindowProc 获取
+        );
+
+        if (this->m_hWnd == NULL) {
+            std::cout << "[Window] Error: CreateWindowExW failed!" << std::endl;
+            // 可以在这里抛出异常或调用 exit(1)
+        } else {
+            std::cout << "[Window] Window Created Successfully. HWND: " << this->m_hWnd << std::endl;
+        }
     }
 
     deinit { }
 
     func show() {
-        var nCmdShow: int = this.m_app.getNCmdShow();
-        ShowWindow(this.m_hWnd, nCmdShow);
-        UpdateWindow(this.m_hWnd);
+        var nCmdShow: int = this->m_app->getNCmdShow();
+        ShowWindow(this->m_hWnd, nCmdShow);
+        UpdateWindow(this->m_hWnd);
     }
 
-    // [新增] 添加子控件实现
-    func addChild(widget: unique[Widget]) {
-        var id: int = this.m_nextId;
-        this.m_nextId = this.m_nextId + 1;
+    func addChild(widget: unique<Widget>) {
+        var id: int = this->m_nextId;
+        this->m_nextId = this->m_nextId + 1;
 
-        // 1. 获取原始指针用于创建和查找
         var ptr: Widget* = widget.get();
+        ptr->create(this->m_hWnd, id);
 
-        // 2. 创建实际的 Win32 控件
-        ptr.create(this.m_hWnd, id);
-
-        // 3. 存入查找表
-        this.m_lookup[id] = ptr;
-
-        // 4. 转移所有权到 vector (使用 std::move)
-        this.m_children.push_back(@move(widget));
+        this->m_lookup[id] = ptr;
+        this->m_children.push_back(@move(widget));
     }
 
-    // [修改] 增加消息路由逻辑
     func handleMessage(
         uMsg: UINT, wParam: WPARAM, lParam: LPARAM
     ) -> LRESULT
     {
         switch (uMsg) {
-            // [关键] 处理命令消息 (按钮点击等)
             case WM_COMMAND {
-                // Win32: LOWORD(wParam) 是控件 ID
                 var id: int = LOWORD(wParam);
-                // Win32: HIWORD(wParam) 是通知码 (如 BN_CLICKED)
                 var code: int = HIWORD(wParam);
-
-                // 查找控件
-                if (this.m_lookup.count(id) > 0) {
-                    var widget: Widget* = this.m_lookup[id];
-                    // 分发给控件
-                    widget.onCommand(code);
+                if (this->m_lookup.count(id) > 0) {
+                    var widget: Widget* = this->m_lookup[id];
+                    widget->onCommand(code);
                 }
-                // 按钮点击通常不需要 Default 处理，但返回 0 是个好习惯
+                return 0;
+            }
+            // [新增] 处理关闭消息，否则点击 X 号虽然窗口关了，但进程还在后台挂起
+            case WM_DESTROY {
+                PostQuitMessage(0);
                 return 0;
             }
         }
 
-        return DefWindowProc(this.m_hWnd, uMsg, wParam, lParam);
+        return DefWindowProc(this->m_hWnd, uMsg, wParam, lParam);
     }
 }

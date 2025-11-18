@@ -27,7 +27,7 @@ INTERFACE: 'interface' ; // <-- [新增]
 IMPL    : 'impl' ;      // <-- [新增]
 AS      : 'as' ;     // [新增] 用于 import 别名
 USING   : 'using' ;
-TYPEMAP : 'typemap' ;
+
 NAMESPACE : 'namespace';
 END_NAMESPACE : 'endnamespace' ;
 EXTERN : 'extern';
