@@ -13,7 +13,6 @@ import "Application"
 import "Widget"
 
 #define C_LRESULT_CALLBACK LRESULT CALLBACK
-#define C_HBRUSH HBRUSH
 
 extern func GlobalWindowProc(
     hWnd: HWND, uMsg: UINT, wParam: WPARAM, lParam: LPARAM

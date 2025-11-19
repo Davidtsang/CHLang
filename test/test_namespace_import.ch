@@ -28,7 +28,7 @@ func main() -> int {
     @end
 
     // [测试 2 调用]
-    // 预期翻译: Math::multiply(x, 2)
+    // 预期翻译: MyMath::multiply(x, 2)
     var y: i32 = Math::multiply(x, 2);
 
     // [修改] 使用 @cpp 块打印 i32 变量 'y'
