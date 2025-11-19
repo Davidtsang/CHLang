@@ -109,6 +109,21 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#enumDefinition.
+    def visitEnumDefinition(self, ctx:ChronoParser.EnumDefinitionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#enumBody.
+    def visitEnumBody(self, ctx:ChronoParser.EnumBodyContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ChronoParser#enumItem.
+    def visitEnumItem(self, ctx:ChronoParser.EnumItemContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#functionSignature.
     def visitFunctionSignature(self, ctx:ChronoParser.FunctionSignatureContext):
         return self.visitChildren(ctx)

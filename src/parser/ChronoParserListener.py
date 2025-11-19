@@ -188,6 +188,33 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#enumDefinition.
+    def enterEnumDefinition(self, ctx:ChronoParser.EnumDefinitionContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#enumDefinition.
+    def exitEnumDefinition(self, ctx:ChronoParser.EnumDefinitionContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#enumBody.
+    def enterEnumBody(self, ctx:ChronoParser.EnumBodyContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#enumBody.
+    def exitEnumBody(self, ctx:ChronoParser.EnumBodyContext):
+        pass
+
+
+    # Enter a parse tree produced by ChronoParser#enumItem.
+    def enterEnumItem(self, ctx:ChronoParser.EnumItemContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#enumItem.
+    def exitEnumItem(self, ctx:ChronoParser.EnumItemContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#functionSignature.
     def enterFunctionSignature(self, ctx:ChronoParser.FunctionSignatureContext):
         pass

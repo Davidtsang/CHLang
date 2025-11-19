@@ -81,6 +81,7 @@ topLevelStatement
     | classDefinition
     | structDefinition
     | functionDefinition
+    | enumDefinition
     | functionSignature
     | implementationBlock // [ [ [ 修正：添加此行 ] ] ]
     | interfaceDefinition
@@ -112,6 +113,7 @@ deinitSignature
 
 classBodyStatement
     : (accessModifier)? variableDeclaration
+    | (accessModifier)? enumDefinition
     | ( (accessModifier)? (STATIC)? | (STATIC)? (accessModifier)? ) functionSignature // 允许 'public static func'
     | (accessModifier)? initSignature
     | (accessModifier)? deinitSignature // <--- 修复 'publicdeinit' 错误
@@ -153,6 +155,7 @@ structDefinition
 // structBodyStatement 规则
 structBodyStatement
     : (accessModifier)? variableDeclaration
+    | (accessModifier)? enumDefinition
     | (accessModifier)? functionSignature // (Struct 不支持 static func)
     | (accessModifier)? initSignature
     | (accessModifier)? deinitSignature // <--- 修复 'publicdeinit' 错误
@@ -161,6 +164,24 @@ structBodyStatement
     | deinitSignature   // (用于私有 deinit)
     | cppBlock
     | CPP_DIRECTIVE
+    ;
+
+// [新增] 枚举定义规则
+// 匹配:
+// 1. enum Color { Red, Blue }
+// 2. enum class State : u8 { OK = 0, Error = 1 }
+enumDefinition
+    : ENUM (CLASS)? name=IDENTIFIER
+      (COLON typeSpecifier)? // 可选底层类型
+      LBRACE enumBody? RBRACE SEMIC_TOKEN?
+    ;
+
+enumBody
+    : enumItem (COMMA enumItem)* (COMMA)? // 允许尾部逗号
+    ;
+
+enumItem
+    : name=IDENTIFIER (ASSIGN expression)?
     ;
 
 // [ [ [ 1. 新增：全局/类 函数声明 (用于 .h.ch) ] ] ]

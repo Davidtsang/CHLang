@@ -1,0 +1,5 @@
+--- Enum Test ---
+Color is Green
+State is Error
+Machine Mode is Auto
+Enum Test Finished.

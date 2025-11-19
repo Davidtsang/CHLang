@@ -1,7 +1,7 @@
 import "Button"
 
 // 需要 HMENU 类型转换用于传递 ID
-typemap C_HMENU = "HMENU";
+#define C_HMENU HMENU
 
 implement Button {
     init(text: std::string) {

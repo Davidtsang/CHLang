@@ -19,11 +19,11 @@ import <cstdint>
 @cpp using namespace Gdiplus; @end
 
 // typemaps (保留以兼容 Win32 宏类型)
-typemap C_INT_WINAPI = "int WINAPI";
-typemap C_IN_HINSTANCE = "_In_ HINSTANCE";
-typemap C_IN_OPT_HINSTANCE = "_In_opt_ HINSTANCE";
-typemap C_IN_LPSTR = "_In_ LPSTR";
-typemap C_IN_INT = "_In_ int";
+#define C_INT_WINAPI int WINAPI
+#define C_IN_HINSTANCE _In_ HINSTANCE
+#define C_IN_OPT_HINSTANCE _In_opt_ HINSTANCE
+#define C_IN_LPSTR _In_ LPSTR
+#define C_IN_INT _In_ int
 
 // 框架全局变量
 var g_hInstance: HINSTANCE = NULL;

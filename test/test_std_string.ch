@@ -7,14 +7,14 @@ func change(s: std.string*){
     *s = "Hbcelloaaa";
 }
 
-func change2(s: std.string&){
+func change2(s: std::string&){
 
     s = "Hbcelloaaa";
 }
 
 func main() -> int {
 
-    var s: std.string = "Hello";
+    var s: std::string = "Hello";
 
     change2(s);
 

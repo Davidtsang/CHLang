@@ -19,12 +19,13 @@ import "runtime/ChronoObject.h" // (用于 main)
 
 // --- 3. 使用 'typemap' (字面量代换) ---
 // (用于 C++ 互操作性)
-typemap C_LRESULT_CALLBACK = "LRESULT CALLBACK";
-typemap C_IN_HINSTANCE = "_In_ HINSTANCE";
-typemap C_INT_WINAPI : i32 = "int WINAPI";
-typemap C_HWND = "HWND";
-typemap C_UINT = "UINT";
-typemap C_INT:int = "int";
+#define  C_LRESULT_CALLBACK LRESULT CALLBACK
+#define C_IN_HINSTANCE _In_ HINSTANCE
+#define C_INT_WINAPI int WINAPI
+#define C_HWND HWND
+#define C_UINT UINT
+#define C_INT int
+
 
 // --- 4. 使用 'using' (Chrono 类型别名) ---
 // (只用于纯 Chrono 类型)

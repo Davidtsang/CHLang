@@ -372,65 +372,141 @@ class ChronoVisitor(BaseChronoVisitor):
         return f"{cpp_func_name}({args_code})"
 
     def _translate_variable_declaration(self, ctx):
-        # ... (前 1-5 步逻辑保持不变: Const, Name, Type, Validations, Pointer Check) ...
-        # ... (请保留原有的 is_const, var_name, base_type_cpp 等获取逻辑) ...
+        """
+        [重构 - 完整版]
+        处理变量声明，包含以下特性支持：
+        1. Const/Var 区分。
+        2. 自动类型推导 (auto)。
+        3. 智能指针识别 (std::unique_ptr 等)。
+        4. C-Style 数组声明 (int arr[3])，通过 {NAME} 占位符处理。
+        5. C-Style 函数指针声明 (int (*p)(int))，通过 {NAME} 占位符处理。
+        6. 强制未初始化的裸指针为 nullptr。
+        """
 
-        # --- [为了方便，这里只展示修改后的核心逻辑] ---
+        # --- 1. 确定 Const / Var ---
         is_const = bool(ctx.CONST())
         const_prefix = "const " if is_const else ""
+
+        # --- 2. 确定名称 ---
         var_name = ctx.name.text
         key = var_name
-        cpp_name = var_name
+        cpp_name = var_name  # 始终使用原始名称
+
+        # --- 3. 确定类型 ---
+        base_type_cpp = ""
+        cpp_final_type = ""
 
         if ctx.typeName:
             base_type_cpp = self.visit(ctx.typeName)
             cpp_final_type = base_type_cpp
         else:
-            # auto 逻辑
-            if not ctx.expression(): raise Exception("...")
+            if not ctx.expression():
+                raise Exception(
+                    f"Chrono Error (Line {ctx.start.line}): Declaration of '{var_name}' must have an explicit type or an initializer.")
             base_type_cpp = "auto"
             cpp_final_type = "auto"
 
-        # ... (is_pointer 判断逻辑保持不变) ...
-        # ... (is_c_array 判断逻辑: 现在的 array 都在 base_type_cpp 里带 {NAME} 了) ...
+        # --- 4. 验证 Const ---
+        if is_const and not ctx.expression():
+            raise Exception(
+                f"Chrono Error (Line {ctx.start.line}): Constant declaration '{var_name}' must be initialized.")
 
-        # [修改] 简单的指针判断
-        is_pointer = base_type_cpp.endswith('*') or \
-                     base_type_cpp.startswith("std::unique_ptr") or \
-                     base_type_cpp.startswith("std::shared_ptr")
-        # 注意：C-Style Func Ptr 和 Array 现在通过 {NAME} 判断，不再通过 plain text 检查
+        # --- 5. 确定是指针/引用/数组 ---
+        is_pointer = False
+        is_reference = False
 
-        accessor = "->" if is_pointer else "."
+        # 检查是否为 C-Style 函数指针 (特征：包含 (*{NAME}) )
+        is_c_style_func_ptr = "(*{NAME})" in cpp_final_type
 
-        # 注册变量
+        # 检查是否为 C-Style 数组 (特征：包含 {NAME} 但不是函数指针)
+        # 注意：visitTypeSpecifier 现在会为数组生成 int32_t {NAME}[3] 格式
+        is_c_array = "{NAME}" in cpp_final_type and not is_c_style_func_ptr
+
+        if base_type_cpp != "auto":
+            # 判断是否为指针类型
+            if base_type_cpp.endswith('*') or \
+                    base_type_cpp.startswith("std::unique_ptr") or \
+                    base_type_cpp.startswith("std::shared_ptr") or \
+                    base_type_cpp.startswith("std::weak_ptr") or \
+                    is_c_style_func_ptr:
+                is_pointer = True
+
+            is_reference = base_type_cpp.endswith('&')
+
+        # [ auto 推导逻辑 ]
+        if base_type_cpp == "auto" and ctx.expression():
+            primary_node = None
+            try:
+                # 尝试获取表达式的第一个节点来推测是否是工厂调用
+                # 这只是一个简单的启发式判断，用于设置默认访问器
+                primary_node = ctx.expression().unaryExpression(0).simpleExpression().children[0]
+            except Exception as e:
+                pass
+
+            is_factory_call = False
+            if primary_node and isinstance(primary_node, ChronoParser.PrimaryContext):
+                if primary_node.NEW():
+                    is_factory_call = True
+                elif primary_node.AT_MAKE_UNIQUE():
+                    is_factory_call = True
+                elif primary_node.AT_MAKE_SHARED():
+                    is_factory_call = True
+
+            if is_factory_call:
+                is_pointer = True
+
+        # --- 6. 确定访问器 ---
+        accessor = "."
+        if is_c_array:
+            accessor = "."  # 数组名本身用 . 访问 (作为衰变后的指针或者对象)
+        elif is_c_style_func_ptr:
+            accessor = "."  # 函数指针通常直接调用，或者解引用
+        elif is_pointer:
+            accessor = "->"  # 指针默认用箭头
+
+        # --- 7. 注册到作用域栈 ---
+        # 将变量名及其属性注册到当前作用域，供后续表达式解析使用
         self._add_variable(key, {
             "cpp_name": cpp_name,
             "accessor": accessor,
             "cpp_type": base_type_cpp
         })
 
-        # 赋值
+        # --- 8. 确定赋值 ---
         cpp_value = ""
         if ctx.expression():
             cpp_value = f" = {self.visit(ctx.expression())}"
-        elif is_pointer and base_type_cpp != "auto":
-            cpp_value = " = nullptr"
 
-        # 成员变量判断
+        elif is_pointer and base_type_cpp != "auto":
+            # [关键修复] 处理未初始化的指针
+            # 1. 智能指针不需要显式 = nullptr (默认构造函数会处理)
+            # 2. 裸指针 (*) 和 C-Style 函数指针 ((*)) 必须显式初始化为 nullptr，否则是野指针
+
+            is_smart_ptr = (base_type_cpp.startswith("std::unique_ptr") or
+                            base_type_cpp.startswith("std::shared_ptr") or
+                            base_type_cpp.startswith("std::weak_ptr"))
+
+            if not is_smart_ptr:
+                cpp_value = " = nullptr"
+
+        # --- 9. 确定是局部还是成员 ---
         is_member_variable = (self._in_class or self._in_struct) and not self._in_class_method
         access = getattr(ctx, '_chrono_access', 'private')
 
-        # --- [关键修改] 生成核心 C++ 代码 ---
+        # --- 10. 生成核心 C++ 代码 ---
         core_cpp = ""
 
         if "{NAME}" in cpp_final_type:
-            # 这是一个数组声明 (e.g. "int32_t {NAME}[3]")
-            # 或 函数指针 (e.g. "int (*{NAME})(int)")
+            # 这是一个带占位符的类型 (数组或函数指针)
+            # e.g. "int32_t {NAME}[3]" -> "int32_t myArr[3]"
+            # e.g. "int (*{NAME})(int)" -> "int (*myFunc)(int)"
             core_cpp = f"{const_prefix}{cpp_final_type.replace('{NAME}', cpp_name)}{cpp_value}"
         else:
-            # 普通声明
+            # 标准声明
+            # e.g. "int32_t myVar"
             core_cpp = f"{const_prefix}{cpp_final_type} {cpp_name}{cpp_value}"
 
+        # 返回元组
         return (core_cpp, is_member_variable, access, cpp_final_type, cpp_name)
 
     def _enter_scope(self):
@@ -780,10 +856,11 @@ class ChronoVisitor(BaseChronoVisitor):
         self._current_class_name = None
 
         final_class_body = ""
-        if self._class_sections["private"]:
-            final_class_body += "\nprivate:\n" + self._class_sections["private"]
         if self._class_sections["public"]:
             final_class_body += "\npublic:\n" + self._class_sections["public"]
+
+        if self._class_sections["private"]:
+            final_class_body += "\nprivate:\n" + self._class_sections["private"]
 
         self._in_class = False
         self._current_class_name = None
@@ -820,6 +897,13 @@ class ChronoVisitor(BaseChronoVisitor):
             # 传递 static 状态 (尽管 G4 不支持 static var)
             ctx.variableDeclaration()._chrono_static = is_static
             return self.visit(ctx.variableDeclaration())
+
+            # [新增] 处理嵌套枚举
+        elif ctx.enumDefinition():
+            enum_code = self.visit(ctx.enumDefinition())
+            # 枚举定义直接放入对应的访问区段
+            self._class_sections[access] += enum_code
+            return ""
 
         elif ctx.functionSignature():
             ctx.functionSignature()._chrono_access = access
@@ -1735,3 +1819,53 @@ class ChronoVisitor(BaseChronoVisitor):
         # 3. 生成 C++ 代码 (struct Child;)
         line_comment = f"\n// Line {ctx.start.line} (forward decl)\n"
         return f"{line_comment}{kind_keyword} {name};\n"
+
+    # src/ChronoVisitor.py
+
+    def visitEnumDefinition(self, ctx: ChronoParser.EnumDefinitionContext):
+        line_comment = f"\n// Line {ctx.start.line} (enum)\n"
+
+        # 1. 确定是 enum 还是 enum class
+        is_scoped = bool(ctx.CLASS())
+        keyword = "enum class" if is_scoped else "enum"
+
+        name = ctx.name.text
+
+        # 2. 处理底层类型 (e.g. : u8 -> : uint8_t)
+        underlying_type = ""
+        if ctx.typeSpecifier():
+            cpp_type = self.visit(ctx.typeSpecifier())
+            underlying_type = f" : {cpp_type}"
+
+        # 3. 处理枚举体
+        body_code = ""
+        if ctx.enumBody():
+            # 手动遍历 item，确保格式整洁
+            items = ctx.enumBody().enumItem()
+            formatted_items = []
+            for item in items:
+                item_code = self.visit(item)
+                formatted_items.append(f"{INDENT}{item_code}")
+
+            body_code = ",\n".join(formatted_items)
+            if body_code:
+                body_code = f"\n{body_code}\n"
+
+        # 4. 组装 C++
+        # 检查是否有访问修饰符 (用于类内部定义)
+        # 但这个是在父级 (classBodyStatement) 处理的，这里只返回定义本身
+
+        code = (
+            f"{line_comment}"
+            f"{keyword} {name}{underlying_type} {{\n"
+            f"{body_code}"
+            f"}};\n"
+        )
+        return code
+
+    def visitEnumItem(self, ctx: ChronoParser.EnumItemContext):
+        name = ctx.name.text
+        if ctx.expression():
+            val = self.visit(ctx.expression())
+            return f"{name} = {val}"
+        return name

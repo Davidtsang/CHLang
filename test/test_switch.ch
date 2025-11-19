@@ -9,8 +9,8 @@ import "runtime/ChronoObject.h" // (用于 main)
 import <iostream>
 
 // (用于测试 'typemap' 代换)
-typemap C_CASE_2 = "2";
-typemap C_CASE_3 = "3";
+#define  C_CASE_2 2
+#define  C_CASE_3 3
 
 // 一个辅助函数
 func testSwitch(val: i32) {

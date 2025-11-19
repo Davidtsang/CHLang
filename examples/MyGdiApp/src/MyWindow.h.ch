@@ -13,7 +13,9 @@ import "Application"
 
 @cpp using namespace Gdiplus; @end
 
+
 class MyWindow : Window {
+
     public init(app: Application*);
 
     // 重写(Override)基类的虚拟函数

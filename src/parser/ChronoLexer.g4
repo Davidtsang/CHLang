@@ -14,6 +14,7 @@ RETURN  : 'return' ;
 CLASS   : 'class' ;
 IMPLEMENT: 'implement'; //
 STRUCT  : 'struct' ; // <-- [新增]
+ENUM : 'enum' ;
 INIT    : 'init' ;    // <-- [ 新增 ]
 DEINIT  : 'deinit' ; 
 THIS    : 'this' ;   
