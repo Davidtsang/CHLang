@@ -1,36 +1,56 @@
 import "Application"
-import "Button" // 导入按钮
+import "Button"
+import "Label"
 import "MyWindow"
 import <memory>
-import <iostream> // 用于打印
+import <iostream>
+import <gdiplus.h>
 
-// 回调函数
+@cpp using namespace Gdiplus; @end
+
 func onBtnClicked() {
-    // [重构] 移除 @cpp，使用原生 Chrono 语法 (<< 和 ::)
-    std::cout << ">>> Button Clicked! Hello form Chrono!" << std::endl;
+    std::cout << ">>> Bye Bye!" << std::endl;
 }
 
 func CHMain() -> int {
-    // [重构] 泛型 [] -> <>
-    var app: unique<Application> = @make<Application>();
+    var app = @make<Application>();
+    var window = @make<MyWindow>(app.get(), 600, 400);
 
-    // [重构] app 是 unique_ptr 对象，访问其 get() 方法使用 .
-    // get() 返回 raw pointer
-    var window: unique<MyWindow> = @make<MyWindow>(app.get());
+    window->setBackgroundColor(192, 192, 192);
 
-    // 1. 创建按钮
-    var btn: unique<Button> = @make<Button>("Click Me!");
+    // --- 1. Label ---
+    var label = @make<Label>("Warning: System will shutdown.");
+    label->setFont("Tahoma", 9.0);
+    label->setTextColor(Color(255, 0, 0, 0));
+    label->setBackgroundColor(Color(0, 0, 0, 0));
+    label->setAlignment(1, 1); // 居中
 
-    // 2. 设置回调
-    // [重构] btn 是指针类型 (unique_ptr 重载了 ->)，使用 -> 访问成员
+    // [关键修复] 在 move 之前设置位置
+    // x=50, y=50, w=500, h=40
+    label->setGeometry(50, 50, 500, 40);
+
+    // --- 2. Button ---
+    var btn = @make<Button>("Shut Down");
+    btn->setStyle(
+        Color(255, 210, 210, 210),
+        Color(255, 0, 0, 0),
+        Color(255, 0, 0, 0),
+        1.0, 9.0
+    );
     btn->setOnClick(onBtnClicked);
 
-    // 3. 添加到窗口 (转移所有权)
-    // [重构] window 是指针类型，使用 ->
+    // [关键修复] 在 move 之前设置位置
+    // x=200, y=150, w=200, h=50
+    btn->setGeometry(200, 150, 200, 50);
+
+    // --- 3. 添加并转移所有权 ---
+    // 注意：这行代码执行后，本地变量 'label' 和 'btn' 变为空指针
+    // 绝对不能再访问它们了
+    window->addChild(@move(label));
     window->addChild(@move(btn));
 
-    window->show();
+    // [安全] 移除了那个导致崩溃的 @cpp SetWindowPos 块
 
-    // [重构] app 也是指针语义，使用 -> 访问 exec
+    window->show();
     return app->exec();
 }

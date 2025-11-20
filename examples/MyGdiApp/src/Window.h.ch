@@ -10,7 +10,7 @@ import <vector>
 import <map>
 import <memory>
 import "Application"
-import "Widget"
+import "Widget" // 必须导入基类
 
 #define C_LRESULT_CALLBACK LRESULT CALLBACK
 
@@ -18,25 +18,23 @@ extern func GlobalWindowProc(
     hWnd: HWND, uMsg: UINT, wParam: WPARAM, lParam: LPARAM
 ) -> C_LRESULT_CALLBACK;
 
-class Window {
-    public var m_hWnd: HWND;
+// [修复 1] 继承 Widget
+class Window : Widget {
+    // [修复 2] 删除重复的 m_hWnd (使用 Widget 的)
+    // public var m_hWnd: HWND; <--- 删除这行
+
     var m_app: Application*;
-
-    // [重构] 泛型使用 < >
-    // 1. vector<unique<Widget>>
     var m_children: std::vector<unique<Widget> >;
-    // 2. map<int, Widget*>
     var m_lookup: std::map<int, Widget*>;
-
     var m_nextId: int;
 
-    public init(title: LPCWSTR, app: Application*);
+    public init(title: LPCWSTR, app: Application*, width: int, height: int);
     public deinit;
     public func show();
 
-    // [重构] 泛型使用 < >
     public func addChild(widget: unique<Widget>);
 
+    // 重写基类虚函数
     public func handleMessage(
         uMsg: UINT, wParam: WPARAM, lParam: LPARAM
     ) -> LRESULT;

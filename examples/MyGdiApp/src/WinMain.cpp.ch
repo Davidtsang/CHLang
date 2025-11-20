@@ -30,7 +30,8 @@ var g_hInstance: HINSTANCE = NULL;
 var g_nCmdShow: int = 0;
 var g_gdiplusToken: ULONG_PTR;
 
-
+// 声明用户必须提供的 "CHMain"
+func CHMain() -> int;
 
 // WinMain 入口点
 func WinMain(

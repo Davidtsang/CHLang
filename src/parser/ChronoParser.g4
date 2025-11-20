@@ -236,7 +236,7 @@ parameter
 
 cppBlock : AT_CPP CPP_BODY* AT_END ;
 
-returnStatement : RETURN expression SEMIC_TOKEN ;
+returnStatement : RETURN expression? SEMIC_TOKEN ;
 
 assignmentOperator
     : ASSIGN

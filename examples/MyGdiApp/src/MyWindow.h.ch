@@ -3,7 +3,6 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 
-// [关键修复] 必须在 gdiplus.h 之前包含 objidl.h
 import <objidl.h>
 import <windows.h>
 import <gdiplus.h>
@@ -13,12 +12,16 @@ import "Application"
 
 @cpp using namespace Gdiplus; @end
 
-
 class MyWindow : Window {
+    // [新增] 存储背景颜色 (GDI+ Color 对象)
+    var m_bgColor: Color;
 
-    public init(app: Application*);
+    // [修改] 构造函数增加宽高
+    public init(app: Application*, w: int, h: int);
 
-    // 重写(Override)基类的虚拟函数
+    // [新增] 设置背景色 API
+    public func setBackgroundColor(r: u8, g: u8, b: u8);
+
     public func handleMessage(
         uMsg: UINT, wParam: WPARAM, lParam: LPARAM
     ) -> LRESULT;

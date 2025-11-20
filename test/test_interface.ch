@@ -1,5 +1,5 @@
 // file: test/test_interface.ch
-// 目的: 验证 'interface' 和 'impl' 关键字
+// 目的: 验证 'interface' 和 'with' 关键字
 
 import <iostream>
 import <string>
@@ -27,7 +27,7 @@ interface IShape {
 // 类 A: "Circle"
 // - 继承自 ChronoObject (用于 MRC)
 // - 实现 ILoggable 和 IShape
-class Circle : ChronoObject impl ILoggable, IShape {
+class Circle : ChronoObject with ILoggable, IShape {
 
     var radius: f32;
 //    var radius: unique[Cat] = @make[Cat]();
@@ -68,7 +68,7 @@ implement Circle{
 // 类 B: "Square"
 // - 继承自 ChronoObject (用于 MRC)
 // - 只实现 IShape
-class Square : ChronoObject impl IShape {
+class Square : ChronoObject with IShape {
 
     var side: f32;
 
