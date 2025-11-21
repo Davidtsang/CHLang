@@ -9,18 +9,17 @@ import <gdiplus.h>
 
 import "Window"
 import "Application"
+import "Geometry" // [新增]
 
 @cpp using namespace Gdiplus; @end
 
 class MyWindow : Window {
-    // [新增] 存储背景颜色 (GDI+ Color 对象)
     var m_bgColor: Color;
 
-    // [修改] 构造函数增加宽高
     public init(app: Application*, w: int, h: int);
 
-    // [新增] 设置背景色 API
-    public func setBackgroundColor(r: u8, g: u8, b: u8);
+    // [修复] 参数改为 CGColor
+    public func setBackgroundColor(color: CGColor);
 
     public func handleMessage(
         uMsg: UINT, wParam: WPARAM, lParam: LPARAM

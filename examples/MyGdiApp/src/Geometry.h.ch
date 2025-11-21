@@ -1,77 +1,53 @@
-// file: framework/Geometry.ch
+// file: framework/Geometry.h.ch
 #pragma once
+import <cstdint> // 必须导入，用于 u8 等类型
 
 // --- 1. 基础几何结构 ---
 
 struct CGPoint {
-    var x: f32;
-    var y: f32;
+    public var x: f32;
+    public var y: f32;
 
-    init(x: f32, y: f32);
-}
-implement CGPoint {
-    init(x: f32, y: f32) { this.x = x; this.y = y; }
+    public init();
+    public init(x: f32, y: f32);
 }
 
 struct CGSize {
-    var width: f32;
-    var height: f32;
+    public var width: f32;
+    public var height: f32;
 
-    init(w: f32, h: f32);
-}
-implement CGSize {
-    init(w: f32, h: f32) { this.width = w; this.height = h; }
+    public init();
+    public init(w: f32, h: f32);
 }
 
 struct CGRect {
-    var origin: CGPoint;
-    var size: CGSize;
+    public var origin: CGPoint;
+    public var size: CGSize;
 
-    init(x: f32, y: f32, w: f32, h: f32);
+    public init();
+    public init(x: f32, y: f32, w: f32, h: f32);
 
-    // 辅助方法
-    func getMinX() -> f32;
-    func getMinY() -> f32;
-    func getWidth() -> f32;
-    func getHeight() -> f32;
-}
-implement CGRect {
-    init(x: f32, y: f32, w: f32, h: f32) {
-        this.origin.x = x;
-        this.origin.y = y;
-        this.size.width = w;
-        this.size.height = h;
-    }
-    func getMinX() -> f32 { return this.origin.x; }
-    func getMinY() -> f32 { return this.origin.y; }
-    func getWidth() -> f32 { return this.size.width; }
-    func getHeight() -> f32 { return this.size.height; }
+    // 方法声明 (无函数体)
+    public func getMinX() -> f32;
+    public func getMinY() -> f32;
+    public func getWidth() -> f32;
+    public func getHeight() -> f32;
 }
 
 // --- 2. 颜色结构体 ---
 
 struct CGColor {
-    var r: u8;
-    var g: u8;
-    var b: u8;
-    var a: u8;
+    public var r: u8;
+    public var g: u8;
+    public var b: u8;
+    public var a: u8;
 
-    init(r: u8, g: u8, b: u8, a: u8);
+    public init();
+    public init(r: u8, g: u8, b: u8, a: u8);
 
-    // 预设颜色工厂方法
-    static func black() -> CGColor;
-    static func white() -> CGColor;
-    static func clear() -> CGColor; // 透明
-    static func red() -> CGColor;
-}
-
-implement CGColor {
-    init(r: u8, g: u8, b: u8, a: u8) {
-        this.r = r; this.g = g; this.b = b; this.a = a;
-    }
-
-    func black() -> CGColor { return CGColor(0, 0, 0, 255); }
-    func white() -> CGColor { return CGColor(255, 255, 255, 255); }
-    func clear() -> CGColor { return CGColor(0, 0, 0, 0); }
-    func red()   -> CGColor { return CGColor(255, 0, 0, 255); }
+    // 静态方法声明
+    public static func black() -> CGColor;
+    public static func white() -> CGColor;
+    public static func clear() -> CGColor;
+    public static func red() -> CGColor;
 }

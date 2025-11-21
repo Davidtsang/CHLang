@@ -1,23 +1,23 @@
 // file: framework/Widget.h.ch
 #pragma once
 import <windows.h>
-import "Geometry" // 导入 CG 类型
+import "Geometry"
 
 class Widget {
     public var m_hWnd: HWND;
     public var m_id: int;
-
-    // [修改] 使用 CGRect
     public var m_frame: CGRect;
 
     public init();
     public deinit;
 
-    // [修改] 接收 CGRect
     public func setFrame(frame: CGRect);
     public func getFrame() -> CGRect;
 
-    public func create(parent: HWND, id: int);
-    public func handleMessage(uMsg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
-    public func onCommand(notificationCode: int) -> bool;
+    // [关键修改] 添加 virtual 关键字
+    // 因为子类(Button/Label)使用了 override，所以基类必须是 virtual
+    public virtual func create(parent: HWND, id: int);
+    public virtual func handleMessage(uMsg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
+
+    public virtual func onCommand(notificationCode: int) -> bool;
 }

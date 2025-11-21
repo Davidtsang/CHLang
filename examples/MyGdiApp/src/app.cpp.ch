@@ -38,7 +38,7 @@ func CHMain() -> int {
         CGColor::black(),      // 边框
         2.0                    // 边框宽
     );
-    btn->setFont("Segoe UI Bold", 12.0);
+    btn->setFont("Segoe UI", 12.0);
 
     // [修正] 传入函数名，而不是匿名函数
     btn->setOnClick(onShutdownCallback);

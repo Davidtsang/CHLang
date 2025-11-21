@@ -5,12 +5,8 @@ implement Widget {
     init() {
         this->m_hWnd = NULL;
         this->m_id = 0;
-
-        // [新增] 默认值
-        this->m_x = 10;
-        this->m_y = 10;
-        this->m_w = 100;
-        this->m_h = 30;
+        // [修复] 使用 ->
+        this->m_frame = CGRect(10.0, 10.0, 100.0, 30.0);
     }
 
     deinit {
@@ -19,17 +15,21 @@ implement Widget {
         }
     }
 
-    // [新增] 实现
-    func setGeometry(x: int, y: int, w: int, h: int) {
-        this->m_x = x;
-        this->m_y = y;
-        this->m_w = w;
-        this->m_h = h;
-
-        // 如果窗口已经创建了，立刻应用
+    func setFrame(frame: CGRect) {
+        this->m_frame = frame;
         if (this->m_hWnd != NULL) {
-            MoveWindow(this->m_hWnd, x, y, w, h, true);
+            // frame 是栈上的值类型，使用 . 访问
+            MoveWindow(this->m_hWnd,
+                static_cast<int>(frame.getMinX()),
+                static_cast<int>(frame.getMinY()),
+                static_cast<int>(frame.getWidth()),
+                static_cast<int>(frame.getHeight()),
+                true);
         }
+    }
+
+    func getFrame() -> CGRect {
+        return this->m_frame;
     }
 
     func onCommand(notificationCode: int) -> bool {
