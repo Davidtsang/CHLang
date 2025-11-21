@@ -1,40 +1,30 @@
-// file: project/Label.h.ch
 #pragma once
-
 import "Widget"
+import "Geometry"
 import <string>
-import <objidl.h>
-import <gdiplus.h>
-
-@cpp using namespace Gdiplus; @end
+import <gdiplus.h> // GDI+ 仅用于实现，不用于接口类型
 
 class Label : Widget {
-    // 数据
     var m_text: std::string;
 
-    // 样式
-    var m_textColor: Color;
-    var m_bgColor: Color;
+    // [修改] 使用 CGColor
+    var m_textColor: CGColor;
+    var m_bgColor: CGColor;
 
     var m_fontName: std::wstring;
     var m_fontSize: f32;
 
-    // 对齐 (0=Near, 1=Center, 2=Far)
-    var m_alignH: int; // 水平
-    var m_alignV: int; // 垂直
+    var m_alignH: int;
+    var m_alignV: int;
 
     public init(text: std::string);
 
-    // --- API ---
     public func setText(text: std::string);
-    public func setTextColor(color: Color);
-    public func setBackgroundColor(color: Color);
+    // [修改] 接口使用 CGColor
+    public func setTextColor(color: CGColor);
+    public func setBackgroundColor(color: CGColor);
     public func setFont(name: std::string, size: f32);
 
-    // 设置对齐: h(0,1,2), v(0,1,2)
-    public func setAlignment(h: int, v: int);
-
-    // 虚函数实现
     public func create(parent: HWND, id: int);
     public func handleMessage(uMsg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
 }

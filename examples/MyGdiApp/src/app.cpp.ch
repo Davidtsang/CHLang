@@ -2,54 +2,50 @@ import "Application"
 import "Button"
 import "Label"
 import "MyWindow"
+import "Geometry" // 导入 CG 类型
 import <memory>
 import <iostream>
-import <gdiplus.h>
 
-@cpp using namespace Gdiplus; @end
-
-func onBtnClicked() {
-    std::cout << ">>> Bye Bye!" << std::endl;
+// [修正] 定义一个具名的回调函数
+func onShutdownCallback() {
+    @cpp std::cout << "Shutdown confirmed via Callback!" << std::endl; @end
 }
 
 func CHMain() -> int {
     var app = @make<Application>();
     var window = @make<MyWindow>(app.get(), 600, 400);
 
-    window->setBackgroundColor(192, 192, 192);
+    // 使用 CGColor
+    window->setBackgroundColor(CGColor(240, 240, 240, 255));
 
     // --- 1. Label ---
-    var label = @make<Label>("Warning: System will shutdown.");
-    label->setFont("Tahoma", 9.0);
-    label->setTextColor(Color(255, 0, 0, 0));
-    label->setBackgroundColor(Color(0, 0, 0, 0));
-    label->setAlignment(1, 1); // 居中
+    var label = @make<Label>("System Alert");
 
-    // [关键修复] 在 move 之前设置位置
-    // x=50, y=50, w=500, h=40
-    label->setGeometry(50, 50, 500, 40);
+    // 使用 CGRect 和 CGColor
+    label->setFrame(CGRect(50.0, 20.0, 500.0, 30.0));
+    label->setTextColor(CGColor::red());
+    label->setFont("Tahoma", 16.0);
 
-    // --- 2. Button ---
-    var btn = @make<Button>("Shut Down");
+    // --- 2. Modular Button ---
+    var btn = @make<Button>("Confirm Shutdown");
+
+    // 设置位置
+    btn->setFrame(CGRect(200.0, 100.0, 200.0, 50.0));
+
+    // 设置样式
     btn->setStyle(
-        Color(255, 210, 210, 210),
-        Color(255, 0, 0, 0),
-        Color(255, 0, 0, 0),
-        1.0, 9.0
+        CGColor::white(),      // 背景
+        CGColor::black(),      // 边框
+        2.0                    // 边框宽
     );
-    btn->setOnClick(onBtnClicked);
+    btn->setFont("Segoe UI Bold", 12.0);
 
-    // [关键修复] 在 move 之前设置位置
-    // x=200, y=150, w=200, h=50
-    btn->setGeometry(200, 150, 200, 50);
+    // [修正] 传入函数名，而不是匿名函数
+    btn->setOnClick(onShutdownCallback);
 
-    // --- 3. 添加并转移所有权 ---
-    // 注意：这行代码执行后，本地变量 'label' 和 'btn' 变为空指针
-    // 绝对不能再访问它们了
+    // --- 3. 添加 ---
     window->addChild(@move(label));
     window->addChild(@move(btn));
-
-    // [安全] 移除了那个导致崩溃的 @cpp SetWindowPos 块
 
     window->show();
     return app->exec();
