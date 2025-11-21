@@ -34,6 +34,9 @@ class ChronoVisitor(BaseChronoVisitor):
         self._current_namespace_str = ""  # 用于 C++ 作用域
         self._current_class_members = {}
 
+        # [新增] 控制流深度 (0=线性/顶层, >0=条件或循环内)
+        self._control_flow_depth = 0
+
     def _collect_suffixes(self, ctx):
         """
         [辅助函数] 收集并按源代码顺序排序类型后缀 (* 和 &)。
@@ -351,22 +354,69 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return f"{cpp_final_type} {cpp_name}"
 
+
     def visitFunctionCallExpression(self, ctx: ChronoParser.FunctionCallExpressionContext):
-        """
-        [重构] 新增对 @move 的翻译
-        """
         name_token = ctx.funcName
 
-        if name_token.type == ChronoParser.AT_MOVE:
-            cpp_func_name = "std::move"
-        else:
-            cpp_func_name = name_token.text
+        # 识别 Move 操作
+        is_safe_move = (name_token.type == ChronoParser.AT_MOVE)
+
+        is_unsafe_move = False
+        if hasattr(ChronoParser, 'AT_UNSAFE_MOVE'):
+            is_unsafe_move = (name_token.type == ChronoParser.AT_UNSAFE_MOVE)
+
+        if is_safe_move or is_unsafe_move:
+            # 1. 获取变量名 (假设 @move(var) 形式)
+            var_name = ""
+            if ctx.expressionList() and ctx.expressionList().expression():
+                # 获取参数节点文本
+                arg_node = ctx.expressionList().expression()[0]
+                var_name = arg_node.getText()
+
+            var_info = self._find_variable(var_name)
+
+            if var_info:
+                # --- [检查 A] 生命周期状态 ---
+                if var_info.get('state') == 'Moved':
+                    raise Exception(
+                        f"\n[Chrono Borrow Error] Line {ctx.start.line}: Variable '{var_name}' is ALREADY moved!\n"
+                        f"You cannot move the same value twice."
+                    )
+
+                # --- [检查 B] 安全墙 (仅针对普通 @move) ---
+                var_depth = var_info.get('def_depth', 0)
+                current_depth = self._control_flow_depth
+
+                if is_safe_move and (current_depth > var_depth):
+                    raise Exception(
+                        f"\n[Chrono Safety Error] --------------------------------------\n"
+                        f"Line {ctx.start.line}: Cannot safely @move('{var_name}') inside a loop or conditional block.\n"
+                        f"Reason: '{var_name}' is defined in an outer scope (Depth {var_depth} < Current {current_depth}).\n"
+                        f"Moving it here could cause a crash if the block is executed multiple times or conditionally.\n"
+                        f"\n"
+                        f"Fix Options:\n"
+                        f"  1. Use 'shared<T>' instead of 'unique<T>' for shared ownership.\n"
+                        f"  2. If you are SURE this is safe (e.g. you break/return immediately),\n"
+                        f"     use '@unsafe_move({var_name})' to explicitly bypass this check.\n"
+                        f"--------------------------------------------------------------\n"
+                    )
+
+                # --- [执行] 状态变更 ---
+                var_info['state'] = 'Moved'
+
+                # 生成 C++ 代码
+                return f"std::move({var_name})"
+
+        # [关键修复] 这一块必须取消缩进，放在 if 块外面！
+        # --- 普通函数调用 ---
+        cpp_func_name = name_token.text
+        # 容错
+        if name_token.type == ChronoParser.AT_MOVE: cpp_func_name = "std::move"
 
         args_list = []
         if ctx.expressionList():
             for arg_expr in ctx.expressionList().expression():
-                arg_code = self.visit(arg_expr)
-                args_list.append(arg_code)
+                args_list.append(self.visit(arg_expr))
         args_code = ", ".join(args_list)
 
         return f"{cpp_func_name}({args_code})"
@@ -542,6 +592,10 @@ class ChronoVisitor(BaseChronoVisitor):
 
     def _add_variable(self, chrono_name, metadata):
         """在*当前*作用域中定义一个新变量 (使用 Chrono 名字 $s 或 s 作为 Key)"""
+        # [新增] 初始化借用状态元数据
+        metadata['state'] = 'Alive'  # 状态: Alive / Moved
+        metadata['def_depth'] = self._control_flow_depth  # 出生时的深度
+
         self._scope_stack[-1][chrono_name] = metadata
 
     def _find_variable(self, chrono_name):
@@ -1242,6 +1296,14 @@ class ChronoVisitor(BaseChronoVisitor):
             # 1. 优先查找变量 (局部变量、成员变量)
             variable_info = self._find_variable(primary_text)
             if variable_info:
+                # [新增] 检查是否访问了“尸体”
+                if variable_info.get('state') == 'Moved':
+                    raise Exception(
+                        f"\n[Chrono Safety Error] Line {ctx.start.line}: Use of moved variable '{primary_text}'.\n"
+                        f"Hint: Ownership was transferred via @move/@unsafe_move. This variable is now invalid (null).\n"
+
+                    )
+
                 if '[' in variable_info["cpp_type"]:
                     return primary_text
                 else:
@@ -1335,10 +1397,20 @@ class ChronoVisitor(BaseChronoVisitor):
 
     def visitAssignment(self, ctx: ChronoParser.AssignmentContext):
         line_comment = f"{INDENT}// Line {ctx.start.line}\n"
+
+        # [修改] 移除了“复活逻辑”
+        # 我们不再检查是否是纯赋值，也不再将状态重置为 'Alive'。
+
+        # 直接生成目标代码。
+        # 关键点：self.visit(ctx.assignableExpression()) 会调用 visitAssignablePrimary。
+        # 如果该变量的状态是 'Moved'，visitAssignablePrimary 会直接抛出 Safety Error。
+        # 这意味着：禁止对已移动的变量进行任何操作（包括赋值）。
         target = self.visit(ctx.assignableExpression())
+
         value = self.visit(ctx.expression())
         op_str = self.visit(ctx.assignmentOperator())
         return f"{line_comment}{INDENT}{target} {op_str} {value};\n"
+
 
     def visitAssignableExpression(self, ctx: ChronoParser.AssignableExpressionContext):
         # ... (primary 处理同前) ...
@@ -1379,18 +1451,20 @@ class ChronoVisitor(BaseChronoVisitor):
 
     def visitForStatement(self, ctx: ChronoParser.ForStatementContext):
         self._enter_scope()
-        init_code = ""
-        if ctx.init:
-            init_code = self.visit(ctx.init)
-        cond_code = ""
-        if ctx.cond:
-            cond_code = self.visit(ctx.cond)
-        incr_code = ""
-        if ctx.incr:
-            incr_code = self.visit(ctx.incr)
+        init_code = self.visit(ctx.init) if ctx.init else ""
+
+        # 进入循环体 (包含条件和增量部分) -> 深度 +1
+        self._control_flow_depth += 1
+
+        cond_code = self.visit(ctx.cond) if ctx.cond else ""
+        incr_code = self.visit(ctx.incr) if ctx.incr else ""
+
         statements = self._safe_iterate_statements(ctx.statement())
         body_code = "".join(self.visit(s) for s in statements)
+
+        self._control_flow_depth -= 1
         self._exit_scope()
+
         code = f"{INDENT}for ({init_code}; {cond_code}; {incr_code}) {{\n"
         code += body_code
         code += f"{INDENT}}}\n"
@@ -1438,13 +1512,23 @@ class ChronoVisitor(BaseChronoVisitor):
 
     def visitIfStatement(self, ctx: ChronoParser.IfStatementContext):
         condition = self.visit(ctx.expression())
+
+        # 进入 IF 块 -> 深度 +1
+        self._control_flow_depth += 1
         if_body = self.visit(ctx.if_block) if ctx.if_block else ""
+        self._control_flow_depth -= 1
+
         code = f"{INDENT}if ({condition}) {{\n{if_body}{INDENT}}}\n"
+
         if ctx.ELSE():
             if ctx.else_if:
                 code += f"{INDENT}else {self.visit(ctx.else_if)}"
             elif ctx.else_block:
+                # 进入 ELSE 块 -> 深度 +1
+                self._control_flow_depth += 1
                 else_body = self.visit(ctx.else_block)
+                self._control_flow_depth -= 1
+
                 code += f"{INDENT}else {{\n{else_body}{INDENT}}}\n"
         return code
 
@@ -1463,11 +1547,17 @@ class ChronoVisitor(BaseChronoVisitor):
         return body_code
 
     def visitWhileStatement(self, ctx: ChronoParser.WhileStatementContext):
+        # While 也算控制流
+        self._control_flow_depth += 1
         condition = self.visit(ctx.expression())
+
         self._enter_scope()
         body_statements = self._safe_iterate_statements(ctx.statement())
         body_code = "".join(self.visit(s) for s in body_statements)
         self._exit_scope()
+
+        self._control_flow_depth -= 1
+
         code = f"{INDENT}while ({condition}) {{\n"
         code += body_code
         code += f"{INDENT}}}\n"
@@ -1537,13 +1627,24 @@ class ChronoVisitor(BaseChronoVisitor):
         if ctx.IDENTIFIER():
             primary_text = ctx.IDENTIFIER().getText()
             variable_info = self._find_variable(primary_text)
+
             if variable_info:
+                # [新增] 检查是否访问了“尸体” (左值访问)
+                # 即使是赋值操作 (a->id = 200)，如果 a 已经 Moved，也是非法的！
+                if variable_info.get('state') == 'Moved':
+                    raise Exception(
+                        f"\n[Chrono Safety Error] Line {ctx.start.line}: Use of moved variable '{primary_text}'.\n"
+                        f"Hint: Ownership was transferred via @move/@unsafe_move. This variable is now invalid (null).\n"
+
+                    )
+
                 if '[' in variable_info["cpp_type"]:
                     return primary_text
                 else:
                     return variable_info["cpp_name"]  # [修复] 移除了 '_'
             else:
                 return self._chrono_to_cpp_type(primary_text)
+
         if ctx.THIS():
             return "this"
         if ctx.STAR():
@@ -1690,21 +1791,14 @@ class ChronoVisitor(BaseChronoVisitor):
         return final_code
 
     def visitSwitchStatement(self, ctx: ChronoParser.SwitchStatementContext):
-        """
-        [新增] 访问 'switchStatement' 规则
-        e.g., switch (val) { ... }
-        """
+        self._control_flow_depth += 1
 
-        # 1. 翻译 switch (expr)
         expr = self.visit(ctx.expression())
-
-        # 2. 翻译所有 case 块
         case_code = "".join(self.visit(cb) for cb in ctx.caseBlock())
-
-        # 3. 翻译可选的 default 块
         default_code = self.visit(ctx.defaultBlock()) if ctx.defaultBlock() else ""
 
-        # 4. 组装 C++
+        self._control_flow_depth -= 1
+
         code = f"{INDENT}switch ({expr}) {{\n"
         code += case_code
         code += default_code

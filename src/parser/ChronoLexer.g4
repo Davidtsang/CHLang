@@ -45,6 +45,7 @@ WEAK_KW   : 'weak' ;       // [新增]
 AT_MAKE_UNIQUE : '@make' ;        // [新增] 对应 @make[T]
 AT_MAKE_SHARED : '@make_shared' ; // [新增] 对应 @make_shared[T] (修正了你的 @make_shread 拼写)
 AT_MOVE        : '@move' ;       // [新增] 对应 @move(a)
+AT_UNSAFE_MOVE : '@unsafe_move' ;
 
 STATIC_CAST      : 'static_cast' ;
 REINTERPRET_CAST : 'reinterpret_cast' ;

@@ -44,9 +44,9 @@ func demo_unique_ptr() {
 
         // 1d. 验证 ptr1 已失效
         
-        if (ptr1 == nullptr) {
-           std::cout << "  ptr1 is now null after move." << std::endl;
-        }        
+//        if (ptr1 == nullptr) {
+//           std::cout << "  ptr1 is now null after move." << std::endl;
+//        }
 
         std::cout << "  Inner scope ending (ptr2 dies)..." << std::endl;
     } // <-- ptr2 在此离开作用域. Resource 1 应该被销毁.

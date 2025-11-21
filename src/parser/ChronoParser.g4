@@ -419,8 +419,8 @@ initializerList
 
 // (在 ChronoParser.g4 中替换 functionCallExpression)
 functionCallExpression
-    : funcName=(IDENTIFIER | AT_MOVE) // [修改] 允许 @move 作为函数名
-    LPAREN expressionList? RPAREN
+    : funcName=(IDENTIFIER | AT_MOVE | AT_UNSAFE_MOVE)
+      LPAREN expressionList? RPAREN
     ;
 
 expressionList : expression (COMMA expression)* ;
