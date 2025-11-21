@@ -36,7 +36,7 @@ func CHMain() -> int {
     btn->setStyle(
         CGColor::white(),      // 背景
         CGColor::black(),      // 边框
-        2.0                    // 边框宽
+        1.0                    // 边框宽
     );
     btn->setFont("Segoe UI", 12.0);
 
