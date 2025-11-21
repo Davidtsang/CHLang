@@ -25,7 +25,6 @@ class ChronoVisitor(BaseChronoVisitor):
         self._current_class_name = None
         self._class_sections = {"private": "", "public": ""}
         self._alias_to_namespace_map = {}
-        # self._literal_alias_map = {} # <--- [删除] 改用 self.context
         self._scope_stack = [{}]
         self._namespace_is_open = False
 
@@ -67,12 +66,8 @@ class ChronoVisitor(BaseChronoVisitor):
             size_expr = self.visit(ctx.expression())  # 3 -> "3"
 
             # [关键修复] 使用 {NAME} 占位符构建 C++ 数组声明语法
-            # 如果 base 已经包含 {NAME} (例如多维数组 [[i32; 2]; 3])
-            # base 可能是 "int32_t {NAME}[2]"
             if "{NAME}" in base:
                 # 对于多维数组，C++ 的顺序是 arr[Rows][Cols]
-                # Chrono 是 [ [i32; Cols]; Rows ]
-                # 我们需要把新的维度追加到 {NAME} 后面
                 core_type = base.replace("{NAME}", f"{{NAME}}[{size_expr}]")
             else:
                 # 基础情况: int32_t {NAME}[3]
@@ -111,8 +106,6 @@ class ChronoVisitor(BaseChronoVisitor):
         # --- 后缀处理 ---
         # 如果是函数指针模式
         if is_function_type and suffixes and suffixes[0].getText() == '*':
-            # ... (C-Style 函数指针处理逻辑保持不变，请保留原代码) ...
-            # (为节省篇幅省略，确保保留之前的 RawAdder 修复逻辑)
             inner_sig = core_type[14:-1]
             first_paren_index = inner_sig.find('(')
             if first_paren_index != -1:
@@ -126,10 +119,6 @@ class ChronoVisitor(BaseChronoVisitor):
         # --- 普通类型后缀 ---
         suffix_str = "".join(s.getText() for s in suffixes)
 
-        # [关键] 如果 core_type 已经包含 {NAME} (数组)，后缀应该放在类型前面吗？
-        # int32_t {NAME}[3] 的指针 -> int32_t (*{NAME})[3] (太复杂了)
-        # 暂时假设数组不会直接跟 * 后缀 (Chrono 语法目前 [Type; N]* 会被解析为 base 为数组)
-        # 如果有 {NAME}，直接返回，暂不处理外部后缀叠加（除非你需要指向数组的指针）
         if "{NAME}" in core_type:
             return core_type
 
@@ -139,9 +128,6 @@ class ChronoVisitor(BaseChronoVisitor):
         raw_text = ctx.getText()
 
         # 2. 直接替换 :: (如果是新语法) 或者 . (如果是旧语法) 为 ::
-        # 如果用户写 std::vector，raw_text 就是 std::vector
-        # 如果用户写 std.vector，raw_text 就是 std.vector
-        # 我们统一转换为 ::
         cpp_type = raw_text.replace('.', '::')
 
         # 处理别名 (例如 IO.cout -> IO::cout)
@@ -153,18 +139,14 @@ class ChronoVisitor(BaseChronoVisitor):
         return self._chrono_to_cpp_type(final_type)
 
     def visitNamespaceStatement(self, ctx: ChronoParser.NamespaceStatementContext):
-        # [ [ [ 关键修复 ] ] ]
-        # 'ctx.name' 是一个 ANTLR 规则上下文 (QualifiedIdentifierContext),
-        # 不是一个 Token。我们必须使用 .getText() 方法来获取其完整文本。
         self._namespace_is_open = True
-        namespace_name = ctx.name.getText()  # <--- 修复
+        namespace_name = ctx.name.getText()
 
         cpp_namespace = namespace_name.replace('.', '::')
         self._current_namespace_str = cpp_namespace + "::"
 
         # 1:1 翻译
         open_block = f"namespace {namespace_name.replace('.', ' { namespace ')} {{\n\n"
-        # (我们必须在 visitProgram 中添加闭合 '}' )
         return open_block
 
     def visitEndNamespaceStatement(self, ctx: ChronoParser.EndNamespaceStatementContext):
@@ -176,7 +158,7 @@ class ChronoVisitor(BaseChronoVisitor):
         closing_braces = "}" * depth
         comment_name = self._current_namespace_str.replace('::', '.')[:-1]
 
-        self._namespace_is_open = False  # <-- [ [ [ 保留 ] ] ]
+        self._namespace_is_open = False
         self._current_namespace_str = ""
 
         return f"\n{closing_braces} // namespace {comment_name}\n\n"
@@ -185,7 +167,7 @@ class ChronoVisitor(BaseChronoVisitor):
         # 1. 设置状态
         self._in_implementation_block = True
         self._current_class_name = ctx.name.text
-        self._in_class = True  # (模拟在类中，以使 'this' 和方法解析正常工作)
+        self._in_class = True
 
         # 2. 访问所有实现体 (methodDefinition, initDefinition...)
         body_code = ""
@@ -209,15 +191,11 @@ class ChronoVisitor(BaseChronoVisitor):
         self._enter_scope()
 
         # [ [ [ 修复 B-2: 加载 'this' 和所有成员到作用域 ] ] ]
-
-        # 1. 确定 'this' 的访问器 (-> 或 .)
-        accessor = "None"
-
+        # [清理] 移除 accessor 相关逻辑
         cpp_type = f"{self._current_class_name}*"
 
         self._add_variable("this", {
             "cpp_name": "this",
-            "accessor": accessor,  # ←-- 关键: '.' (struct) or '→' (class)
             "cpp_type": cpp_type
         })
 
@@ -255,7 +233,7 @@ class ChronoVisitor(BaseChronoVisitor):
                 access = getattr(ctx, '_chrono_access', 'public')
 
             static_prefix = "static " if is_static else ""
-            virtual_prefix = "virtual " if not is_static else ""
+            virtual_prefix = ""
 
             func_def_code = (
                 f"{line_comment}"
@@ -283,21 +261,15 @@ class ChronoVisitor(BaseChronoVisitor):
         if func_name == "main":
             cpp_func_name = "main"  # 强制全局
         else:
-            # [ [ [ 修复 A-2: 移除函数定义中的命名空间前缀 ] ] ]
             cpp_func_name = func_name
 
         params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
         body_code = "".join(self.visit(s) for s in self._safe_iterate_statements(ctx.statement()))
         return_type = self.visit(ctx.returnType) if ctx.returnType else "void"
 
-        # [ [ [ 关键修复 ] ] ]
-        # 正确检查 (STATIC)? 关键字
-        # (ChronoParser.g4 中 functionDefinition 规则定义了 (STATIC)? )
         is_static = bool(ctx.STATIC())
         static_prefix = "static " if is_static else ""
 
-        # [ [ [ 核心修复 ] ] ]
-        # 直接构建并返回 C++ 代码字符串，不再委托给 visitMethodDefinition
         func_def_code = (
             f"{line_comment}"
             f"{static_prefix}{return_type} {cpp_func_name}({params_code}) {{\n"
@@ -307,45 +279,43 @@ class ChronoVisitor(BaseChronoVisitor):
         )
 
         self._exit_scope()
-
-        # [ [ [ 核心修复 ] ] ]
-        return func_def_code  # <--- 返回生成的代码，而不是 ""
+        return func_def_code
 
     def visitParameter(self, ctx: ChronoParser.ParameterContext):
         """
         [重构] 访问 'parameter' 规则。
-        [ [ [ 关键修复 ] ] ] 移除了 '_' 前缀。
+        [修复] 正确处理带 {NAME} 占位符的数组/函数指针类型。
         """
 
         var_name = ctx.name.text
         key = var_name
-        cpp_name = var_name  # 默认 C++ 名称 (无 '_')
+        cpp_name = var_name
 
         base_type_cpp = self.visit(ctx.typeName)
+
+        # 注册变量
+        self._add_variable(key, {
+            "cpp_name": cpp_name,
+            "cpp_type": base_type_cpp
+        })
+
+        # [关键修复] 检查类型字符串是否包含 {NAME} 占位符
+        # 数组类型 (e.g. [i32; 3]) 会被翻译为 "int32_t {NAME}[3]"
+        # 我们必须将 {NAME} 替换为实际的参数名 "arr"，生成 "int32_t arr[3]"
+        if "{NAME}" in base_type_cpp:
+            return base_type_cpp.replace("{NAME}", cpp_name)
+
+        # 普通类型处理
         cpp_final_type = base_type_cpp
 
+        # (旧逻辑兼容: 如果 base_type_cpp 包含 ';[' 则转为指针)
         is_pointer = base_type_cpp.endswith('*')
         is_reference = base_type_cpp.endswith('&')
-        is_c_array = False
 
         if not is_pointer and not is_reference and ';[' in base_type_cpp:
-            is_c_array = True
             parts = base_type_cpp.split(';')
             base_only = parts[0]
             cpp_final_type = f"{base_only}*"
-            is_pointer = True
-
-        accessor = "None"
-
-
-        # [ [ [ 关键 ] ] ]
-        # 移除了所有 'cpp_name = f"_{cpp_name}"' 逻辑
-
-        self._add_variable(key, {
-            "cpp_name": cpp_name,  # 始终使用原始名称
-            "accessor": accessor,
-            "cpp_type": base_type_cpp
-        })
 
         return f"{cpp_final_type} {cpp_name}"
 
@@ -458,14 +428,9 @@ class ChronoVisitor(BaseChronoVisitor):
 
         # --- 5. 确定是指针/引用/数组 ---
         is_pointer = False
-        is_reference = False
 
         # 检查是否为 C-Style 函数指针 (特征：包含 (*{NAME}) )
         is_c_style_func_ptr = "(*{NAME})" in cpp_final_type
-
-        # 检查是否为 C-Style 数组 (特征：包含 {NAME} 但不是函数指针)
-        # 注意：visitTypeSpecifier 现在会为数组生成 int32_t {NAME}[3] 格式
-        is_c_array = "{NAME}" in cpp_final_type and not is_c_style_func_ptr
 
         if base_type_cpp != "auto":
             # 判断是否为指针类型
@@ -476,14 +441,11 @@ class ChronoVisitor(BaseChronoVisitor):
                     is_c_style_func_ptr:
                 is_pointer = True
 
-            is_reference = base_type_cpp.endswith('&')
-
         # [ auto 推导逻辑 ]
         if base_type_cpp == "auto" and ctx.expression():
             primary_node = None
             try:
                 # 尝试获取表达式的第一个节点来推测是否是工厂调用
-                # 这只是一个简单的启发式判断，用于设置默认访问器
                 primary_node = ctx.expression().unaryExpression(0).simpleExpression().children[0]
             except Exception as e:
                 pass
@@ -500,14 +462,12 @@ class ChronoVisitor(BaseChronoVisitor):
             if is_factory_call:
                 is_pointer = True
 
-        # --- 6. 确定访问器 ---
-        accessor = "None"
+        # [清理] 移除了步骤 6 (确定访问器)
 
         # --- 7. 注册到作用域栈 ---
-        # 将变量名及其属性注册到当前作用域，供后续表达式解析使用
+        # [清理] 不再存储 accessor
         self._add_variable(key, {
             "cpp_name": cpp_name,
-            "accessor": accessor,
             "cpp_type": base_type_cpp
         })
 
@@ -518,9 +478,6 @@ class ChronoVisitor(BaseChronoVisitor):
 
         elif is_pointer and base_type_cpp != "auto":
             # [关键修复] 处理未初始化的指针
-            # 1. 智能指针不需要显式 = nullptr (默认构造函数会处理)
-            # 2. 裸指针 (*) 和 C-Style 函数指针 ((*)) 必须显式初始化为 nullptr，否则是野指针
-
             is_smart_ptr = (base_type_cpp.startswith("std::unique_ptr") or
                             base_type_cpp.startswith("std::shared_ptr") or
                             base_type_cpp.startswith("std::weak_ptr"))
@@ -537,12 +494,9 @@ class ChronoVisitor(BaseChronoVisitor):
 
         if "{NAME}" in cpp_final_type:
             # 这是一个带占位符的类型 (数组或函数指针)
-            # e.g. "int32_t {NAME}[3]" -> "int32_t myArr[3]"
-            # e.g. "int (*{NAME})(int)" -> "int (*myFunc)(int)"
             core_cpp = f"{const_prefix}{cpp_final_type.replace('{NAME}', cpp_name)}{cpp_value}"
         else:
             # 标准声明
-            # e.g. "int32_t myVar"
             core_cpp = f"{const_prefix}{cpp_final_type} {cpp_name}{cpp_value}"
 
         # 返回元组
@@ -691,8 +645,6 @@ class ChronoVisitor(BaseChronoVisitor):
         line_comment = f"\n// Line {ctx.start.line} \n"
 
         # --- [关键修复] 路径重建逻辑 ---
-        # 因为我们从 Lexer 删除了 INCLUDE_PATH，现在需要在 Visitor 里还原路径字符串
-
         path_text = ""
         is_system_header = False
 
@@ -701,8 +653,6 @@ class ChronoVisitor(BaseChronoVisitor):
             path_text = ctx.pathStr.text
         else:
             # 情况 B: import <vector> 或 import <sys/stat.h>
-            # ANTLR 将其拆分为了 LT, IDENTIFIER(sys), SLASH, IDENTIFIER(stat), DOT, IDENTIFIER(h), GT
-            # 我们需要获取 pathSeq 对应的完整原始文本
             raw_seq = ctx.pathSeq.getText()  # getText() 会自动拼接子节点文本
             path_text = f"<{raw_seq}>"
             is_system_header = True
@@ -715,7 +665,7 @@ class ChronoVisitor(BaseChronoVisitor):
             self.import_loader_callback(raw_path)
         # --------------------
 
-        base_name = os.path.basename(path_text.strip('\"<>'))
+        base_name = os.path.basename(path_text.strip('\\\"<>'))
         true_namespace, _ = os.path.splitext(base_name)
 
         if ctx.alias:
@@ -763,8 +713,6 @@ class ChronoVisitor(BaseChronoVisitor):
             cpp_type = cpp_type_pattern
 
         return f"{line_comment}using {name} = {cpp_type};\n"
-
-        # src/ChronoVisitor.py
 
     def visitParameters(self, ctx: ChronoParser.ParametersContext):
         """
@@ -814,7 +762,6 @@ class ChronoVisitor(BaseChronoVisitor):
         return code
 
     def visitFunctionSignature(self, ctx: ChronoParser.FunctionSignatureContext):
-        # is_static = (ctx.STATIC() is not None) # <-- [删除] 不再重新计算
         line_comment = f"\n// Line {ctx.start.line} \n"
 
         func_name = ctx.name.text
@@ -825,20 +772,38 @@ class ChronoVisitor(BaseChronoVisitor):
             default_access = 'public' if self._in_struct else 'private'
             access = getattr(ctx, '_chrono_access', default_access)
 
-            # [ [ [ 关键修复 ] ] ]
-            # 依赖从 visitClassBodyStatement 传递过来的 _chrono_static 标志
-            is_static = getattr(ctx, '_chrono_static', False)
+            # 1. 获取修饰符状态
+            # (STATIC)? 来自 Parser
+            is_static = bool(ctx.STATIC())
+            # (VIRTUAL)? 来自 Parser [新增]
+            is_virtual = bool(ctx.VIRTUAL()) if hasattr(ctx, 'VIRTUAL') and ctx.VIRTUAL() else False
+            # (OVERRIDE)? 来自 Parser [新增]
+            is_override = bool(ctx.OVERRIDE()) if hasattr(ctx, 'OVERRIDE') and ctx.OVERRIDE() else False
 
+            # 如果是从 classBodyStatement 传下来的 static 标志 (兼容旧逻辑)
+            if getattr(ctx, '_chrono_static', False):
+                is_static = True
+
+            # 2. 构建前缀/后缀
             static_prefix = "static " if is_static else ""
-            virtual_prefix = "virtual " if not is_static else ""  # 保持：static 和 virtual 互斥
 
-            decl = f"{line_comment}{INDENT}{virtual_prefix}{static_prefix}{return_type} {func_name}({params_code});\n"
+            # [核心修改] 不再自动 virtual，必须显式指定
+            virtual_prefix = "virtual " if is_virtual else ""
+
+            override_suffix = " override" if is_override else ""
+
+            # 3. 互斥检查 (C++ 不允许 static virtual)
+            if is_static and (is_virtual or is_override):
+                raise Exception(
+                    f"Error (Line {ctx.start.line}): Function '{func_name}' cannot be both static and virtual/override.")
+
+            decl = f"{line_comment}{INDENT}{virtual_prefix}{static_prefix}{return_type} {func_name}({params_code}){override_suffix};\n"
             self._class_sections[access] += decl
             return ""
         else:
-            # 全局函数签名 (不在类中)
+            # 全局函数... (保持不变)
             is_extern = bool(ctx.EXTERN())
-            is_static = bool(ctx.STATIC())  # <--- [修正] 全局函数签名也需要正确检查
+            is_static = bool(ctx.STATIC())
             static_prefix = "static " if is_static else ""
             extern_prefix = "extern " if is_extern else ""
             return f"{line_comment}{extern_prefix}{static_prefix}{return_type} {self._current_namespace_str}{func_name}({params_code});\n"
@@ -866,9 +831,6 @@ class ChronoVisitor(BaseChronoVisitor):
         return ""
 
     def visitClassDefinition(self, ctx: ChronoParser.ClassDefinitionContext):
-        # (调用  中的 visitClassDefinition 逻辑)
-        # (它会访问 classBodyStatement，后者会填充 _class_sections)
-        # (然后它会组装 C++ 类声明)
         self._current_class_members = {}  # <--- [ [ [ 新增 2/4 (a) ] ] ]
         self._in_class = True
         # --- 这是 .h.ch (HEADER) 模式 ---
@@ -919,9 +881,6 @@ class ChronoVisitor(BaseChronoVisitor):
     def visitClassBodyStatement(self, ctx: ChronoParser.ClassBodyStatementContext):
         # [ [ [ 关键修复 ] ] ]
         # 修复了 static 关键字的检测。
-        # G4 语法在 (classBody) 和 (functionSignature) 中都有 (STATIC)?，这有歧义。
-        # 我们必须检查这两个地方，以确保捕捉到 'static'。
-
         is_static = False
         if ctx.functionSignature():
             # 检查 classBodyStatement 级别的 (STATIC)?
@@ -975,13 +934,10 @@ class ChronoVisitor(BaseChronoVisitor):
         self._enter_scope()
 
         # [ [ [ 修复 B-2: 加载 'this' 和所有成员到作用域 ] ] ]
-        # ( ... 您现有的加载 'this' 和成员的代码 ... )
-        accessor = "None"
-
+        # [清理] 移除 accessor 相关逻辑
         cpp_type = f"{self._current_class_name}*"
         self._add_variable("this", {
             "cpp_name": "this",
-            "accessor": accessor,
             "cpp_type": cpp_type
         })
         for member_name, metadata in self._current_class_members.items():
@@ -1026,17 +982,6 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return init_code if self._in_implementation_block else ""
 
-    def _process_array_chain_step(self, child_nodes, i, current_code, current_accessor):
-        i += 1
-        if i >= len(child_nodes): return current_code, i, "."
-        index_expr = self.visit(child_nodes[i])
-        i += 1
-        if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.RBRACK:
-            i += 1
-        new_code = f"{current_code}[{index_expr}]"
-        new_accessor = current_accessor
-        return new_code, i, new_accessor
-
     def visitDeinitBlock(self, ctx: ChronoParser.DeinitBlockContext):
 
         line_comment = f"\n// Line {ctx.start.line} (deinit)\n"
@@ -1045,16 +990,11 @@ class ChronoVisitor(BaseChronoVisitor):
         self._enter_scope()
 
         # [ [ [ 修复 B-2: 加载 'this' 和所有成员到作用域 ] ] ]
-
-        # 1. 确定 'this' 的访问器 (-> 或 .)
-        accessor = "None"
-
-
+        # [清理] 移除 accessor 相关逻辑
         cpp_type = f"{self._current_class_name}*"
 
         self._add_variable("this", {
             "cpp_name": "this",
-            "accessor": accessor,  # 关键: '.' (struct) or '→' (class)
             "cpp_type": cpp_type
         })
 
@@ -1284,29 +1224,6 @@ class ChronoVisitor(BaseChronoVisitor):
 
     # [ [ [ 替换结束 ] ] ]
 
-    def visitParameter(self, ctx: ChronoParser.ParameterContext):
-        var_name = ctx.name.text
-        key = var_name
-        cpp_name = var_name
-
-        base_type_cpp = self.visit(ctx.typeName)
-
-        accessor = "None"
-
-
-        # 注册变量
-        self._add_variable(key, {
-            "cpp_name": cpp_name,
-            "accessor": accessor,
-            "cpp_type": base_type_cpp
-        })
-
-        # [关键修改] 处理带 {NAME} 的类型 (数组/函数指针)
-        if "{NAME}" in base_type_cpp:
-            return base_type_cpp.replace("{NAME}", cpp_name)
-        else:
-            return f"{base_type_cpp} {cpp_name}"
-
     def visitStatement(self, ctx: ChronoParser.StatementContext):
         if ctx.variableDeclaration():
             return self.visit(ctx.variableDeclaration())
@@ -1418,7 +1335,6 @@ class ChronoVisitor(BaseChronoVisitor):
                 i += 1
 
         return current_code
-
 
     def visitForStatement(self, ctx: ChronoParser.ForStatementContext):
         self._enter_scope()
@@ -1677,7 +1593,9 @@ class ChronoVisitor(BaseChronoVisitor):
         # 不再查找 ...Definition，而是查找 ...Signature
         elif ctx.functionSignature():
             ctx.functionSignature()._chrono_access = access
-            ctx.functionSignature()._chrono_static = False  # Structs 不支持 static 方法
+            # [修复] 允许 struct 拥有静态方法
+            is_static = bool(ctx.functionSignature().STATIC())
+            ctx.functionSignature()._chrono_static = is_static
             return self.visit(ctx.functionSignature())
 
         elif ctx.initSignature():

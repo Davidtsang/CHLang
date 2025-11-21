@@ -1,0 +1,3 @@
+--- Virtual Test ---
+Animal makes a sound (Static)
+Dog runs (Override)

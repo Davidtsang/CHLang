@@ -26,6 +26,8 @@ FOR     : 'for' ;   // <-- [新增]
 PUBLIC  : 'public' ; // class attr access flag
 INTERFACE: 'interface' ; // <-- [新增]
 IMPL    : 'with' ;      // <-- [新增]
+VIRTUAL : 'virtual';   // <--- 新增
+OVERRIDE: 'override';  // <--- 新增
 AS      : 'as' ;     // [新增] 用于 import 别名
 USING   : 'using' ;
 

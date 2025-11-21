@@ -186,9 +186,9 @@ enumItem
 
 // [ [ [ 1. 新增：全局/类 函数声明 (用于 .h.ch) ] ] ]
 functionSignature
-    : (EXTERN)? (STATIC)?
-    FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)?
-    SEMIC_TOKEN // <-- 关键区别：分号，而不是 LBRACE ... RBRACE
+    : (EXTERN)? (STATIC)? (VIRTUAL)? (OVERRIDE)?
+      FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)?
+      SEMIC_TOKEN
     ;
 
 methodDefinition
