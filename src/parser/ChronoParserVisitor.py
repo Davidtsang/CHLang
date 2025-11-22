@@ -304,6 +304,11 @@ class ChronoParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ChronoParser#castExpression.
+    def visitCastExpression(self, ctx:ChronoParser.CastExpressionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ChronoParser#simpleExpression.
     def visitSimpleExpression(self, ctx:ChronoParser.SimpleExpressionContext):
         return self.visitChildren(ctx)

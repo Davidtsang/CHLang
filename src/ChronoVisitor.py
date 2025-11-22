@@ -833,6 +833,32 @@ class ChronoVisitor(BaseChronoVisitor):
         self._class_sections[access] += decl
         return ""
 
+    def visitCastExpression(self, ctx: ChronoParser.CastExpressionContext):
+        # 1. 获取左侧表达式 (simpleExpression)
+        code = self.visit(ctx.simpleExpression())
+
+        # 2. 如果没有 AS 关键字，直接返回左侧代码 (透传)
+        if not ctx.AS():
+            return code
+
+        # 3. 处理 AS 转换
+        # 遍历所有的 typeSpecifier (处理 obj as A as B 的情况)
+        for type_ctx in ctx.typeSpecifier():
+            target_type = self.visit(type_ctx)
+
+            # [智能修正]
+            # 如果用户写 "as Button"，生成 "dynamic_cast<Button*>"
+            # 如果用户写 "as Button*"，生成 "dynamic_cast<Button*>"
+            # 我们默认 Chrono 的类转换都是指针转换
+            if not target_type.endswith('*'):
+                target_type += "*"
+
+            # 生成 C++ dynamic_cast
+            code = f"dynamic_cast<{target_type}>({code})"
+
+        return code
+
+
     def visitClassDefinition(self, ctx: ChronoParser.ClassDefinitionContext):
         self._current_class_members = {}
         self._in_class = True
@@ -872,7 +898,8 @@ class ChronoVisitor(BaseChronoVisitor):
         self._in_class = False
         self._current_class_name = None
         return f"\nclass {class_name}{inheritance_str} {{\n{final_body.strip()}\n}};\n"
-    
+
+
 
     def visitClassBodyStatement(self, ctx: ChronoParser.ClassBodyStatementContext):
         # [ [ [ 关键修复 ] ] ]
@@ -1445,8 +1472,8 @@ class ChronoVisitor(BaseChronoVisitor):
         return current_code
 
     def visitUnaryExpression(self, ctx: ChronoParser.UnaryExpressionContext):
-        if ctx.simpleExpression():
-            return self.visit(ctx.simpleExpression())
+        if ctx.castExpression():
+            return self.visit(ctx.castExpression())
         op = ""
         if ctx.BIT_AND():
             op = "&"

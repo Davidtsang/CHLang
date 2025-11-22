@@ -379,7 +379,12 @@ unaryExpression
     : (PLUS | MINUS | NOT_OP | BIT_NOT) unaryExpression  // 处理 +, -, !, ~
     | BIT_AND unaryExpression // [新增] BIT_AND (& 取地址操作符)
     | STAR unaryExpression // [关键] STAR (* 解引用操作符)
-    | simpleExpression   // 处理普通表达式
+    | castExpression   // 处理普通表达式
+    ;
+
+// 支持链式: obj as A as B (虽然很少用)
+castExpression
+    : simpleExpression (AS typeSpecifier)*
     ;
 
 // --- [ 3. 升级: 'simpleExpression' 规则 ] ---

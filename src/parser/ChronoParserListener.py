@@ -539,6 +539,15 @@ class ChronoParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ChronoParser#castExpression.
+    def enterCastExpression(self, ctx:ChronoParser.CastExpressionContext):
+        pass
+
+    # Exit a parse tree produced by ChronoParser#castExpression.
+    def exitCastExpression(self, ctx:ChronoParser.CastExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by ChronoParser#simpleExpression.
     def enterSimpleExpression(self, ctx:ChronoParser.SimpleExpressionContext):
         pass

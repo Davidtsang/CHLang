@@ -1,0 +1,4 @@
+--- As Cast Test ---
+PASS: d as DerivedA success
+Func A
+PASS: d as DerivedB returned null (Safe)
