@@ -40,6 +40,9 @@ class ChronoVisitor(BaseChronoVisitor):
 
         self._current_base_name = None  # [新增]
 
+        # [新增] 记录继承关系: {"Dog": "Animal", "Cat": "Animal"}
+        self._inheritance_map = {}
+
     def _collect_suffixes(self, ctx):
         """
         [辅助函数] 收集并按源代码顺序排序类型后缀 (* 和 &)。
@@ -198,139 +201,79 @@ class ChronoVisitor(BaseChronoVisitor):
         return body_code
 
     def visitMethodDefinition(self, ctx: ChronoParser.MethodDefinitionContext):
-
-        line_comment = f"\n// Line {ctx.start.line} (method {ctx.name.text})\n"
         self._in_class_method = True
         self._enter_scope()
+        self._add_variable("this", {"cpp_name": "this", "cpp_type": f"{self._current_class_name}*"})
 
-        # [ [ [ 修复 B-2: 加载 'this' 和所有成员到作用域 ] ] ]
-        # [清理] 移除 accessor 相关逻辑
-        cpp_type = f"{self._current_class_name}*"
+        # [新增] 获取返回类型
+        return_type = "void"
+        if ctx.returnType:
+            return_type = self.visit(ctx.returnType)  # e.g., "int32_t", "std::string"
 
-        self._add_variable("this", {
-            "cpp_name": "this",
-            "cpp_type": cpp_type
-        })
-
-        # 2. 将所有类/struct成员 (例如 's') 加载到当前作用域
-        for member_name, metadata in self._current_class_members.items():
-            self._add_variable(member_name, metadata)
-        # [ [ [ 修复结束 ] ] ]
-
-        func_name = ctx.name.text
-
-        # ============================================================
-        # [新增核心逻辑] 收集方法信息用于动态反射
-        # ============================================================
+        # [关键] 收集方法信息
         if self._in_implementation_block:
-            param_types = []
-            # 手动遍历参数列表，提取参数的 C++ 类型 (例如 "std::string", "int")
+            func_name = ctx.name.text
+            params = []
             if ctx.parameters():
                 for p in ctx.parameters().parameter():
-                    # visit(p.typeName) 会触发类型映射，得到最终的 C++ 类型字符串
                     p_type = self.visit(p.typeName)
-                    param_types.append(p_type)
+                    params.append(p_type)
 
-            # 将 (方法名, 参数类型列表) 元组存入列表
-            # 这个列表将在 visitImplementationBlock 结束时被读取，用于生成 findMethodImpl
-            self._current_impl_methods.append((func_name, param_types))
-        # ============================================================
+            # [修改] 存入三元组: (函数名, 参数列表, 返回类型)
+            self._current_impl_methods.append((func_name, params, return_type))
 
+        func_name = ctx.name.text
         params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
         body_code = "".join(self.visit(s) for s in self._safe_iterate_statements(ctx.statement()))
-        return_type = self.visit(ctx.returnType) if ctx.returnType else "void"
 
-        # [ [ [ 检查 'implement' 块 ] ] ]
-        if self._in_implementation_block:
-
-            # [ [ [ 修复 A-3: 移除 'implement' 块中的命名空间前缀 ] ] ]
-            cpp_func_name = f"{self._current_class_name}::{func_name}"
-            static_prefix = ""  # C++ .cpp 实现不重复 'static'
-
-            func_def_code = (
-                f"{line_comment}"
-                f"\n{return_type} {cpp_func_name}({params_code}) {{\n"
-                f"{body_code}"
-                f"{INDENT}// --- Method End ---\n"
-                f"{INDENT}}}\n"
-            )
-        else:
-            # (内联模式)
-            cpp_func_name = func_name
-            is_static = getattr(ctx, '_chrono_static', False)
-            access = getattr(ctx, '_chrono_access', 'private')
-            if self._in_struct:
-                access = getattr(ctx, '_chrono_access', 'public')
-
-            static_prefix = "static " if is_static else ""
-            virtual_prefix = ""
-
-            func_def_code = (
-                f"{line_comment}"
-                f"\n{INDENT}{virtual_prefix}{static_prefix}{return_type} {cpp_func_name}({params_code}) {{\n"
-                f"{body_code}"
-                f"{INDENT}\n"
-                f"{INDENT}}}\n"
-            )
-            self._class_sections[access] += func_def_code
+        # 注意：这里的 return_type 变量上面已经计算过了
 
         self._exit_scope()
         self._in_class_method = False
 
-        return func_def_code if self._in_implementation_block else ""
-
+        if self._in_implementation_block:
+            return f"\n{return_type} {self._current_class_name}::{func_name}({params_code}) {{\n{body_code}{INDENT}}}\n"
+        else:
+            # 内联
+            access = getattr(ctx, '_chrono_access', 'public')
+            self._class_sections[
+                access] += f"\n{INDENT}{return_type} {func_name}({params_code}) {{\n{body_code}{INDENT}}}\n"
+            return ""
 
     def _generate_dynamic_glue_code(self):
-        """
-        [核心] 为 @dynamic 类生成 findMethodImpl 反射表
-        """
         class_name = self._current_class_name
-
-        # 函数头
         code = f"\n// --- Chrono Runtime Glue Code for {class_name} ---\n"
         code += f"ChronoObject::MethodTrampoline {class_name}::findMethodImpl(SelectorID sel) {{\n"
 
-        # 遍历所有收集到的方法
-        for func_name, param_types in self._current_impl_methods:
-            # 生成选择子检查
-            # 注意：目前只支持通过名字查找，暂不支持参数重载的区分（简化版）
+        for func_name, param_types, ret_type in self._current_impl_methods:
             code += f"{INDENT}if (sel == _SEL(\"{func_name}\")) {{\n"
-
-            # 生成 Lambda 蹦床
             code += f"{INDENT}{INDENT}return [this](void* inst, std::vector<std::any>& args) -> std::any {{\n"
-
-            # 1. 恢复 this 指针 (虽然 capture 了 this，但为了通用性接口通常传 void*)
             code += f"{INDENT}{INDENT}{INDENT}{class_name}* self = static_cast<{class_name}*>(inst);\n"
 
-            # 2. 检查参数数量
-            code += f"{INDENT}{INDENT}{INDENT}if (args.size() < {len(param_types)}) return {{}};\n"
+            # 检查参数数量 (可选，这里暂时注释掉以防变参数)
+            # code += f"{INDENT}{INDENT}{INDENT}if (args.size() < {len(param_types)}) return {{}};\n"
 
-            # 3. 解包参数 & 构建调用参数列表
             call_args = []
             for i, p_type in enumerate(param_types):
-                # 生成 std::any_cast<Type>(args[i])
-                # 这里的 p_type 已经是 C++ 类型 (e.g. "std::string", "int32_t")
                 call_args.append(f"std::any_cast<{p_type}>(args[{i}])")
 
             call_args_str = ", ".join(call_args)
+            call_expr = f"self->{func_name}({call_args_str})"
 
-            # 4. 调用真函数
-            code += f"{INDENT}{INDENT}{INDENT}self->{func_name}({call_args_str});\n"
-            code += f"{INDENT}{INDENT}{INDENT}return {{}};\n"  # 暂定返回 void
+            if ret_type == "void":
+                code += f"{INDENT}{INDENT}{INDENT}{call_expr};\n"
+                code += f"{INDENT}{INDENT}{INDENT}return {{}};\n"
+            else:
+                code += f"{INDENT}{INDENT}{INDENT}return {call_expr};\n"
 
-            code += f"{INDENT}{INDENT}}};\n"  # End Lambda
-            code += f"{INDENT}}}\n"  # End If
+            code += f"{INDENT}{INDENT}}};\n"
+            code += f"{INDENT}}}\n"
 
-        # 默认递归查父类 (假设父类是 ChronoObject 或 Widget)
-        # 简化起见，直接调用 Widget::findMethodImpl 或 ChronoObject::findMethodImpl
-        # 这里我们假设所有动态类最终继承自 ChronoObject
-        # [修复] 递归查父类 (使用记录的基类名，而不是写死 ChronoObject)
-        base = self._current_base_name if self._current_base_name else "ChronoObject"
-        code += f"{INDENT}return {base}::findMethodImpl(sel);\n"
+        # [修复 2/2] 使用记录的基类，而不是硬编码 ChronoObject
+        parent_class = self._inheritance_map.get(class_name, "ChronoObject")
+        code += f"{INDENT}return {parent_class}::findMethodImpl(sel);\n"
         code += "}\n"
-
         return code
-
 
     def visitFunctionDefinition(self, ctx: ChronoParser.FunctionDefinitionContext):
 
@@ -891,68 +834,45 @@ class ChronoVisitor(BaseChronoVisitor):
         return ""
 
     def visitClassDefinition(self, ctx: ChronoParser.ClassDefinitionContext):
-        # 1. 初始化状态
         self._current_class_members = {}
         self._in_class = True
         self._in_struct = False
         class_name = ctx.name.text
 
-        # [新增] 记录基类名称
-        if ctx.base:
-            self._current_base_name = ctx.base.text
-        else:
-            self._current_base_name = "ChronoObject"  # 默认基类
-
-        # 2. 处理继承
-        inheritance_list = []
+        # [修复 1/2] 记录继承关系
+        base_name = "ChronoObject"
         if ctx.base:
             base_name = ctx.base.text
-            inheritance_list.append(f"public {base_name}")
+        self._inheritance_map[class_name] = base_name
+
+        inheritance_list = []
+        if ctx.base: inheritance_list.append(f"public {ctx.base.text}")
         if ctx.interfaces:
-            interface_names_str = self.visit(ctx.interfaces)
-            for name in interface_names_str.split(','):
+            for name in self.visit(ctx.interfaces).split(','):
                 inheritance_list.append(f"public {name.strip()}")
+        inheritance_str = (" : " + ", ".join(inheritance_list)) if inheritance_list else ""
 
-        inheritance_str = ""
-        if inheritance_list:
-            inheritance_str = " : " + ", ".join(inheritance_list)
-
-        # 3. 设置上下文
         self._current_class_name = class_name
         self._class_sections = {"private": "", "public": ""}
 
-        # 4. [关键] 检查 @dynamic 注解
         is_dynamic = bool(ctx.AT_DYNAMIC())
 
-        # 5. 访问类体
         if hasattr(ctx, 'classBodyStatement'):
             for child in ctx.classBodyStatement():
                 self.visit(child)
 
-        # 6. [关键修复] 如果是动态类，必须在头文件声明虚函数！
         if is_dynamic:
-            # 注意：返回值类型是 ChronoObject::MethodTrampoline
-            decl = f"{INDENT}virtual ChronoObject::MethodTrampoline findMethodImpl(SelectorID sel) override;\n"
-            self._class_sections["public"] += decl
+            self._class_sections[
+                "public"] += f"{INDENT}virtual MethodTrampoline findMethodImpl(SelectorID sel) override;\n"
 
-        # 7. 组装 C++ 代码
-        final_class_body = ""
-        if self._class_sections["public"]:
-            final_class_body += f"\npublic:\n{self._class_sections['public']}"
+        final_body = ""
+        if self._class_sections["public"]: final_body += f"\npublic:\n{self._class_sections['public']}"
+        if self._class_sections["private"]: final_body += f"\nprivate:\n{self._class_sections['private']}"
 
-        if self._class_sections["private"]:
-            final_class_body += f"\nprivate:\n{self._class_sections['private']}"
-
-        # 8. 清理状态
         self._in_class = False
         self._current_class_name = None
-        self._current_class_members = {}
-
-        return (
-            f"\nclass {class_name}{inheritance_str} {{\n"
-            f"{final_class_body.strip()}\n"
-            "};\n"
-        )
+        return f"\nclass {class_name}{inheritance_str} {{\n{final_body.strip()}\n}};\n"
+    
 
     def visitClassBodyStatement(self, ctx: ChronoParser.ClassBodyStatementContext):
         # [ [ [ 关键修复 ] ] ]
