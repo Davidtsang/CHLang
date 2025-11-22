@@ -66,46 +66,25 @@ implement Button {
     func create(parent: HWND, id: int) {
         this->m_id = id;
 
-        @cpp extern HINSTANCE g_hInstance; @end
-        @cpp extern LRESULT CALLBACK GlobalWindowProc(HWND, UINT, WPARAM, LPARAM); @end
-
-        var wc: WNDCLASSEX = {};
-        wc.cbSize = sizeof(WNDCLASSEX);
-        wc.style = 0;
-        wc.lpfnWndProc = GlobalWindowProc;
-        wc.hInstance = g_hInstance;
-        wc.hCursor = LoadCursor(NULL, IDC_HAND);
-        wc.lpszClassName = L"ChronoCustomButton";
-        wc.hbrBackground = NULL;
-
-        RegisterClassEx(&wc);
-
-        var f = this->m_frame;
-
-        // [关键修复] 移除 WS_CLIPCHILDREN
-        // 允许 Button 在 Label 下方绘制背景和边框
-        var style = WS_CHILD | WS_VISIBLE;
-
-        this->m_hWnd = CreateWindowExW(
-            0, L"ChronoCustomButton", NULL,
-            style,
-            static_cast<int>(f.getMinX()),
-            static_cast<int>(f.getMinY()),
-            static_cast<int>(f.getWidth()),
-            static_cast<int>(f.getHeight()),
+        // 调用基类辅助函数
+        // 1. 类名: L"ChronoCustomButton"
+        // 2. 光标: IDC_HAND (手型)
+        // 3. 样式: WS_CHILD | WS_VISIBLE (无剪裁)
+        this->createStandardWindow(
             parent,
-            reinterpret_cast<HMENU>(static_cast<int64_t>(id)),
-            g_hInstance,
-            this
+            L"ChronoCustomButton",
+            IDC_HAND,
+            WS_CHILD | WS_VISIBLE
         );
 
+        // 只有 Button 特有的子控件逻辑留在这里
         if (this->m_internalLabel) {
+            var f = this->m_frame;
             var contentRect = CGRect(0.0, 0.0, f.getWidth(), f.getHeight());
             this->m_internalLabel->setFrame(contentRect);
             this->m_internalLabel->create(this->m_hWnd, 0);
         }
     }
-
     // --- 事件处理 (Qt 风格) ---
 
     func onResize(w: int, h: int) {
@@ -150,14 +129,21 @@ implement Button {
             var gdiBorder = Color(bc.a, bc.r, bc.g, bc.b);
             var pen = Pen(gdiBorder, this->m_borderWidth);
 
+            // 确保像素锐利
             g->SetSmoothingMode(SmoothingModeNone);
 
-            // [关键修复] 边框内缩算法
-            var inset = this->m_borderWidth / 1.0;
-            var drawW = static_cast<f32>(w) - this->m_borderWidth;
-            var drawH = static_cast<f32>(h) - this->m_borderWidth;
-
-            g->DrawRectangle(&pen, inset, inset, drawW, drawH);
+            if (this->m_borderWidth == 1.0) {
+                // [关键修复] 针对 1px 边框的特殊处理
+                // 使用默认对齐 (Center)，但手动将宽高减 1
+                // 这样 1px 线条正好落在 0 和 w-1 的像素格子上
+                g->DrawRectangle(&pen, 0, 0, w - 1, h - 1);
+            } else {
+                // [关键修复] 针对 >1px 的边框
+                // 使用内缩对齐 (Inset)，画在 0 到 w 之间
+                // Inset 会自动处理线条向内生长
+                pen.SetAlignment(PenAlignmentInset);
+                g->DrawRectangle(&pen, 0, 0, w, h);
+            }
         }
     }
 

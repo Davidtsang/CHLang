@@ -11,7 +11,7 @@ func onShutdownCallback() {
     @cpp std::cout << "Shutdown confirmed via Callback!" << std::endl; @end
 }
 
-func CHMain() -> int {
+func CGMain() -> int {
     var app = @make<Application>();
     var window = @make<MyWindow>(app.get(), 600, 400);
 
@@ -24,7 +24,7 @@ func CHMain() -> int {
     // 使用 CGRect 和 CGColor
     label->setFrame(CGRect(50.0, 20.0, 500.0, 30.0));
     label->setTextColor(CGColor::red());
-    label->setFont("Tahoma", 16.0);
+    label->setFont("Tahoma", 9.0);
 
     // --- 2. Modular Button ---
     var btn = @make<Button>("Confirm Shutdown");
@@ -38,7 +38,7 @@ func CHMain() -> int {
         CGColor::black(),      // 边框
         1.0                    // 边框宽
     );
-    btn->setFont("Segoe UI", 12.0);
+    btn->setFont("Segoe UI", 9.0);
 
     // [修正] 传入函数名，而不是匿名函数
     btn->setOnClick(onShutdownCallback);

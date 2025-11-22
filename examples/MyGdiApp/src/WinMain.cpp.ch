@@ -30,8 +30,8 @@ var g_hInstance: HINSTANCE = NULL;
 var g_nCmdShow: int = 0;
 var g_gdiplusToken: ULONG_PTR;
 
-// 声明用户必须提供的 "CHMain"
-func CHMain() -> int;
+// 声明用户必须提供的 "CGMain"
+func CGMain() -> int;
 
 // WinMain 入口点
 func WinMain(
@@ -48,7 +48,7 @@ func WinMain(
     var gdiplusStartupInput: GdiplusStartupInput;
     GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);
 
-    var exit_code: int = CHMain();
+    var exit_code: int = CGMain();
 
     GdiplusShutdown(g_gdiplusToken);
 

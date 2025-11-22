@@ -64,37 +64,18 @@ implement Label {
     }
 
     // --- 核心生命周期 (无 override 关键字) ---
-
     func create(parent: HWND, id: int) {
         this->m_id = id;
 
-        @cpp extern HINSTANCE g_hInstance; @end
-        @cpp extern LRESULT CALLBACK GlobalWindowProc(HWND, UINT, WPARAM, LPARAM); @end
-
-        var wc: WNDCLASSEX = {};
-        wc.cbSize = sizeof(WNDCLASSEX);
-        wc.style = CS_HREDRAW | CS_VREDRAW;
-        wc.lpfnWndProc = GlobalWindowProc;
-        wc.hInstance = g_hInstance;
-        wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-        wc.lpszClassName = L"ChronoLabel";
-        wc.hbrBackground = NULL;
-
-        RegisterClassEx(&wc);
-
-        var f = this->m_frame;
-
-        this->m_hWnd = CreateWindowExW(
-            0, L"ChronoLabel", NULL,
-            WS_CHILD | WS_VISIBLE,
-            static_cast<int>(f.getMinX()),
-            static_cast<int>(f.getMinY()),
-            static_cast<int>(f.getWidth()),
-            static_cast<int>(f.getHeight()),
+        // 调用基类辅助函数
+        // 1. 类名: L"ChronoLabel"
+        // 2. 光标: IDC_ARROW (箭头)
+        // 3. 样式: WS_CHILD | WS_VISIBLE
+        this->createStandardWindow(
             parent,
-            reinterpret_cast<HMENU>(static_cast<int64_t>(id)),
-            g_hInstance,
-            this
+            L"ChronoLabel",
+            IDC_ARROW,
+            WS_CHILD | WS_VISIBLE
         );
     }
 
@@ -136,9 +117,7 @@ implement Label {
         format.SetAlignment(alignH);
         format.SetLineAlignment(alignV);
 
-        @cpp
-        std::wstring wtext(this->m_text.begin(), this->m_text.end());
-        @end
+        var wtext: std::wstring = std::wstring(this->m_text.begin(), this->m_text.end());
 
         var layoutRect = RectF(0.0, 0.0, f_w, f_h);
         g->DrawString(wtext.c_str(), -1, &font, layoutRect, &format, &textBrush);

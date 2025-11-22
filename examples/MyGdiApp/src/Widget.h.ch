@@ -49,6 +49,6 @@ class Widget {
     // className: 窗口类名 (e.g. L"ChronoButton")
     // cursor: 光标资源 (e.g. IDC_HAND)
     // style: 窗口样式 (e.g. WS_CHILD | WS_VISIBLE)
-    protected func createStandardWindow(parent: HWND, className: LPCWSTR, cursor: LPCWSTR, style: DWORD);
-    
+    public func createStandardWindow(parent: HWND, className: LPCWSTR, cursor: LPCWSTR, style: DWORD);
+
 }
