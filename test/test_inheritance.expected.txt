@@ -1,0 +1,8 @@
+--- Inheritance Test ---
+[Dog]
+Woof! (Dog Override)
+Dog wags tail
+Zzzzz...
+[Cat]
+Animal makes noise
+Zzzzz...

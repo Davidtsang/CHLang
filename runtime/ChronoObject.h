@@ -1,9 +1,21 @@
-﻿//ChronoObject.h
-#pragma once
+﻿#pragma once
 
 #include <string>
 #include <iostream>
-#include <cstdint> // 用于 int32_t 等
+#include <cstdint>
+#include <vector>
+#include <any>        // [修复] 必须包含，用于 std::any
+#include <functional> // [修复] 必须包含，用于 std::function
+
+// [修复] 引入 Selector 定义
+// 如果编译器报错找不到这个文件，请确保编译命令里加了 /I.
+#include "ChronoSelector.h"
+
+// [定义] 动态类型别名
+class ChronoObject;
+using dyn = ChronoObject*;
+using AnyVar = std::any;
+using ArgsList = std::vector<AnyVar>;
 
 // --- [ 1. MRC 基类 ] ---
 // 
@@ -48,6 +60,35 @@ public:
             // 这将触发调用析构函数 (~ChronoObject)
             delete this;
         }
+    }
+
+
+    using MethodTrampoline = std::function<AnyVar(void* instance, ArgsList& args)>;
+
+    // 2. 消息发送入口 (objc_msgSend)
+    // 所有的 obj~>method(...) 最终都会调用这里
+    virtual AnyVar msgSend(SelectorID sel, ArgsList args) {
+        // 查找
+        MethodTrampoline method = this->findMethodImpl(sel);
+
+        if (method) {
+            try {
+                // 调用
+                return method(this, args);
+            } catch (const std::bad_any_cast& e) {
+                std::cerr << "[ChronoRuntime] Type mismatch: " << e.what() << std::endl;
+            }
+        } else {
+            // 没找到
+            // 这里可以打印出 sel 的整数 ID，虽然不可读，但在调试器里能看
+            std::cerr << "[ChronoRuntime] Selector ID " << sel << " not recognized." << std::endl;
+        }
+        return {};
+    }
+
+    // 3. 查找表 (由 @dynamic 自动生成的代码覆盖)
+    virtual MethodTrampoline findMethodImpl(SelectorID sel) {
+        return nullptr; // 基类没有任何动态方法
     }
 
     // --- 辅助方法 ---

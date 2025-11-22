@@ -40,6 +40,9 @@ DEFAULT : 'default' ;
 
 TYPE : 'type';
 
+DYN         : 'dyn' ;       // [新增] 动态类型关键字
+AT_DYNAMIC  : '@dynamic';   // [新增] 类注解
+
 UNIQUE_KW : 'unique' ;     // [新增]
 SHARED_KW : 'shared' ;     // [新增]
 WEAK_KW   : 'weak' ;       // [新增]
@@ -52,6 +55,8 @@ AT_UNSAFE_MOVE : '@unsafe_move' ;
 STATIC_CAST      : 'static_cast' ;
 REINTERPRET_CAST : 'reinterpret_cast' ;
 CONST_CAST       : 'const_cast' ;
+
+TILDE_ARROW : '~>' ;        // [新增] 动态调用操作符
 
 // BOOL_LITERAL 必须在 IDENTIFIER 之前
 BOOL_LITERAL    : 'true' | 'false' ;

@@ -36,6 +36,10 @@ class ChronoVisitor(BaseChronoVisitor):
         # [新增] 控制流深度 (0=线性/顶层, >0=条件或循环内)
         self._control_flow_depth = 0
 
+        self._current_impl_methods = []  # [新增]用于存储当前 implement 块中的方法信息
+
+        self._current_base_name = None  # [新增]
+
     def _collect_suffixes(self, ctx):
         """
         [辅助函数] 收集并按源代码顺序排序类型后缀 (* 和 &)。
@@ -164,12 +168,16 @@ class ChronoVisitor(BaseChronoVisitor):
         return f"\n{closing_braces} // namespace {comment_name}\n\n"
 
     def visitImplementationBlock(self, ctx: ChronoParser.ImplementationBlockContext):
-        # 1. 设置状态
         self._in_implementation_block = True
         self._current_class_name = ctx.name.text
         self._in_class = True
 
-        # 2. 访问所有实现体 (methodDefinition, initDefinition...)
+        # [新增] 清空方法列表
+        self._current_impl_methods = []
+
+        # [新增] 检查是否标记为 @dynamic
+        is_dynamic = bool(ctx.AT_DYNAMIC())
+
         body_code = ""
         for child in ctx.children:
             if isinstance(child, (ChronoParser.MethodDefinitionContext,
@@ -177,12 +185,17 @@ class ChronoVisitor(BaseChronoVisitor):
                                   ChronoParser.DeinitBlockContext)):
                 body_code += self.visit(child)
 
-        # 3. 重置状态
+        # [核心逻辑] 如果是动态类，自动生成反射胶水代码
+        if is_dynamic:
+            glue_code = self._generate_dynamic_glue_code()
+            body_code += glue_code
+
         self._in_implementation_block = False
         self._current_class_name = None
         self._in_class = False
+        self._current_impl_methods = []  # 清理
 
-        return body_code  # 返回所有 C++ 实现代码
+        return body_code
 
     def visitMethodDefinition(self, ctx: ChronoParser.MethodDefinitionContext):
 
@@ -202,10 +215,27 @@ class ChronoVisitor(BaseChronoVisitor):
         # 2. 将所有类/struct成员 (例如 's') 加载到当前作用域
         for member_name, metadata in self._current_class_members.items():
             self._add_variable(member_name, metadata)
-
         # [ [ [ 修复结束 ] ] ]
 
         func_name = ctx.name.text
+
+        # ============================================================
+        # [新增核心逻辑] 收集方法信息用于动态反射
+        # ============================================================
+        if self._in_implementation_block:
+            param_types = []
+            # 手动遍历参数列表，提取参数的 C++ 类型 (例如 "std::string", "int")
+            if ctx.parameters():
+                for p in ctx.parameters().parameter():
+                    # visit(p.typeName) 会触发类型映射，得到最终的 C++ 类型字符串
+                    p_type = self.visit(p.typeName)
+                    param_types.append(p_type)
+
+            # 将 (方法名, 参数类型列表) 元组存入列表
+            # 这个列表将在 visitImplementationBlock 结束时被读取，用于生成 findMethodImpl
+            self._current_impl_methods.append((func_name, param_types))
+        # ============================================================
+
         params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
         body_code = "".join(self.visit(s) for s in self._safe_iterate_statements(ctx.statement()))
         return_type = self.visit(ctx.returnType) if ctx.returnType else "void"
@@ -248,6 +278,59 @@ class ChronoVisitor(BaseChronoVisitor):
         self._in_class_method = False
 
         return func_def_code if self._in_implementation_block else ""
+
+
+    def _generate_dynamic_glue_code(self):
+        """
+        [核心] 为 @dynamic 类生成 findMethodImpl 反射表
+        """
+        class_name = self._current_class_name
+
+        # 函数头
+        code = f"\n// --- Chrono Runtime Glue Code for {class_name} ---\n"
+        code += f"ChronoObject::MethodTrampoline {class_name}::findMethodImpl(SelectorID sel) {{\n"
+
+        # 遍历所有收集到的方法
+        for func_name, param_types in self._current_impl_methods:
+            # 生成选择子检查
+            # 注意：目前只支持通过名字查找，暂不支持参数重载的区分（简化版）
+            code += f"{INDENT}if (sel == _SEL(\"{func_name}\")) {{\n"
+
+            # 生成 Lambda 蹦床
+            code += f"{INDENT}{INDENT}return [this](void* inst, std::vector<std::any>& args) -> std::any {{\n"
+
+            # 1. 恢复 this 指针 (虽然 capture 了 this，但为了通用性接口通常传 void*)
+            code += f"{INDENT}{INDENT}{INDENT}{class_name}* self = static_cast<{class_name}*>(inst);\n"
+
+            # 2. 检查参数数量
+            code += f"{INDENT}{INDENT}{INDENT}if (args.size() < {len(param_types)}) return {{}};\n"
+
+            # 3. 解包参数 & 构建调用参数列表
+            call_args = []
+            for i, p_type in enumerate(param_types):
+                # 生成 std::any_cast<Type>(args[i])
+                # 这里的 p_type 已经是 C++ 类型 (e.g. "std::string", "int32_t")
+                call_args.append(f"std::any_cast<{p_type}>(args[{i}])")
+
+            call_args_str = ", ".join(call_args)
+
+            # 4. 调用真函数
+            code += f"{INDENT}{INDENT}{INDENT}self->{func_name}({call_args_str});\n"
+            code += f"{INDENT}{INDENT}{INDENT}return {{}};\n"  # 暂定返回 void
+
+            code += f"{INDENT}{INDENT}}};\n"  # End Lambda
+            code += f"{INDENT}}}\n"  # End If
+
+        # 默认递归查父类 (假设父类是 ChronoObject 或 Widget)
+        # 简化起见，直接调用 Widget::findMethodImpl 或 ChronoObject::findMethodImpl
+        # 这里我们假设所有动态类最终继承自 ChronoObject
+        # [修复] 递归查父类 (使用记录的基类名，而不是写死 ChronoObject)
+        base = self._current_base_name if self._current_base_name else "ChronoObject"
+        code += f"{INDENT}return {base}::findMethodImpl(sel);\n"
+        code += "}\n"
+
+        return code
+
 
     def visitFunctionDefinition(self, ctx: ChronoParser.FunctionDefinitionContext):
 
@@ -323,68 +406,41 @@ class ChronoVisitor(BaseChronoVisitor):
     def visitFunctionCallExpression(self, ctx: ChronoParser.FunctionCallExpressionContext):
         name_token = ctx.funcName
 
-        # 识别 Move 操作
+        # @move 检查
         is_safe_move = (name_token.type == ChronoParser.AT_MOVE)
-
         is_unsafe_move = False
         if hasattr(ChronoParser, 'AT_UNSAFE_MOVE'):
             is_unsafe_move = (name_token.type == ChronoParser.AT_UNSAFE_MOVE)
 
         if is_safe_move or is_unsafe_move:
-            # 1. 获取变量名 (假设 @move(var) 形式)
             var_name = ""
             if ctx.expressionList() and ctx.expressionList().expression():
-                # 获取参数节点文本
                 arg_node = ctx.expressionList().expression()[0]
                 var_name = arg_node.getText()
-
             var_info = self._find_variable(var_name)
-
             if var_info:
-                # --- [检查 A] 生命周期状态 ---
                 if var_info.get('state') == 'Moved':
-                    raise Exception(
-                        f"\n[Chrono Borrow Error] Line {ctx.start.line}: Variable '{var_name}' is ALREADY moved!\n"
-                        f"You cannot move the same value twice."
-                    )
-
-                # --- [检查 B] 安全墙 (仅针对普通 @move) ---
+                    raise Exception(f"\n[Chrono Borrow Error] Variable '{var_name}' ALREADY moved!")
                 var_depth = var_info.get('def_depth', 0)
                 current_depth = self._control_flow_depth
-
                 if is_safe_move and (current_depth > var_depth):
-                    raise Exception(
-                        f"\n[Chrono Safety Error] --------------------------------------\n"
-                        f"Line {ctx.start.line}: Cannot safely @move('{var_name}') inside a loop or conditional block.\n"
-                        f"Reason: '{var_name}' is defined in an outer scope (Depth {var_depth} < Current {current_depth}).\n"
-                        f"Moving it here could cause a crash if the block is executed multiple times or conditionally.\n"
-                        f"\n"
-                        f"Fix Options:\n"
-                        f"  1. Use 'shared<T>' instead of 'unique<T>' for shared ownership.\n"
-                        f"  2. If you are SURE this is safe (e.g. you break/return immediately),\n"
-                        f"     use '@unsafe_move({var_name})' to explicitly bypass this check.\n"
-                        f"--------------------------------------------------------------\n"
-                    )
-
-                # --- [执行] 状态变更 ---
+                    raise Exception(f"\n[Chrono Safety Error] Cannot safely @move('{var_name}') inside loop.")
                 var_info['state'] = 'Moved'
-
-                # 生成 C++ 代码
                 return f"std::move({var_name})"
 
-        # [关键修复] 这一块必须取消缩进，放在 if 块外面！
-        # --- 普通函数调用 ---
-        cpp_func_name = name_token.text
-        # 容错
-        if name_token.type == ChronoParser.AT_MOVE: cpp_func_name = "std::move"
+        # 普通函数调用
+        raw_name = name_token.text
+
+        # [新增] 类型映射，支持构造函数简写 (e.g. string() -> std::string())
+        cpp_func_name = "std::move" if name_token.type == ChronoParser.AT_MOVE else self._chrono_to_cpp_type(raw_name)
 
         args_list = []
         if ctx.expressionList():
             for arg_expr in ctx.expressionList().expression():
                 args_list.append(self.visit(arg_expr))
         args_code = ", ".join(args_list)
-
         return f"{cpp_func_name}({args_code})"
+
 
     def _translate_variable_declaration(self, ctx):
         """
@@ -597,6 +653,10 @@ class ChronoVisitor(BaseChronoVisitor):
             return "float"
         if chrono_type_name == "f64":
             return "double"
+        # [新增] 动态类型映射
+        if chrono_type_name == "dyn":
+            return "dyn"
+
         return chrono_type_name
 
     def _get_access_level(self, ctx, default_level='private'):
@@ -831,47 +891,63 @@ class ChronoVisitor(BaseChronoVisitor):
         return ""
 
     def visitClassDefinition(self, ctx: ChronoParser.ClassDefinitionContext):
-        self._current_class_members = {}  # <--- [ [ [ 新增 2/4 (a) ] ] ]
+        # 1. 初始化状态
+        self._current_class_members = {}
         self._in_class = True
-        # --- 这是 .h.ch (HEADER) 模式 ---
+        self._in_struct = False
         class_name = ctx.name.text
+
+        # [新增] 记录基类名称
+        if ctx.base:
+            self._current_base_name = ctx.base.text
+        else:
+            self._current_base_name = "ChronoObject"  # 默认基类
+
+        # 2. 处理继承
         inheritance_list = []
         if ctx.base:
             base_name = ctx.base.text
             inheritance_list.append(f"public {base_name}")
         if ctx.interfaces:
             interface_names_str = self.visit(ctx.interfaces)
-            interfaces = [f"public {name.strip()}" for name in interface_names_str.split(',')]
-            inheritance_list.extend(interfaces)
+            for name in interface_names_str.split(','):
+                inheritance_list.append(f"public {name.strip()}")
+
         inheritance_str = ""
         if inheritance_list:
             inheritance_str = " : " + ", ".join(inheritance_list)
 
-        self._in_class = True
-        self._in_struct = False
+        # 3. 设置上下文
         self._current_class_name = class_name
-        self._class_sections = {"private": "", "public": ""}  # 重置
+        self._class_sections = {"private": "", "public": ""}
 
-        # 访问所有声明 (variableDeclaration, functionSignature, etc.)
+        # 4. [关键] 检查 @dynamic 注解
+        is_dynamic = bool(ctx.AT_DYNAMIC())
+
+        # 5. 访问类体
         if hasattr(ctx, 'classBodyStatement'):
             for child in ctx.classBodyStatement():
                 self.visit(child)
 
-        self._in_class = False
-        self._current_class_name = None
+        # 6. [关键修复] 如果是动态类，必须在头文件声明虚函数！
+        if is_dynamic:
+            # 注意：返回值类型是 ChronoObject::MethodTrampoline
+            decl = f"{INDENT}virtual ChronoObject::MethodTrampoline findMethodImpl(SelectorID sel) override;\n"
+            self._class_sections["public"] += decl
 
+        # 7. 组装 C++ 代码
         final_class_body = ""
         if self._class_sections["public"]:
-            final_class_body += "\npublic:\n" + self._class_sections["public"]
+            final_class_body += f"\npublic:\n{self._class_sections['public']}"
 
         if self._class_sections["private"]:
-            final_class_body += "\nprivate:\n" + self._class_sections["private"]
+            final_class_body += f"\nprivate:\n{self._class_sections['private']}"
 
+        # 8. 清理状态
         self._in_class = False
         self._current_class_name = None
         self._current_class_members = {}
 
-        # [ [ [ 修复 A-1: 移除类定义中的命名空间前缀 ] ] ]
         return (
             f"\nclass {class_name}{inheritance_str} {{\n"
             f"{final_class_body.strip()}\n"
@@ -1051,10 +1127,9 @@ class ChronoVisitor(BaseChronoVisitor):
 
     def visitSimpleExpression(self, ctx: ChronoParser.SimpleExpressionContext):
         """
-        [重构 - 纯净模式]
-        完全移除魔法推导。用户写什么符号，就生成什么符号。
+        [重构] 支持 . / -> / :: / [] / ~>
         """
-        # 1. 处理链条的头部 (Primary)
+        # 1. Primary
         current_code = ""
         if ctx.primary():
             current_code = self.visit(ctx.primary())
@@ -1063,103 +1138,93 @@ class ChronoVisitor(BaseChronoVisitor):
         else:
             return ""
 
-        # 2. 处理后续的链条 (.foo, ->bar, ::baz, [0])
-        # 我们直接遍历子节点，不再进行类型推导
+        # 2. Suffixes
         child_nodes = ctx.children
-
-        # 跳过第一个节点 (Primary)，因为它已经被处理了
         i = 1
         while i < len(child_nodes):
             node = child_nodes[i]
+            token_type = node.getSymbol().type
 
-            # 获取 Token 类型
-            symbol = node.getSymbol()
-            token_type = symbol.type
-
-            # --- 情况 A: 访问符 (., ->, ::) ---
+            # A. 访问符 (., ->, ::)
             if token_type in [ChronoParser.DOT, ChronoParser.ARROW, ChronoParser.COLON_COLON]:
-                # 1. 映射操作符
-                op_str = ""
-                if token_type == ChronoParser.DOT:
-                    op_str = "."
-                elif token_type == ChronoParser.ARROW:
-                    op_str = "->"
-                elif token_type == ChronoParser.COLON_COLON:
-                    op_str = "::"
-
-                # 2. 获取标识符
-                i += 1  # 移动到标识符
-                if i >= len(child_nodes): break
-
-                ident_node = child_nodes[i]
-                raw_ident = ident_node.getText()
-
-                # 尝试查找是否有 C++ 映射名 (例如 map key)，如果没有则用原名
-                # 注意：我们只查名字映射，绝不查访问器类型
-                var_info = self._find_variable(raw_ident)
-                cpp_ident = var_info["cpp_name"] if var_info else raw_ident
-
-                # 3. 处理泛型 <T> (如果有)
-                template_part = ""
+                op = node.getText()  # ., ->, ::
                 i += 1
+                ident = child_nodes[i].getText()
+
+                # 变量名映射
+                var_info = self._find_variable(ident)
+                if var_info:
+                    ident = var_info["cpp_name"]
+                else:
+                    ident = self._chrono_to_cpp_type(ident)  # 类型映射 (支持 string::npos)
+
+                current_code += f"{op}{ident}"
+                i += 1
+
+                # Template <T>
                 if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LT:
-                    # 这是一个泛型调用 .foo<T>
-                    i += 1  # skip <
+                    i += 1  # <
                     if i < len(child_nodes) and isinstance(child_nodes[i], ChronoParser.TypeListContext):
-                        template_part = f"<{self.visit(child_nodes[i])}>"
-                        i += 1  # skip typeList
-                    if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.GT:
-                        i += 1  # skip >
-
-                # 4. 处理函数调用 (...) (如果有)
-                call_part = ""
-                if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LPAREN:
-                    i += 1  # skip (
-                    args_code = ""
-                    if i < len(child_nodes) and isinstance(child_nodes[i], ChronoParser.ExpressionListContext):
-                        args_code = self.visit(child_nodes[i])
+                        current_code += f"<{self.visit(child_nodes[i])}>"
                         i += 1
-                    if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.RPAREN:
-                        i += 1  # skip )
-                    call_part = f"({args_code})"
+                    i += 1  # >
 
-                # 5. 拼接
-                current_code = f"{current_code}{op_str}{cpp_ident}{template_part}{call_part}"
+                # Call (...)
+                if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LPAREN:
+                    i += 1  # (
+                    args = ""
+                    if i < len(child_nodes) and isinstance(child_nodes[i], ChronoParser.ExpressionListContext):
+                        args = self.visit(child_nodes[i])
+                        i += 1
+                    i += 1  # )
+                    current_code += f"({args})"
 
-            # --- 情况 B: 数组索引 [expr] ---
+            # B. 数组索引 [ ]
             elif token_type == ChronoParser.LBRACK:
-                i += 1  # skip [
-                index_expr = self.visit(child_nodes[i])
-                i += 1  # skip expr
-                if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.RBRACK:
-                    i += 1  # skip ]
+                i += 1
+                idx = self.visit(child_nodes[i])
+                i += 2
+                current_code += f"[{idx}]"
 
-                current_code = f"{current_code}[{index_expr}]"
+            # C. [新增] 动态调用 ~>
+            elif token_type == ChronoParser.TILDE_ARROW:
+                i += 1  # skip ~>
+
+                method_name = child_nodes[i].getText()
+                i += 1
+
+                args_code = ""
+                if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LPAREN:
+                    i += 1  # (
+                    if i < len(child_nodes) and isinstance(child_nodes[i], ChronoParser.ExpressionListContext):
+                        # 特殊处理：参数装箱
+                        boxed_args = []
+                        for expr in child_nodes[i].expression():
+                            val = self.visit(expr)
+                            # 字符串字面量处理: "abc" -> std::string("abc")
+                            # 否则 std::any 会存 const char*，导致解包 std::string 失败
+                            if val.startswith('"') and val.endswith('"'):
+                                val = f"std::string({val})"
+                            boxed_args.append(val)
+                        args_code = ", ".join(boxed_args)
+                        i += 1
+                    i += 1  # )
+
+                # 生成 msgSend 代码
+                current_code = f"{current_code}->msgSend(_SEL(\"{method_name}\"), {{ {args_code} }})"
 
             else:
-                # 安全防御：未知的 token，跳过
                 i += 1
 
         return current_code
 
     def visitPrimary(self, ctx: ChronoParser.PrimaryContext):
-        """
-        [重构]
-        [新增] 支持 static_cast[T](val), reinterpret_cast[T](val), const_cast[T](val)
-        [修复] 确保 'typemap' 代换的常量 (e.g., C_COLOR_WINDOW) 在表达式中被正确识别
-        """
-
         if ctx.NEW():
-            class_name = self.visit(ctx.baseType())
+            type_name = self.visit(ctx.baseType())
             args = self.visit(ctx.expressionList()) if ctx.expressionList() else ""
-            return f"new {class_name}({args})"
+            return f"new {type_name}({args})"
 
-        # [ [ [ 关键：处理 Casts 和 @make ] ] ]
-        #
-        # 解析器 (g4) 匹配了 Chrono 语法 (使用方括号 LBRACK):
-        # e.g., static_cast[C_HBRUSH](value)
-        # e.g., @make[Resource](args)
-
+        # @make 等处理
         if ctx.LT():
             cpp_func_name = ""
             if ctx.AT_MAKE_UNIQUE():
@@ -1174,56 +1239,31 @@ class ChronoVisitor(BaseChronoVisitor):
                 cpp_func_name = "const_cast"
 
             target_type = self.visit(ctx.typeSpecifier())
-
             args = self.visit(ctx.expressionList()) if ctx.expressionList() else ""
-
             return f"{cpp_func_name}<{target_type}>({args})"
 
-        # [ [ [ 转换逻辑结束 ] ] ]
-
-        if ctx.literal():
-            return self.visit(ctx.literal())
-
-        if ctx.initializerList():
-            return self.visit(ctx.initializerList())
+        if ctx.literal(): return self.visit(ctx.literal())
+        if ctx.initializerList(): return self.visit(ctx.initializerList())
 
         if ctx.IDENTIFIER():
-            primary_text = ctx.IDENTIFIER().getText()
+            text = ctx.IDENTIFIER().getText()
+            var = self._find_variable(text)
+            if var:
+                if var.get('state') == 'Moved':
+                    raise Exception(f"Use of moved variable '{text}'.")
+                if '[' in var["cpp_type"]: return text
+                return var["cpp_name"]
 
-            # 1. 优先查找变量 (局部变量、成员变量)
-            variable_info = self._find_variable(primary_text)
-            if variable_info:
-                # [新增] 检查是否访问了“尸体”
-                if variable_info.get('state') == 'Moved':
-                    raise Exception(
-                        f"\n[Chrono Safety Error] Line {ctx.start.line}: Use of moved variable '{primary_text}'.\n"
-                        f"Hint: Ownership was transferred via @move/@unsafe_move. This variable is now invalid (null).\n"
+            if text in self._alias_to_namespace_map:
+                return self._alias_to_namespace_map[text]
 
-                    )
+            # [新增] 类型映射 (e.g. string::npos -> std::string::npos)
+            mapped = self._chrono_to_cpp_type(text)
+            return mapped
 
-                if '[' in variable_info["cpp_type"]:
-                    return primary_text
-                else:
-                    return variable_info["cpp_name"]
-
-            # 2. [关键修复] 查找 Import 别名 (Namespace Alias)
-            # 如果 primary_text 是 "Math"，且在 map 中映射为 "MyMath"
-            if primary_text in self._alias_to_namespace_map:
-                return self._alias_to_namespace_map[primary_text]
-
-            # 4. 最后的兜底 (原样输出)
-            return primary_text
-
-        if ctx.THIS():
-            return "this"
-
-        if ctx.LPAREN():
-            return f"({self.visit(ctx.expression())})"
-
+        if ctx.THIS(): return "this"
+        if ctx.LPAREN(): return f"({self.visit(ctx.expression())})"
         return ""
-
-    # [ [ [ 替换结束 ] ] ]
-
     def visitStatement(self, ctx: ChronoParser.StatementContext):
         if ctx.variableDeclaration():
             return self.visit(ctx.variableDeclaration())

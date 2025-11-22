@@ -36,7 +36,7 @@ baseType
     : UNIQUE_KW
     | SHARED_KW
     | WEAK_KW
-    // [修改] 允许 IDENTIFIER 后跟 . 或 ::
+    | DYN          // [新增] 允许 var x: dyn;
     // (为了兼容性保留 DOT，但推荐使用 COLON_COLON)
     | IDENTIFIER ( (DOT | COLON_COLON) IDENTIFIER )*
     ;
@@ -125,7 +125,8 @@ classBodyStatement
     ;
 
 classDefinition
-    : CLASS name=IDENTIFIER
+    : (AT_DYNAMIC)? // [新增] 允许 @dynamic class Name ...
+     CLASS name=IDENTIFIER
       (COLON base=IDENTIFIER)?      // [不变] 基类：可选，且只有一个
       (IMPL interfaces=typeList)? // [新增] 接口：可选，可以是一个列表
       LBRACE
@@ -135,7 +136,8 @@ classDefinition
 
 // [ [ [ 1. 新增：实现块 (用于 .ch 文件) ] ] ]
 implementationBlock
-    : IMPLEMENT name=IDENTIFIER LBRACE
+    : (AT_DYNAMIC)?
+    IMPLEMENT name=IDENTIFIER LBRACE
         ( methodDefinition  // 方法实现
         | initDefinition    // 构造函数实现
         | deinitBlock       // 析构函数实现
@@ -385,10 +387,15 @@ unaryExpression
 simpleExpression
     : ( primary | functionCallExpression )
       (
-        // [修改] 显式匹配三种访问符
+        // 路径 A: .foo / ->bar / ::baz
         (DOT | ARROW | COLON_COLON) IDENTIFIER (LT typeList GT)? (LPAREN expressionList? RPAREN)?
 
+        // 路径 B: 数组索引 [i]
       | LBRACK expression RBRACK
+
+        // 路径 C: [新增] 动态调用 ~>method(args)
+        // 语法结构: ~> methodName ( args... )
+      | TILDE_ARROW dynMethodName=IDENTIFIER LPAREN expressionList? RPAREN
       )* ;
 
 primary
