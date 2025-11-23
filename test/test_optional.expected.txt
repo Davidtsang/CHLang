@@ -1,0 +1,8 @@
+--- Optional Interface Test ---
+1. Static Call (Required):
+[Full] Required task done.
+[Lazy] Required task done.
+2. Dynamic Call (Optional on Full):
+[Full] Optional task: Hello World
+3. Dynamic Call (Optional on Lazy):
+[ChronoRuntime] Selector ID {{HASH}} not recognized.

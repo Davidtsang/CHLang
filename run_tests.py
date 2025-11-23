@@ -4,6 +4,7 @@ import glob
 import subprocess
 import filecmp
 import sys
+import re  # [新增] 引入正则模块
 
 # --- 配置 ---
 PYTHON_EXE = "python3"
@@ -29,6 +30,36 @@ CPP_LINK_COMMAND = [
 
 
 # --- 结束配置 ---
+def smart_compare(actual, expected):
+    a_lines = actual.strip().splitlines()
+    e_lines = expected.strip().splitlines()
+
+    if len(a_lines) != len(e_lines):
+        print(f"  [Diff] Line count mismatch: Actual {len(a_lines)}, Expected {len(e_lines)}")
+        return False
+
+    for i, (a_line, e_line) in enumerate(zip(a_lines, e_lines)):
+        # 1. 如果预期行包含 {{HASH}} 占位符
+        if "{{HASH}}" in e_line:
+            # 将 e_line 转为正则:
+            # 1. 先 escape 特殊字符 (如 [, ])
+            # 2. 把转义后的 \{\{HASH\}\} 替换为 \d+ (匹配任意数字)
+            pattern_str = re.escape(e_line).replace(r"\{\{HASH\}\}", r"\d+")
+            if not re.fullmatch(pattern_str, a_line):
+                print(f"  [Diff Line {i + 1}] Pattern mismatch.")
+                print(f"    Exp: {e_line}")
+                print(f"    Act: {a_line}")
+                return False
+
+        # 2. 否则，普通字符串比较
+        elif a_line != e_line:
+            print(f"  [Diff Line {i + 1}] Content mismatch.")
+            print(f"    Exp: {e_line}")
+            print(f"    Act: {a_line}")
+            return False
+
+    return True
+
 
 def print_color(text, color_code):
     """在 Windows 终端打印彩色文本"""
@@ -71,7 +102,17 @@ def run_test(test_file_path):
         # --- 步骤 3: 运行 (EXE -> Output) ---
         print(f"  [Run] {exe_output}")
         # text=True: 将输出解码为文本
-        run_result = subprocess.run([exe_output], check=True, capture_output=True, text=True, encoding='utf-8')
+        # 1. 去掉 capture_output=True
+        # 2. 显式重定向 stdout 为 PIPE
+        # 3. 显式将 stderr 重定向到 STDOUT (合并流)
+        run_result = subprocess.run(
+            [exe_output],
+            check=False,  # 改为 False，防止程序返回非 0 导致 Python 抛异常（有些测试可能会故意 crash）
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,  # <--- 关键：把错误流合并进输出流
+            text=True,
+            encoding='utf-8'
+        )
 
         # 将实际输出写入文件 (清理 \r\n 为 \n 以便比较)
         actual_content = run_result.stdout.strip().replace('\r\n', '\n')
@@ -82,7 +123,7 @@ def run_test(test_file_path):
         with open(expected_output, 'r') as f:
             expected_content = f.read().strip().replace('\r\n', '\n')
 
-        if actual_content == expected_content:
+        if smart_compare(actual_content, expected_content):
             print_color("  [PASS]", 32)
             return True
         else:
@@ -102,6 +143,7 @@ def run_test(test_file_path):
         print("  --- STDERR ---")
         print(e.stderr)
         return False
+
     except FileNotFoundError as e:
         # 捕获 python3, cl.exe, 或 .exe 未找到的错误
         if e.filename == expected_output:

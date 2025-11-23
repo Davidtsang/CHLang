@@ -3,18 +3,24 @@ import <iostream>
 
 @dynamic
 class Base : ChronoObject { public init(); }
-@dynamic implement Base { init(){} }
+
+@dynamic
+implement Base { init(){} }
 
 @dynamic
 class DerivedA : Base { public init(); public func funcA(); }
-@dynamic implement DerivedA {
+
+@dynamic
+implement DerivedA {
     init(){}
     func funcA() { @cpp std::cout << "Func A" << std::endl; @end }
 }
 
 @dynamic
 class DerivedB : Base { public init(); }
-@dynamic implement DerivedB { init(){} }
+
+@dynamic
+implement DerivedB { init(){} }
 
 func main() -> int {
     @cpp std::cout << "--- As Cast Test ---" << std::endl; @end

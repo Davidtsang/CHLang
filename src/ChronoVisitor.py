@@ -751,15 +751,25 @@ class ChronoVisitor(BaseChronoVisitor):
     def visitInterfaceDefinition(self, ctx: ChronoParser.InterfaceDefinitionContext):
         interface_name = ctx.name.text
         body_code = ""
-        child_nodes = ctx.children[2:-1]
-        for child in child_nodes:
+
+        # 遍历子节点
+        for child in ctx.children:
             if isinstance(child, ChronoParser.MethodSignatureContext):
-                body_code += self.visit(child)
-            elif isinstance(child, ChronoParser.CppBlockContext):
-                body_code += self.visit(child)
+                # [核心逻辑] 检查是否有 @optional
+                is_optional = bool(child.AT_OPTIONAL())
+
+                if is_optional:
+                    # 如果是可选的，生成注释，或者完全不生成 C++ 代码
+                    # 这样 C++ 编译器就不会因为没实现它而报错
+                    func_name = child.name.text
+                    body_code += f"{INDENT}// virtual void {func_name}(...) // @optional in Chrono\n"
+                else:
+                    # 必须实现的，生成纯虚函数
+                    body_code += self.visit(child)
+
         code = f"\nclass {interface_name} {{\n"
         code += "public:\n"
-        code += f"{INDENT}virtual ~{interface_name}() {{}} // Virtual destructor\n"
+        code += f"{INDENT}virtual ~{interface_name}() {{}} \n"
         code += body_code
         code += "};\n"
         return code

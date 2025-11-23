@@ -340,7 +340,8 @@ forIncrement
     ;
 
 methodSignature
-    : FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)? SEMIC_TOKEN
+    : (AT_OPTIONAL)? (accessModifier)?
+     FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)? SEMIC_TOKEN
     ;
 
 interfaceDefinition

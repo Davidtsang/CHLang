@@ -25,6 +25,7 @@ WHILE   : 'while' ;
 FOR     : 'for' ;   // <-- [新增]
 PUBLIC  : 'public' ; // class attr access flag
 INTERFACE: 'interface' ; // <-- [新增]
+AT_OPTIONAL : '@optional';
 IMPL    : 'with' ;      // <-- [新增]
 VIRTUAL : 'virtual';   // <--- 新增
 OVERRIDE: 'override';  // <--- 新增
