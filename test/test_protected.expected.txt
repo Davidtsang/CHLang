@@ -1,0 +1,3 @@
+--- Protected Test ---
+Child accessing protected var: 100
+Parent::internalHelper called

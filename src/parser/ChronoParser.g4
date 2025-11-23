@@ -97,7 +97,11 @@ forwardDeclaration
     : TYPE name=IDENTIFIER COLON (kind=CLASS | kind=STRUCT) SEMIC_TOKEN
     ;
 
-accessModifier : PUBLIC ;
+// [修改] 支持 public 或 protected
+accessModifier
+    : PUBLIC
+    | PROTECTED
+    ;
 
 endNamespaceStatement : END_NAMESPACE SEMIC_TOKEN ;
 

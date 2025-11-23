@@ -23,7 +23,7 @@ class ChronoVisitor(BaseChronoVisitor):
         self._in_class = False
         self._in_struct = False
         self._current_class_name = None
-        self._class_sections = {"private": "", "public": ""}
+        self._class_sections = {"private": "", "public": "", "protected": ""}
         self._alias_to_namespace_map = {}
         self._scope_stack = [{}]
         self._namespace_is_open = False
@@ -603,15 +603,31 @@ class ChronoVisitor(BaseChronoVisitor):
         return chrono_type_name
 
     def _get_access_level(self, ctx, default_level='private'):
-        """检查上下文是否包含访问修饰符，返回 'public' 或指定的默认值。"""
+        """检查上下文是否包含访问修饰符，返回 'public', 'protected' 或默认值。"""
+
+        # 辅助函数：从具体的 AccessModifierContext 解析字符串
+        def resolve_modifier(mod_ctx):
+            if not mod_ctx: return None
+            if mod_ctx.PROTECTED(): return "protected"
+            if mod_ctx.PUBLIC(): return "public"
+            return None
+
+        # 1. 直接检查当前节点 (如 classBodyStatement)
         if hasattr(ctx, 'accessModifier') and ctx.accessModifier():
-            return "public"
-        elif hasattr(ctx, 'declaration') and hasattr(ctx.variableDeclaration(),
-                                                     'accessModifier') and ctx.variableDeclaration().accessModifier():
-            return "public"
-        elif hasattr(ctx, 'methodDefinition') and hasattr(ctx.methodDefinition(),
-                                                          'accessModifier') and ctx.methodDefinition().accessModifier():
-            return "public"
+            return resolve_modifier(ctx.accessModifier())
+
+        # 2. 检查嵌套声明 (如 variableDeclaration)
+        # 有些规则可能是 declaration -> variableDeclaration -> accessModifier
+        elif hasattr(ctx, 'variableDeclaration') and ctx.variableDeclaration():
+            var_decl = ctx.variableDeclaration()
+            if hasattr(var_decl, 'accessModifier') and var_decl.accessModifier():
+                return resolve_modifier(var_decl.accessModifier())
+
+        elif hasattr(ctx, 'methodDefinition') and hasattr(ctx.methodDefinition(), 'accessModifier'):
+            # 注意：methodDefinition 在 .g4 中可能没有直接挂 accessModifier，通常由 classBodyStatement 处理
+            # 如果您的语法树结构里 methodDefinition 自带修饰符，则取消注释
+            pass
+
         return default_level
 
     # --- 顶层规则 ---
@@ -889,8 +905,7 @@ class ChronoVisitor(BaseChronoVisitor):
         inheritance_str = (" : " + ", ".join(inheritance_list)) if inheritance_list else ""
 
         self._current_class_name = class_name
-        self._class_sections = {"private": "", "public": ""}
-
+        self._class_sections = {"private": "", "public": "", "protected": ""}
         is_dynamic = bool(ctx.AT_DYNAMIC())
 
         if hasattr(ctx, 'classBodyStatement'):
@@ -902,8 +917,16 @@ class ChronoVisitor(BaseChronoVisitor):
                 "public"] += f"{INDENT}virtual MethodTrampoline findMethodImpl(SelectorID sel) override;\n"
 
         final_body = ""
-        if self._class_sections["public"]: final_body += f"\npublic:\n{self._class_sections['public']}"
-        if self._class_sections["private"]: final_body += f"\nprivate:\n{self._class_sections['private']}"
+        # [修改] 按 C++ 习惯顺序组装: public -> protected -> private
+        if self._class_sections["public"]:
+            final_body += f"\npublic:\n{self._class_sections['public']}"
+
+        # [新增] 插入 protected 块
+        if self._class_sections["protected"]:
+            final_body += f"\nprotected:\n{self._class_sections['protected']}"
+
+        if self._class_sections["private"]:
+            final_body += f"\nprivate:\n{self._class_sections['private']}"
 
         self._in_class = False
         self._current_class_name = None
@@ -1618,7 +1641,8 @@ class ChronoVisitor(BaseChronoVisitor):
         self._in_class = False
         self._in_struct = True
         self._current_class_name = struct_name
-        self._class_sections = {"private": "", "public": ""}
+        self._class_sections = {"private": "", "public": "", "protected": ""}
+
         if hasattr(ctx, 'structBodyStatement'):
             for child in ctx.structBodyStatement():
                 self.visit(child)
@@ -1627,12 +1651,17 @@ class ChronoVisitor(BaseChronoVisitor):
         # [ [ [ 修复 B-2: 添加 struct 的成员字典重置 ] ] ]
         self._current_class_members = {}
         final_struct_body = ""
+
         if self._class_sections["public"]:
-            final_struct_body += "\npublic:\n"
-            final_struct_body += self._class_sections["public"]
+            final_struct_body += f"\npublic:\n{self._class_sections['public']}"
+
+        # [新增]
+        if self._class_sections["protected"]:
+            final_struct_body += f"\nprotected:\n{self._class_sections['protected']}"
+
         if self._class_sections["private"]:
-            final_struct_body += "\nprivate:\n"
-            final_struct_body += self._class_sections["private"]
+            final_struct_body += f"\nprivate:\n{self._class_sections['private']}"
+
         return (
             f"\nstruct {struct_name} {{\n"
             f"{final_struct_body.strip()}\n"

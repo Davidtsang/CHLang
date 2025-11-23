@@ -24,6 +24,8 @@ ELSE    : 'else' ;
 WHILE   : 'while' ;
 FOR     : 'for' ;   // <-- [新增]
 PUBLIC  : 'public' ; // class attr access flag
+PROTECTED : 'protected' ; // [新增]
+
 INTERFACE: 'interface' ; // <-- [新增]
 AT_OPTIONAL : '@optional';
 IMPL    : 'with' ;      // <-- [新增]
