@@ -1,10 +1,10 @@
-import "runtime/ChronoObject.h"
+import "runtime/CHObject.h"
 import <iostream>
 import <string>
 
 // --- 基类 ---
 @dynamic
-class Animal : ChronoObject {
+class Animal : CHObject {
     public init();
     public virtual func speak();      // 将被 Dog 重写
     public virtual func sleep();      // 将被子类继承

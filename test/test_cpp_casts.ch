@@ -7,7 +7,7 @@ import <iostream>
 import <cstdint>     // i32, intptr_t
 import <type_traits> // static_assert
 import <windows.h>   // (我们上一个 bug 修复)
-import "runtime/ChronoObject.h" // (用于 main)
+import "runtime/CHObject.h" // (用于 main)
 
 // --- 2. typemap 定义 (GDI+ 示例) ---
 #define C_HBRUSH HBRUSH

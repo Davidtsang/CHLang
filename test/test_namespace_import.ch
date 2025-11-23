@@ -1,7 +1,7 @@
 // file: test/test_namespace_import.ch
 // 目的: 验证 'import as' 和 C++ 原生打印
 
-import "runtime/ChronoObject.h"
+import "runtime/CHObject.h"
 import <iostream> // [新增] 导入 C++ 原生打印
 
 // [测试 1: 自动别名]

@@ -1,8 +1,8 @@
 // test/test_virtual.ch
-import "runtime/ChronoObject.h"
+import "runtime/CHObject.h"
 import <iostream>
 
-class Animal : ChronoObject {
+class Animal : CHObject {
     public init();
 
     // 1. 普通方法 (非虚)

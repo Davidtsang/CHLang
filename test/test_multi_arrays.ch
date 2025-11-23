@@ -1,13 +1,13 @@
 // test/test_multi_arrays.ch
 import <iostream>
 import <cstdint>
-import "runtime/ChronoObject.h"
+import "runtime/CHObject.h"
 
 func main() -> int {
     std::cout << "--- Multi-Array Test Start ---" << std::endl; 
 
     // 1. 声明
-    // Chrono: [[i32; 3]; 2]
+    // CH: [[i32; 3]; 2]
     // C++: int32_t matrix[2][3]
     var matrix: [[i32; 3]; 2] = {{10, 11, 12}, {20, 21, 22}};
 

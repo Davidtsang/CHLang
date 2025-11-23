@@ -1,8 +1,8 @@
-import "runtime/ChronoObject.h"
+import "runtime/CHObject.h"
 import <iostream>
 
 @dynamic
-class Base : ChronoObject { public init(); }
+class Base : CHObject { public init(); }
 
 @dynamic
 implement Base { init(){} }

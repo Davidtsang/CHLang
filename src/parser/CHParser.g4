@@ -1,12 +1,12 @@
 // -----------------------------------------------------------------------------
-// Chrono Parser (ChronoParser.g4) - [已修复: simpleExpression 歧义]
+// CH Parser (CHParser.g4) - [已修复: simpleExpression 歧义]
 // -----------------------------------------------------------------------------
-parser grammar ChronoParser;
-options { tokenVocab = ChronoLexer; }
+parser grammar CHParser;
+options { tokenVocab = CHLexer; }
 
 
-// (在 ChronoParser.g4 中)
-// (在 ChronoParser.g4 中)
+// (在 CHParser.g4 中)
+// (在 CHParser.g4 中)
 
 // --- [ 1. 升级: 泛型/数组/函数 类型规则 ] ---
 typeSpecifier
@@ -22,7 +22,7 @@ typeSpecifier
       )
       ( (STAR | BIT_AND) )* // 指针/引用后缀
 
-    | ( // 路径 C: Chrono 闭包/函数指针类型 (Params) -> Ret
+    | ( // 路径 C: CH 闭包/函数指针类型 (Params) -> Ret
         LPAREN
         (
             (params=typeList? RPAREN ARROW returnType=typeSpecifier)
@@ -255,7 +255,7 @@ assignmentOperator
 
 assignment : assignableExpression assignmentOperator expression SEMIC_TOKEN ;
 
-// (在 ChronoParser.g4 中替换 assignableExpression)
+// (在 CHParser.g4 中替换 assignableExpression)
 assignableExpression
     : assignablePrimary
       ( // 循环处理链
@@ -434,7 +434,7 @@ initializerList
     : LBRACE expressionList? RBRACE
     ;
 
-// (在 ChronoParser.g4 中替换 functionCallExpression)
+// (在 CHParser.g4 中替换 functionCallExpression)
 functionCallExpression
     : funcName=(IDENTIFIER | AT_MOVE | AT_UNSAFE_MOVE)
       LPAREN expressionList? RPAREN

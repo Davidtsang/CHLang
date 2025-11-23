@@ -1,12 +1,12 @@
-// runtime/Chrono.h
+// runtime/CH.h
 #pragma once
 #include <iostream>
 #include <stdint.h>     // 用于 int32_t
 #include <type_traits>  // 用于 C++17 的 'if constexpr'
-#include "ChronoObject.h" // 必须包含，用于 is_base_of
+#include "CHObject.h" // 必须包含，用于 is_base_of
 
-// [关键] 我们将所有日志功能封装在 'Chrono' 命名空间中
-namespace Chrono {
+// [关键] 我们将所有日志功能封装在 'CH' 命名空间中
+namespace CH {
 
     // --- 1. 针对已知“值类型”的函数重载 ---
     inline void log(int32_t val) {
@@ -32,10 +32,10 @@ namespace Chrono {
         // [ 关键 ] C++17 的 'if constexpr'
         // 这是一个编译时 if 语句，用于智能区分类型
 
-        // 检查 T 是否继承自 ChronoObject
-        if constexpr (std::is_base_of<ChronoObject, T>::value) {
+        // 检查 T 是否继承自 CHObject
+        if constexpr (std::is_base_of<CHObject, T>::value) {
 
-            // 场景 A: 它是 MRC 对象 (ChronoString, MyClass, etc.)
+            // 场景 A: 它是 MRC 对象 (CHString, MyClass, etc.)
             ptr->printValue(); // 多态调用虚函数
 
         } else {
@@ -47,4 +47,4 @@ namespace Chrono {
         }
     }
 
-} // namespace Chrono
+} // namespace CH

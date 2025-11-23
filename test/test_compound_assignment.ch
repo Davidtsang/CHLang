@@ -1,10 +1,10 @@
 // file: test/test_compound_assignment.ch
 // 目的: 验证复合赋值运算符 (+=, -=, *=, /=, %=)
-// [修改] 移除 Chrono.log，使用原生 @cpp std::cout
+// [修改] 移除 CH.log，使用原生 @cpp std::cout
 
 import <iostream> // <-- [新增] 导入 C++ IO
-import "runtime/ChronoObject.h"
-// [移除] 不再需要 import "runtime/Chrono.h"
+import "runtime/CHObject.h"
+// [移除] 不再需要 import "runtime/CH.h"
 
 func main() -> int {
     @cpp std::cout << "--- Compound Assignment Test ---" << std::endl; @end
@@ -43,7 +43,7 @@ func main() -> int {
     @cpp std::cout << "Test For-Loop (i += 2):" << std::endl; @end
 
     for (var i: i32 = 0; i < 5; i += 2) {
-        // [修改] @cpp 块在 for 循环的 Chrono 作用域内
+        // [修改] @cpp 块在 for 循环的 CH 作用域内
         @cpp std::cout << i << std::endl; @end
     }
     // 预期: 0, 2, 4

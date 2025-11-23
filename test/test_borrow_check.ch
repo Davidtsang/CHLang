@@ -11,7 +11,7 @@ implement Box {
 }
 
 func main() -> int {
-    @cpp std::cout << "--- Chrono Borrow Checker Test ---" << std::endl; @end
+    @cpp std::cout << "--- CH Borrow Checker Test ---" << std::endl; @end
 
     // ==========================================
     // 场景 1: 线性移动检查 (Linear Check)

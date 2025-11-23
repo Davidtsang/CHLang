@@ -1,4 +1,4 @@
-# Generated from src/parser/ChronoParser.g4 by ANTLR 4.13.2
+# Generated from src/parser/CHParser.g4 by ANTLR 4.13.2
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
@@ -372,9 +372,9 @@ def serializedATN():
         854,857,867,870,872,879,889,899,911,915,922,931
     ]
 
-class ChronoParser ( Parser ):
+class CHParser ( Parser ):
 
-    grammarFileName = "ChronoParser.g4"
+    grammarFileName = "CHParser.g4"
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
@@ -645,62 +645,62 @@ class ChronoParser ( Parser ):
             self.nested = None # TypeSpecifierContext
 
         def LBRACK(self):
-            return self.getToken(ChronoParser.LBRACK, 0)
+            return self.getToken(CHParser.LBRACK, 0)
 
         def typeSpecifier(self):
-            return self.getTypedRuleContext(ChronoParser.TypeSpecifierContext,0)
+            return self.getTypedRuleContext(CHParser.TypeSpecifierContext,0)
 
 
         def SEMIC_TOKEN(self):
-            return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
+            return self.getToken(CHParser.SEMIC_TOKEN, 0)
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def RBRACK(self):
-            return self.getToken(ChronoParser.RBRACK, 0)
+            return self.getToken(CHParser.RBRACK, 0)
 
         def STAR(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.STAR)
+                return self.getTokens(CHParser.STAR)
             else:
-                return self.getToken(ChronoParser.STAR, i)
+                return self.getToken(CHParser.STAR, i)
 
         def BIT_AND(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.BIT_AND)
+                return self.getTokens(CHParser.BIT_AND)
             else:
-                return self.getToken(ChronoParser.BIT_AND, i)
+                return self.getToken(CHParser.BIT_AND, i)
 
         def baseType(self):
-            return self.getTypedRuleContext(ChronoParser.BaseTypeContext,0)
+            return self.getTypedRuleContext(CHParser.BaseTypeContext,0)
 
 
         def LT(self):
-            return self.getToken(ChronoParser.LT, 0)
+            return self.getToken(CHParser.LT, 0)
 
         def typeList(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.TypeListContext)
+                return self.getTypedRuleContexts(CHParser.TypeListContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.TypeListContext,i)
+                return self.getTypedRuleContext(CHParser.TypeListContext,i)
 
 
         def GT(self):
-            return self.getToken(ChronoParser.GT, 0)
+            return self.getToken(CHParser.GT, 0)
 
         def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
+            return self.getToken(CHParser.LPAREN, 0)
 
         def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
+            return self.getToken(CHParser.RPAREN, 0)
 
         def ARROW(self):
-            return self.getToken(ChronoParser.ARROW, 0)
+            return self.getToken(CHParser.ARROW, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_typeSpecifier
+            return CHParser.RULE_typeSpecifier
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterTypeSpecifier" ):
@@ -721,7 +721,7 @@ class ChronoParser ( Parser ):
 
     def typeSpecifier(self):
 
-        localctx = ChronoParser.TypeSpecifierContext(self, self._ctx, self.state)
+        localctx = CHParser.TypeSpecifierContext(self, self._ctx, self.state)
         self.enterRule(localctx, 0, self.RULE_typeSpecifier)
         self._la = 0 # Token type
         try:
@@ -731,15 +731,15 @@ class ChronoParser ( Parser ):
             if token in [83]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 132
-                self.match(ChronoParser.LBRACK)
+                self.match(CHParser.LBRACK)
                 self.state = 133
                 self.typeSpecifier()
                 self.state = 134
-                self.match(ChronoParser.SEMIC_TOKEN)
+                self.match(CHParser.SEMIC_TOKEN)
                 self.state = 135
                 self.expression()
                 self.state = 136
-                self.match(ChronoParser.RBRACK)
+                self.match(CHParser.RBRACK)
                 self.state = 141
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,0,self._ctx)
@@ -766,11 +766,11 @@ class ChronoParser ( Parser ):
                 la_ = self._interp.adaptivePredict(self._input,1,self._ctx)
                 if la_ == 1:
                     self.state = 145
-                    self.match(ChronoParser.LT)
+                    self.match(CHParser.LT)
                     self.state = 146
                     self.typeList()
                     self.state = 147
-                    self.match(ChronoParser.GT)
+                    self.match(CHParser.GT)
 
 
                 self.state = 156
@@ -778,7 +778,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
                 if _la==79:
                     self.state = 151
-                    self.match(ChronoParser.LPAREN)
+                    self.match(CHParser.LPAREN)
                     self.state = 153
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
@@ -788,7 +788,7 @@ class ChronoParser ( Parser ):
 
 
                     self.state = 155
-                    self.match(ChronoParser.RPAREN)
+                    self.match(CHParser.RPAREN)
 
 
                 self.state = 161
@@ -811,7 +811,7 @@ class ChronoParser ( Parser ):
             elif token in [79]:
                 self.enterOuterAlt(localctx, 3)
                 self.state = 164
-                self.match(ChronoParser.LPAREN)
+                self.match(CHParser.LPAREN)
                 self.state = 174
                 self._errHandler.sync(self)
                 la_ = self._interp.adaptivePredict(self._input,6,self._ctx)
@@ -825,9 +825,9 @@ class ChronoParser ( Parser ):
 
 
                     self.state = 168
-                    self.match(ChronoParser.RPAREN)
+                    self.match(CHParser.RPAREN)
                     self.state = 169
-                    self.match(ChronoParser.ARROW)
+                    self.match(CHParser.ARROW)
                     self.state = 170
                     localctx.returnType = self.typeSpecifier()
                     pass
@@ -836,7 +836,7 @@ class ChronoParser ( Parser ):
                     self.state = 171
                     localctx.nested = self.typeSpecifier()
                     self.state = 172
-                    self.match(ChronoParser.RPAREN)
+                    self.match(CHParser.RPAREN)
                     pass
 
 
@@ -877,37 +877,37 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def UNIQUE_KW(self):
-            return self.getToken(ChronoParser.UNIQUE_KW, 0)
+            return self.getToken(CHParser.UNIQUE_KW, 0)
 
         def SHARED_KW(self):
-            return self.getToken(ChronoParser.SHARED_KW, 0)
+            return self.getToken(CHParser.SHARED_KW, 0)
 
         def WEAK_KW(self):
-            return self.getToken(ChronoParser.WEAK_KW, 0)
+            return self.getToken(CHParser.WEAK_KW, 0)
 
         def DYN(self):
-            return self.getToken(ChronoParser.DYN, 0)
+            return self.getToken(CHParser.DYN, 0)
 
         def IDENTIFIER(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.IDENTIFIER)
+                return self.getTokens(CHParser.IDENTIFIER)
             else:
-                return self.getToken(ChronoParser.IDENTIFIER, i)
+                return self.getToken(CHParser.IDENTIFIER, i)
 
         def DOT(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.DOT)
+                return self.getTokens(CHParser.DOT)
             else:
-                return self.getToken(ChronoParser.DOT, i)
+                return self.getToken(CHParser.DOT, i)
 
         def COLON_COLON(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.COLON_COLON)
+                return self.getTokens(CHParser.COLON_COLON)
             else:
-                return self.getToken(ChronoParser.COLON_COLON, i)
+                return self.getToken(CHParser.COLON_COLON, i)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_baseType
+            return CHParser.RULE_baseType
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterBaseType" ):
@@ -928,7 +928,7 @@ class ChronoParser ( Parser ):
 
     def baseType(self):
 
-        localctx = ChronoParser.BaseTypeContext(self, self._ctx, self.state)
+        localctx = CHParser.BaseTypeContext(self, self._ctx, self.state)
         self.enterRule(localctx, 2, self.RULE_baseType)
         self._la = 0 # Token type
         try:
@@ -938,27 +938,27 @@ class ChronoParser ( Parser ):
             if token in [36]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 184
-                self.match(ChronoParser.UNIQUE_KW)
+                self.match(CHParser.UNIQUE_KW)
                 pass
             elif token in [37]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 185
-                self.match(ChronoParser.SHARED_KW)
+                self.match(CHParser.SHARED_KW)
                 pass
             elif token in [38]:
                 self.enterOuterAlt(localctx, 3)
                 self.state = 186
-                self.match(ChronoParser.WEAK_KW)
+                self.match(CHParser.WEAK_KW)
                 pass
             elif token in [34]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 187
-                self.match(ChronoParser.DYN)
+                self.match(CHParser.DYN)
                 pass
             elif token in [99]:
                 self.enterOuterAlt(localctx, 5)
                 self.state = 188
-                self.match(ChronoParser.IDENTIFIER)
+                self.match(CHParser.IDENTIFIER)
                 self.state = 193
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
@@ -971,7 +971,7 @@ class ChronoParser ( Parser ):
                         self._errHandler.reportMatch(self)
                         self.consume()
                     self.state = 190
-                    self.match(ChronoParser.IDENTIFIER)
+                    self.match(CHParser.IDENTIFIER)
                     self.state = 195
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
@@ -998,19 +998,19 @@ class ChronoParser ( Parser ):
 
         def templateArgument(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.TemplateArgumentContext)
+                return self.getTypedRuleContexts(CHParser.TemplateArgumentContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.TemplateArgumentContext,i)
+                return self.getTypedRuleContext(CHParser.TemplateArgumentContext,i)
 
 
         def COMMA(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.COMMA)
+                return self.getTokens(CHParser.COMMA)
             else:
-                return self.getToken(ChronoParser.COMMA, i)
+                return self.getToken(CHParser.COMMA, i)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_typeList
+            return CHParser.RULE_typeList
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterTypeList" ):
@@ -1031,7 +1031,7 @@ class ChronoParser ( Parser ):
 
     def typeList(self):
 
-        localctx = ChronoParser.TypeListContext(self, self._ctx, self.state)
+        localctx = CHParser.TypeListContext(self, self._ctx, self.state)
         self.enterRule(localctx, 4, self.RULE_typeList)
         self._la = 0 # Token type
         try:
@@ -1043,7 +1043,7 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             while _la==88:
                 self.state = 199
-                self.match(ChronoParser.COMMA)
+                self.match(CHParser.COMMA)
                 self.state = 200
                 self.templateArgument()
                 self.state = 205
@@ -1069,36 +1069,36 @@ class ChronoParser ( Parser ):
             self.typeName = None # TypeSpecifierContext
 
         def SEMIC_TOKEN(self):
-            return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
+            return self.getToken(CHParser.SEMIC_TOKEN, 0)
 
         def CONST(self):
-            return self.getToken(ChronoParser.CONST, 0)
+            return self.getToken(CHParser.CONST, 0)
 
         def VAR(self):
-            return self.getToken(ChronoParser.VAR, 0)
+            return self.getToken(CHParser.VAR, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def EXTERN(self):
-            return self.getToken(ChronoParser.EXTERN, 0)
+            return self.getToken(CHParser.EXTERN, 0)
 
         def COLON(self):
-            return self.getToken(ChronoParser.COLON, 0)
+            return self.getToken(CHParser.COLON, 0)
 
         def ASSIGN(self):
-            return self.getToken(ChronoParser.ASSIGN, 0)
+            return self.getToken(CHParser.ASSIGN, 0)
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def typeSpecifier(self):
-            return self.getTypedRuleContext(ChronoParser.TypeSpecifierContext,0)
+            return self.getTypedRuleContext(CHParser.TypeSpecifierContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_variableDeclaration
+            return CHParser.RULE_variableDeclaration
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterVariableDeclaration" ):
@@ -1119,7 +1119,7 @@ class ChronoParser ( Parser ):
 
     def variableDeclaration(self):
 
-        localctx = ChronoParser.VariableDeclarationContext(self, self._ctx, self.state)
+        localctx = CHParser.VariableDeclarationContext(self, self._ctx, self.state)
         self.enterRule(localctx, 6, self.RULE_variableDeclaration)
         self._la = 0 # Token type
         try:
@@ -1129,7 +1129,7 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==29:
                 self.state = 206
-                self.match(ChronoParser.EXTERN)
+                self.match(CHParser.EXTERN)
 
 
             self.state = 209
@@ -1140,13 +1140,13 @@ class ChronoParser ( Parser ):
                 self._errHandler.reportMatch(self)
                 self.consume()
             self.state = 210
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 213
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==85:
                 self.state = 211
-                self.match(ChronoParser.COLON)
+                self.match(CHParser.COLON)
                 self.state = 212
                 localctx.typeName = self.typeSpecifier()
 
@@ -1156,13 +1156,13 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==86:
                 self.state = 215
-                self.match(ChronoParser.ASSIGN)
+                self.match(CHParser.ASSIGN)
                 self.state = 216
                 self.expression()
 
 
             self.state = 219
-            self.match(ChronoParser.SEMIC_TOKEN)
+            self.match(CHParser.SEMIC_TOKEN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1180,15 +1180,15 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def typeSpecifier(self):
-            return self.getTypedRuleContext(ChronoParser.TypeSpecifierContext,0)
+            return self.getTypedRuleContext(CHParser.TypeSpecifierContext,0)
 
 
         def literal(self):
-            return self.getTypedRuleContext(ChronoParser.LiteralContext,0)
+            return self.getTypedRuleContext(CHParser.LiteralContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_templateArgument
+            return CHParser.RULE_templateArgument
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterTemplateArgument" ):
@@ -1209,7 +1209,7 @@ class ChronoParser ( Parser ):
 
     def templateArgument(self):
 
-        localctx = ChronoParser.TemplateArgumentContext(self, self._ctx, self.state)
+        localctx = CHParser.TemplateArgumentContext(self, self._ctx, self.state)
         self.enterRule(localctx, 8, self.RULE_templateArgument)
         try:
             self.state = 223
@@ -1246,18 +1246,18 @@ class ChronoParser ( Parser ):
 
         def IDENTIFIER(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.IDENTIFIER)
+                return self.getTokens(CHParser.IDENTIFIER)
             else:
-                return self.getToken(ChronoParser.IDENTIFIER, i)
+                return self.getToken(CHParser.IDENTIFIER, i)
 
         def DOT(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.DOT)
+                return self.getTokens(CHParser.DOT)
             else:
-                return self.getToken(ChronoParser.DOT, i)
+                return self.getToken(CHParser.DOT, i)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_qualifiedIdentifier
+            return CHParser.RULE_qualifiedIdentifier
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterQualifiedIdentifier" ):
@@ -1278,21 +1278,21 @@ class ChronoParser ( Parser ):
 
     def qualifiedIdentifier(self):
 
-        localctx = ChronoParser.QualifiedIdentifierContext(self, self._ctx, self.state)
+        localctx = CHParser.QualifiedIdentifierContext(self, self._ctx, self.state)
         self.enterRule(localctx, 10, self.RULE_qualifiedIdentifier)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 225
-            self.match(ChronoParser.IDENTIFIER)
+            self.match(CHParser.IDENTIFIER)
             self.state = 230
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while _la==87:
                 self.state = 226
-                self.match(ChronoParser.DOT)
+                self.match(CHParser.DOT)
                 self.state = 227
-                self.match(ChronoParser.IDENTIFIER)
+                self.match(CHParser.IDENTIFIER)
                 self.state = 232
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
@@ -1315,17 +1315,17 @@ class ChronoParser ( Parser ):
             self.name = None # QualifiedIdentifierContext
 
         def NAMESPACE(self):
-            return self.getToken(ChronoParser.NAMESPACE, 0)
+            return self.getToken(CHParser.NAMESPACE, 0)
 
         def SEMIC_TOKEN(self):
-            return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
+            return self.getToken(CHParser.SEMIC_TOKEN, 0)
 
         def qualifiedIdentifier(self):
-            return self.getTypedRuleContext(ChronoParser.QualifiedIdentifierContext,0)
+            return self.getTypedRuleContext(CHParser.QualifiedIdentifierContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_namespaceStatement
+            return CHParser.RULE_namespaceStatement
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterNamespaceStatement" ):
@@ -1346,16 +1346,16 @@ class ChronoParser ( Parser ):
 
     def namespaceStatement(self):
 
-        localctx = ChronoParser.NamespaceStatementContext(self, self._ctx, self.state)
+        localctx = CHParser.NamespaceStatementContext(self, self._ctx, self.state)
         self.enterRule(localctx, 12, self.RULE_namespaceStatement)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 233
-            self.match(ChronoParser.NAMESPACE)
+            self.match(CHParser.NAMESPACE)
             self.state = 234
             localctx.name = self.qualifiedIdentifier()
             self.state = 235
-            self.match(ChronoParser.SEMIC_TOKEN)
+            self.match(CHParser.SEMIC_TOKEN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1373,28 +1373,28 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def EOF(self):
-            return self.getToken(ChronoParser.EOF, 0)
+            return self.getToken(CHParser.EOF, 0)
 
         def topLevelImport(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.TopLevelImportContext)
+                return self.getTypedRuleContexts(CHParser.TopLevelImportContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.TopLevelImportContext,i)
+                return self.getTypedRuleContext(CHParser.TopLevelImportContext,i)
 
 
         def namespaceStatement(self):
-            return self.getTypedRuleContext(ChronoParser.NamespaceStatementContext,0)
+            return self.getTypedRuleContext(CHParser.NamespaceStatementContext,0)
 
 
         def topLevelStatement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.TopLevelStatementContext)
+                return self.getTypedRuleContexts(CHParser.TopLevelStatementContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.TopLevelStatementContext,i)
+                return self.getTypedRuleContext(CHParser.TopLevelStatementContext,i)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_program
+            return CHParser.RULE_program
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterProgram" ):
@@ -1415,7 +1415,7 @@ class ChronoParser ( Parser ):
 
     def program(self):
 
-        localctx = ChronoParser.ProgramContext(self, self._ctx, self.state)
+        localctx = CHParser.ProgramContext(self, self._ctx, self.state)
         self.enterRule(localctx, 14, self.RULE_program)
         self._la = 0 # Token type
         try:
@@ -1450,7 +1450,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 252
-            self.match(ChronoParser.EOF)
+            self.match(CHParser.EOF)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1468,14 +1468,14 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def importDirective(self):
-            return self.getTypedRuleContext(ChronoParser.ImportDirectiveContext,0)
+            return self.getTypedRuleContext(CHParser.ImportDirectiveContext,0)
 
 
         def CPP_DIRECTIVE(self):
-            return self.getToken(ChronoParser.CPP_DIRECTIVE, 0)
+            return self.getToken(CHParser.CPP_DIRECTIVE, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_topLevelImport
+            return CHParser.RULE_topLevelImport
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterTopLevelImport" ):
@@ -1496,7 +1496,7 @@ class ChronoParser ( Parser ):
 
     def topLevelImport(self):
 
-        localctx = ChronoParser.TopLevelImportContext(self, self._ctx, self.state)
+        localctx = CHParser.TopLevelImportContext(self, self._ctx, self.state)
         self.enterRule(localctx, 16, self.RULE_topLevelImport)
         try:
             self.state = 256
@@ -1510,7 +1510,7 @@ class ChronoParser ( Parser ):
             elif token in [102]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 255
-                self.match(ChronoParser.CPP_DIRECTIVE)
+                self.match(CHParser.CPP_DIRECTIVE)
                 pass
             else:
                 raise NoViableAltException(self)
@@ -1532,58 +1532,58 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def cppBlock(self):
-            return self.getTypedRuleContext(ChronoParser.CppBlockContext,0)
+            return self.getTypedRuleContext(CHParser.CppBlockContext,0)
 
 
         def classDefinition(self):
-            return self.getTypedRuleContext(ChronoParser.ClassDefinitionContext,0)
+            return self.getTypedRuleContext(CHParser.ClassDefinitionContext,0)
 
 
         def structDefinition(self):
-            return self.getTypedRuleContext(ChronoParser.StructDefinitionContext,0)
+            return self.getTypedRuleContext(CHParser.StructDefinitionContext,0)
 
 
         def functionDefinition(self):
-            return self.getTypedRuleContext(ChronoParser.FunctionDefinitionContext,0)
+            return self.getTypedRuleContext(CHParser.FunctionDefinitionContext,0)
 
 
         def enumDefinition(self):
-            return self.getTypedRuleContext(ChronoParser.EnumDefinitionContext,0)
+            return self.getTypedRuleContext(CHParser.EnumDefinitionContext,0)
 
 
         def functionSignature(self):
-            return self.getTypedRuleContext(ChronoParser.FunctionSignatureContext,0)
+            return self.getTypedRuleContext(CHParser.FunctionSignatureContext,0)
 
 
         def implementationBlock(self):
-            return self.getTypedRuleContext(ChronoParser.ImplementationBlockContext,0)
+            return self.getTypedRuleContext(CHParser.ImplementationBlockContext,0)
 
 
         def interfaceDefinition(self):
-            return self.getTypedRuleContext(ChronoParser.InterfaceDefinitionContext,0)
+            return self.getTypedRuleContext(CHParser.InterfaceDefinitionContext,0)
 
 
         def usingAlias(self):
-            return self.getTypedRuleContext(ChronoParser.UsingAliasContext,0)
+            return self.getTypedRuleContext(CHParser.UsingAliasContext,0)
 
 
         def variableDeclaration(self):
-            return self.getTypedRuleContext(ChronoParser.VariableDeclarationContext,0)
+            return self.getTypedRuleContext(CHParser.VariableDeclarationContext,0)
 
 
         def forwardDeclaration(self):
-            return self.getTypedRuleContext(ChronoParser.ForwardDeclarationContext,0)
+            return self.getTypedRuleContext(CHParser.ForwardDeclarationContext,0)
 
 
         def CPP_DIRECTIVE(self):
-            return self.getToken(ChronoParser.CPP_DIRECTIVE, 0)
+            return self.getToken(CHParser.CPP_DIRECTIVE, 0)
 
         def endNamespaceStatement(self):
-            return self.getTypedRuleContext(ChronoParser.EndNamespaceStatementContext,0)
+            return self.getTypedRuleContext(CHParser.EndNamespaceStatementContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_topLevelStatement
+            return CHParser.RULE_topLevelStatement
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterTopLevelStatement" ):
@@ -1604,7 +1604,7 @@ class ChronoParser ( Parser ):
 
     def topLevelStatement(self):
 
-        localctx = ChronoParser.TopLevelStatementContext(self, self._ctx, self.state)
+        localctx = CHParser.TopLevelStatementContext(self, self._ctx, self.state)
         self.enterRule(localctx, 18, self.RULE_topLevelStatement)
         try:
             self.state = 271
@@ -1679,7 +1679,7 @@ class ChronoParser ( Parser ):
             elif la_ == 12:
                 self.enterOuterAlt(localctx, 12)
                 self.state = 269
-                self.match(ChronoParser.CPP_DIRECTIVE)
+                self.match(CHParser.CPP_DIRECTIVE)
                 pass
 
             elif la_ == 13:
@@ -1708,25 +1708,25 @@ class ChronoParser ( Parser ):
             self.kind = None # Token
 
         def TYPE(self):
-            return self.getToken(ChronoParser.TYPE, 0)
+            return self.getToken(CHParser.TYPE, 0)
 
         def COLON(self):
-            return self.getToken(ChronoParser.COLON, 0)
+            return self.getToken(CHParser.COLON, 0)
 
         def SEMIC_TOKEN(self):
-            return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
+            return self.getToken(CHParser.SEMIC_TOKEN, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def CLASS(self):
-            return self.getToken(ChronoParser.CLASS, 0)
+            return self.getToken(CHParser.CLASS, 0)
 
         def STRUCT(self):
-            return self.getToken(ChronoParser.STRUCT, 0)
+            return self.getToken(CHParser.STRUCT, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_forwardDeclaration
+            return CHParser.RULE_forwardDeclaration
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterForwardDeclaration" ):
@@ -1747,32 +1747,32 @@ class ChronoParser ( Parser ):
 
     def forwardDeclaration(self):
 
-        localctx = ChronoParser.ForwardDeclarationContext(self, self._ctx, self.state)
+        localctx = CHParser.ForwardDeclarationContext(self, self._ctx, self.state)
         self.enterRule(localctx, 20, self.RULE_forwardDeclaration)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 273
-            self.match(ChronoParser.TYPE)
+            self.match(CHParser.TYPE)
             self.state = 274
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 275
-            self.match(ChronoParser.COLON)
+            self.match(CHParser.COLON)
             self.state = 278
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [6]:
                 self.state = 276
-                localctx.kind = self.match(ChronoParser.CLASS)
+                localctx.kind = self.match(CHParser.CLASS)
                 pass
             elif token in [8]:
                 self.state = 277
-                localctx.kind = self.match(ChronoParser.STRUCT)
+                localctx.kind = self.match(CHParser.STRUCT)
                 pass
             else:
                 raise NoViableAltException(self)
 
             self.state = 280
-            self.match(ChronoParser.SEMIC_TOKEN)
+            self.match(CHParser.SEMIC_TOKEN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1790,13 +1790,13 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def PUBLIC(self):
-            return self.getToken(ChronoParser.PUBLIC, 0)
+            return self.getToken(CHParser.PUBLIC, 0)
 
         def PROTECTED(self):
-            return self.getToken(ChronoParser.PROTECTED, 0)
+            return self.getToken(CHParser.PROTECTED, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_accessModifier
+            return CHParser.RULE_accessModifier
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterAccessModifier" ):
@@ -1817,7 +1817,7 @@ class ChronoParser ( Parser ):
 
     def accessModifier(self):
 
-        localctx = ChronoParser.AccessModifierContext(self, self._ctx, self.state)
+        localctx = CHParser.AccessModifierContext(self, self._ctx, self.state)
         self.enterRule(localctx, 22, self.RULE_accessModifier)
         self._la = 0 # Token type
         try:
@@ -1846,13 +1846,13 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def END_NAMESPACE(self):
-            return self.getToken(ChronoParser.END_NAMESPACE, 0)
+            return self.getToken(CHParser.END_NAMESPACE, 0)
 
         def SEMIC_TOKEN(self):
-            return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
+            return self.getToken(CHParser.SEMIC_TOKEN, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_endNamespaceStatement
+            return CHParser.RULE_endNamespaceStatement
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterEndNamespaceStatement" ):
@@ -1873,14 +1873,14 @@ class ChronoParser ( Parser ):
 
     def endNamespaceStatement(self):
 
-        localctx = ChronoParser.EndNamespaceStatementContext(self, self._ctx, self.state)
+        localctx = CHParser.EndNamespaceStatementContext(self, self._ctx, self.state)
         self.enterRule(localctx, 24, self.RULE_endNamespaceStatement)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 284
-            self.match(ChronoParser.END_NAMESPACE)
+            self.match(CHParser.END_NAMESPACE)
             self.state = 285
-            self.match(ChronoParser.SEMIC_TOKEN)
+            self.match(CHParser.SEMIC_TOKEN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1898,23 +1898,23 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def INIT(self):
-            return self.getToken(ChronoParser.INIT, 0)
+            return self.getToken(CHParser.INIT, 0)
 
         def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
+            return self.getToken(CHParser.LPAREN, 0)
 
         def parameters(self):
-            return self.getTypedRuleContext(ChronoParser.ParametersContext,0)
+            return self.getTypedRuleContext(CHParser.ParametersContext,0)
 
 
         def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
+            return self.getToken(CHParser.RPAREN, 0)
 
         def SEMIC_TOKEN(self):
-            return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
+            return self.getToken(CHParser.SEMIC_TOKEN, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_initSignature
+            return CHParser.RULE_initSignature
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterInitSignature" ):
@@ -1935,20 +1935,20 @@ class ChronoParser ( Parser ):
 
     def initSignature(self):
 
-        localctx = ChronoParser.InitSignatureContext(self, self._ctx, self.state)
+        localctx = CHParser.InitSignatureContext(self, self._ctx, self.state)
         self.enterRule(localctx, 26, self.RULE_initSignature)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 287
-            self.match(ChronoParser.INIT)
+            self.match(CHParser.INIT)
             self.state = 288
-            self.match(ChronoParser.LPAREN)
+            self.match(CHParser.LPAREN)
             self.state = 289
             self.parameters()
             self.state = 290
-            self.match(ChronoParser.RPAREN)
+            self.match(CHParser.RPAREN)
             self.state = 291
-            self.match(ChronoParser.SEMIC_TOKEN)
+            self.match(CHParser.SEMIC_TOKEN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1966,13 +1966,13 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def DEINIT(self):
-            return self.getToken(ChronoParser.DEINIT, 0)
+            return self.getToken(CHParser.DEINIT, 0)
 
         def SEMIC_TOKEN(self):
-            return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
+            return self.getToken(CHParser.SEMIC_TOKEN, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_deinitSignature
+            return CHParser.RULE_deinitSignature
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterDeinitSignature" ):
@@ -1993,14 +1993,14 @@ class ChronoParser ( Parser ):
 
     def deinitSignature(self):
 
-        localctx = ChronoParser.DeinitSignatureContext(self, self._ctx, self.state)
+        localctx = CHParser.DeinitSignatureContext(self, self._ctx, self.state)
         self.enterRule(localctx, 28, self.RULE_deinitSignature)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 293
-            self.match(ChronoParser.DEINIT)
+            self.match(CHParser.DEINIT)
             self.state = 294
-            self.match(ChronoParser.SEMIC_TOKEN)
+            self.match(CHParser.SEMIC_TOKEN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -2018,41 +2018,41 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def variableDeclaration(self):
-            return self.getTypedRuleContext(ChronoParser.VariableDeclarationContext,0)
+            return self.getTypedRuleContext(CHParser.VariableDeclarationContext,0)
 
 
         def accessModifier(self):
-            return self.getTypedRuleContext(ChronoParser.AccessModifierContext,0)
+            return self.getTypedRuleContext(CHParser.AccessModifierContext,0)
 
 
         def enumDefinition(self):
-            return self.getTypedRuleContext(ChronoParser.EnumDefinitionContext,0)
+            return self.getTypedRuleContext(CHParser.EnumDefinitionContext,0)
 
 
         def functionSignature(self):
-            return self.getTypedRuleContext(ChronoParser.FunctionSignatureContext,0)
+            return self.getTypedRuleContext(CHParser.FunctionSignatureContext,0)
 
 
         def STATIC(self):
-            return self.getToken(ChronoParser.STATIC, 0)
+            return self.getToken(CHParser.STATIC, 0)
 
         def initSignature(self):
-            return self.getTypedRuleContext(ChronoParser.InitSignatureContext,0)
+            return self.getTypedRuleContext(CHParser.InitSignatureContext,0)
 
 
         def deinitSignature(self):
-            return self.getTypedRuleContext(ChronoParser.DeinitSignatureContext,0)
+            return self.getTypedRuleContext(CHParser.DeinitSignatureContext,0)
 
 
         def cppBlock(self):
-            return self.getTypedRuleContext(ChronoParser.CppBlockContext,0)
+            return self.getTypedRuleContext(CHParser.CppBlockContext,0)
 
 
         def CPP_DIRECTIVE(self):
-            return self.getToken(ChronoParser.CPP_DIRECTIVE, 0)
+            return self.getToken(CHParser.CPP_DIRECTIVE, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_classBodyStatement
+            return CHParser.RULE_classBodyStatement
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterClassBodyStatement" ):
@@ -2073,7 +2073,7 @@ class ChronoParser ( Parser ):
 
     def classBodyStatement(self):
 
-        localctx = ChronoParser.ClassBodyStatementContext(self, self._ctx, self.state)
+        localctx = CHParser.ClassBodyStatementContext(self, self._ctx, self.state)
         self.enterRule(localctx, 30, self.RULE_classBodyStatement)
         self._la = 0 # Token type
         try:
@@ -2127,7 +2127,7 @@ class ChronoParser ( Parser ):
                     la_ = self._interp.adaptivePredict(self._input,26,self._ctx)
                     if la_ == 1:
                         self.state = 307
-                        self.match(ChronoParser.STATIC)
+                        self.match(CHParser.STATIC)
 
 
                     pass
@@ -2138,7 +2138,7 @@ class ChronoParser ( Parser ):
                     la_ = self._interp.adaptivePredict(self._input,27,self._ctx)
                     if la_ == 1:
                         self.state = 310
-                        self.match(ChronoParser.STATIC)
+                        self.match(CHParser.STATIC)
 
 
                     self.state = 314
@@ -2211,7 +2211,7 @@ class ChronoParser ( Parser ):
             elif la_ == 10:
                 self.enterOuterAlt(localctx, 10)
                 self.state = 331
-                self.match(ChronoParser.CPP_DIRECTIVE)
+                self.match(CHParser.CPP_DIRECTIVE)
                 pass
 
 
@@ -2235,42 +2235,42 @@ class ChronoParser ( Parser ):
             self.interfaces = None # TypeListContext
 
         def CLASS(self):
-            return self.getToken(ChronoParser.CLASS, 0)
+            return self.getToken(CHParser.CLASS, 0)
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def IDENTIFIER(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.IDENTIFIER)
+                return self.getTokens(CHParser.IDENTIFIER)
             else:
-                return self.getToken(ChronoParser.IDENTIFIER, i)
+                return self.getToken(CHParser.IDENTIFIER, i)
 
         def AT_DYNAMIC(self):
-            return self.getToken(ChronoParser.AT_DYNAMIC, 0)
+            return self.getToken(CHParser.AT_DYNAMIC, 0)
 
         def COLON(self):
-            return self.getToken(ChronoParser.COLON, 0)
+            return self.getToken(CHParser.COLON, 0)
 
         def IMPL(self):
-            return self.getToken(ChronoParser.IMPL, 0)
+            return self.getToken(CHParser.IMPL, 0)
 
         def classBodyStatement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.ClassBodyStatementContext)
+                return self.getTypedRuleContexts(CHParser.ClassBodyStatementContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.ClassBodyStatementContext,i)
+                return self.getTypedRuleContext(CHParser.ClassBodyStatementContext,i)
 
 
         def typeList(self):
-            return self.getTypedRuleContext(ChronoParser.TypeListContext,0)
+            return self.getTypedRuleContext(CHParser.TypeListContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_classDefinition
+            return CHParser.RULE_classDefinition
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterClassDefinition" ):
@@ -2291,7 +2291,7 @@ class ChronoParser ( Parser ):
 
     def classDefinition(self):
 
-        localctx = ChronoParser.ClassDefinitionContext(self, self._ctx, self.state)
+        localctx = CHParser.ClassDefinitionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 32, self.RULE_classDefinition)
         self._la = 0 # Token type
         try:
@@ -2301,21 +2301,21 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==35:
                 self.state = 334
-                self.match(ChronoParser.AT_DYNAMIC)
+                self.match(CHParser.AT_DYNAMIC)
 
 
             self.state = 337
-            self.match(ChronoParser.CLASS)
+            self.match(CHParser.CLASS)
             self.state = 338
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 341
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==85:
                 self.state = 339
-                self.match(ChronoParser.COLON)
+                self.match(CHParser.COLON)
                 self.state = 340
-                localctx.base = self.match(ChronoParser.IDENTIFIER)
+                localctx.base = self.match(CHParser.IDENTIFIER)
 
 
             self.state = 345
@@ -2323,13 +2323,13 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==22:
                 self.state = 343
-                self.match(ChronoParser.IMPL)
+                self.match(CHParser.IMPL)
                 self.state = 344
                 localctx.interfaces = self.typeList()
 
 
             self.state = 347
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 351
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -2341,7 +2341,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 354
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -2360,43 +2360,43 @@ class ChronoParser ( Parser ):
             self.name = None # Token
 
         def IMPLEMENT(self):
-            return self.getToken(ChronoParser.IMPLEMENT, 0)
+            return self.getToken(CHParser.IMPLEMENT, 0)
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def AT_DYNAMIC(self):
-            return self.getToken(ChronoParser.AT_DYNAMIC, 0)
+            return self.getToken(CHParser.AT_DYNAMIC, 0)
 
         def methodDefinition(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.MethodDefinitionContext)
+                return self.getTypedRuleContexts(CHParser.MethodDefinitionContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.MethodDefinitionContext,i)
+                return self.getTypedRuleContext(CHParser.MethodDefinitionContext,i)
 
 
         def initDefinition(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.InitDefinitionContext)
+                return self.getTypedRuleContexts(CHParser.InitDefinitionContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.InitDefinitionContext,i)
+                return self.getTypedRuleContext(CHParser.InitDefinitionContext,i)
 
 
         def deinitBlock(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.DeinitBlockContext)
+                return self.getTypedRuleContexts(CHParser.DeinitBlockContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.DeinitBlockContext,i)
+                return self.getTypedRuleContext(CHParser.DeinitBlockContext,i)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_implementationBlock
+            return CHParser.RULE_implementationBlock
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterImplementationBlock" ):
@@ -2417,7 +2417,7 @@ class ChronoParser ( Parser ):
 
     def implementationBlock(self):
 
-        localctx = ChronoParser.ImplementationBlockContext(self, self._ctx, self.state)
+        localctx = CHParser.ImplementationBlockContext(self, self._ctx, self.state)
         self.enterRule(localctx, 34, self.RULE_implementationBlock)
         self._la = 0 # Token type
         try:
@@ -2427,15 +2427,15 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==35:
                 self.state = 356
-                self.match(ChronoParser.AT_DYNAMIC)
+                self.match(CHParser.AT_DYNAMIC)
 
 
             self.state = 359
-            self.match(ChronoParser.IMPLEMENT)
+            self.match(CHParser.IMPLEMENT)
             self.state = 360
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 361
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 367
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -2463,7 +2463,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 370
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -2482,26 +2482,26 @@ class ChronoParser ( Parser ):
             self.name = None # Token
 
         def STRUCT(self):
-            return self.getToken(ChronoParser.STRUCT, 0)
+            return self.getToken(CHParser.STRUCT, 0)
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def structBodyStatement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.StructBodyStatementContext)
+                return self.getTypedRuleContexts(CHParser.StructBodyStatementContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.StructBodyStatementContext,i)
+                return self.getTypedRuleContext(CHParser.StructBodyStatementContext,i)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_structDefinition
+            return CHParser.RULE_structDefinition
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterStructDefinition" ):
@@ -2522,17 +2522,17 @@ class ChronoParser ( Parser ):
 
     def structDefinition(self):
 
-        localctx = ChronoParser.StructDefinitionContext(self, self._ctx, self.state)
+        localctx = CHParser.StructDefinitionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 36, self.RULE_structDefinition)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 372
-            self.match(ChronoParser.STRUCT)
+            self.match(CHParser.STRUCT)
             self.state = 373
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 374
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 378
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -2544,7 +2544,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 381
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -2562,38 +2562,38 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def variableDeclaration(self):
-            return self.getTypedRuleContext(ChronoParser.VariableDeclarationContext,0)
+            return self.getTypedRuleContext(CHParser.VariableDeclarationContext,0)
 
 
         def accessModifier(self):
-            return self.getTypedRuleContext(ChronoParser.AccessModifierContext,0)
+            return self.getTypedRuleContext(CHParser.AccessModifierContext,0)
 
 
         def enumDefinition(self):
-            return self.getTypedRuleContext(ChronoParser.EnumDefinitionContext,0)
+            return self.getTypedRuleContext(CHParser.EnumDefinitionContext,0)
 
 
         def functionSignature(self):
-            return self.getTypedRuleContext(ChronoParser.FunctionSignatureContext,0)
+            return self.getTypedRuleContext(CHParser.FunctionSignatureContext,0)
 
 
         def initSignature(self):
-            return self.getTypedRuleContext(ChronoParser.InitSignatureContext,0)
+            return self.getTypedRuleContext(CHParser.InitSignatureContext,0)
 
 
         def deinitSignature(self):
-            return self.getTypedRuleContext(ChronoParser.DeinitSignatureContext,0)
+            return self.getTypedRuleContext(CHParser.DeinitSignatureContext,0)
 
 
         def cppBlock(self):
-            return self.getTypedRuleContext(ChronoParser.CppBlockContext,0)
+            return self.getTypedRuleContext(CHParser.CppBlockContext,0)
 
 
         def CPP_DIRECTIVE(self):
-            return self.getToken(ChronoParser.CPP_DIRECTIVE, 0)
+            return self.getToken(CHParser.CPP_DIRECTIVE, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_structBodyStatement
+            return CHParser.RULE_structBodyStatement
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterStructBodyStatement" ):
@@ -2614,7 +2614,7 @@ class ChronoParser ( Parser ):
 
     def structBodyStatement(self):
 
-        localctx = ChronoParser.StructBodyStatementContext(self, self._ctx, self.state)
+        localctx = CHParser.StructBodyStatementContext(self, self._ctx, self.state)
         self.enterRule(localctx, 38, self.RULE_structBodyStatement)
         self._la = 0 # Token type
         try:
@@ -2718,7 +2718,7 @@ class ChronoParser ( Parser ):
             elif la_ == 10:
                 self.enterOuterAlt(localctx, 10)
                 self.state = 407
-                self.match(ChronoParser.CPP_DIRECTIVE)
+                self.match(CHParser.CPP_DIRECTIVE)
                 pass
 
 
@@ -2740,36 +2740,36 @@ class ChronoParser ( Parser ):
             self.name = None # Token
 
         def ENUM(self):
-            return self.getToken(ChronoParser.ENUM, 0)
+            return self.getToken(CHParser.ENUM, 0)
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def CLASS(self):
-            return self.getToken(ChronoParser.CLASS, 0)
+            return self.getToken(CHParser.CLASS, 0)
 
         def COLON(self):
-            return self.getToken(ChronoParser.COLON, 0)
+            return self.getToken(CHParser.COLON, 0)
 
         def typeSpecifier(self):
-            return self.getTypedRuleContext(ChronoParser.TypeSpecifierContext,0)
+            return self.getTypedRuleContext(CHParser.TypeSpecifierContext,0)
 
 
         def enumBody(self):
-            return self.getTypedRuleContext(ChronoParser.EnumBodyContext,0)
+            return self.getTypedRuleContext(CHParser.EnumBodyContext,0)
 
 
         def SEMIC_TOKEN(self):
-            return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
+            return self.getToken(CHParser.SEMIC_TOKEN, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_enumDefinition
+            return CHParser.RULE_enumDefinition
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterEnumDefinition" ):
@@ -2790,35 +2790,35 @@ class ChronoParser ( Parser ):
 
     def enumDefinition(self):
 
-        localctx = ChronoParser.EnumDefinitionContext(self, self._ctx, self.state)
+        localctx = CHParser.EnumDefinitionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 40, self.RULE_enumDefinition)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 410
-            self.match(ChronoParser.ENUM)
+            self.match(CHParser.ENUM)
             self.state = 412
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==6:
                 self.state = 411
-                self.match(ChronoParser.CLASS)
+                self.match(CHParser.CLASS)
 
 
             self.state = 414
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 417
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==85:
                 self.state = 415
-                self.match(ChronoParser.COLON)
+                self.match(CHParser.COLON)
                 self.state = 416
                 self.typeSpecifier()
 
 
             self.state = 419
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 421
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -2828,13 +2828,13 @@ class ChronoParser ( Parser ):
 
 
             self.state = 423
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
             self.state = 425
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==78:
                 self.state = 424
-                self.match(ChronoParser.SEMIC_TOKEN)
+                self.match(CHParser.SEMIC_TOKEN)
 
 
         except RecognitionException as re:
@@ -2855,19 +2855,19 @@ class ChronoParser ( Parser ):
 
         def enumItem(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.EnumItemContext)
+                return self.getTypedRuleContexts(CHParser.EnumItemContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.EnumItemContext,i)
+                return self.getTypedRuleContext(CHParser.EnumItemContext,i)
 
 
         def COMMA(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.COMMA)
+                return self.getTokens(CHParser.COMMA)
             else:
-                return self.getToken(ChronoParser.COMMA, i)
+                return self.getToken(CHParser.COMMA, i)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_enumBody
+            return CHParser.RULE_enumBody
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterEnumBody" ):
@@ -2888,7 +2888,7 @@ class ChronoParser ( Parser ):
 
     def enumBody(self):
 
-        localctx = ChronoParser.EnumBodyContext(self, self._ctx, self.state)
+        localctx = CHParser.EnumBodyContext(self, self._ctx, self.state)
         self.enterRule(localctx, 42, self.RULE_enumBody)
         self._la = 0 # Token type
         try:
@@ -2901,7 +2901,7 @@ class ChronoParser ( Parser ):
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                 if _alt==1:
                     self.state = 428
-                    self.match(ChronoParser.COMMA)
+                    self.match(CHParser.COMMA)
                     self.state = 429
                     self.enumItem() 
                 self.state = 434
@@ -2913,7 +2913,7 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==88:
                 self.state = 435
-                self.match(ChronoParser.COMMA)
+                self.match(CHParser.COMMA)
 
 
         except RecognitionException as re:
@@ -2934,17 +2934,17 @@ class ChronoParser ( Parser ):
             self.name = None # Token
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def ASSIGN(self):
-            return self.getToken(ChronoParser.ASSIGN, 0)
+            return self.getToken(CHParser.ASSIGN, 0)
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_enumItem
+            return CHParser.RULE_enumItem
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterEnumItem" ):
@@ -2965,19 +2965,19 @@ class ChronoParser ( Parser ):
 
     def enumItem(self):
 
-        localctx = ChronoParser.EnumItemContext(self, self._ctx, self.state)
+        localctx = CHParser.EnumItemContext(self, self._ctx, self.state)
         self.enterRule(localctx, 44, self.RULE_enumItem)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 438
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 441
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==86:
                 self.state = 439
-                self.match(ChronoParser.ASSIGN)
+                self.match(CHParser.ASSIGN)
                 self.state = 440
                 self.expression()
 
@@ -3001,45 +3001,45 @@ class ChronoParser ( Parser ):
             self.returnType = None # TypeSpecifierContext
 
         def FUNC(self):
-            return self.getToken(ChronoParser.FUNC, 0)
+            return self.getToken(CHParser.FUNC, 0)
 
         def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
+            return self.getToken(CHParser.LPAREN, 0)
 
         def parameters(self):
-            return self.getTypedRuleContext(ChronoParser.ParametersContext,0)
+            return self.getTypedRuleContext(CHParser.ParametersContext,0)
 
 
         def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
+            return self.getToken(CHParser.RPAREN, 0)
 
         def SEMIC_TOKEN(self):
-            return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
+            return self.getToken(CHParser.SEMIC_TOKEN, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def EXTERN(self):
-            return self.getToken(ChronoParser.EXTERN, 0)
+            return self.getToken(CHParser.EXTERN, 0)
 
         def STATIC(self):
-            return self.getToken(ChronoParser.STATIC, 0)
+            return self.getToken(CHParser.STATIC, 0)
 
         def VIRTUAL(self):
-            return self.getToken(ChronoParser.VIRTUAL, 0)
+            return self.getToken(CHParser.VIRTUAL, 0)
 
         def OVERRIDE(self):
-            return self.getToken(ChronoParser.OVERRIDE, 0)
+            return self.getToken(CHParser.OVERRIDE, 0)
 
         def ARROW(self):
-            return self.getToken(ChronoParser.ARROW, 0)
+            return self.getToken(CHParser.ARROW, 0)
 
         def typeSpecifier(self):
-            return self.getTypedRuleContext(ChronoParser.TypeSpecifierContext,0)
+            return self.getTypedRuleContext(CHParser.TypeSpecifierContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_functionSignature
+            return CHParser.RULE_functionSignature
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterFunctionSignature" ):
@@ -3060,7 +3060,7 @@ class ChronoParser ( Parser ):
 
     def functionSignature(self):
 
-        localctx = ChronoParser.FunctionSignatureContext(self, self._ctx, self.state)
+        localctx = CHParser.FunctionSignatureContext(self, self._ctx, self.state)
         self.enterRule(localctx, 46, self.RULE_functionSignature)
         self._la = 0 # Token type
         try:
@@ -3070,7 +3070,7 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==29:
                 self.state = 443
-                self.match(ChronoParser.EXTERN)
+                self.match(CHParser.EXTERN)
 
 
             self.state = 447
@@ -3078,7 +3078,7 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==13:
                 self.state = 446
-                self.match(ChronoParser.STATIC)
+                self.match(CHParser.STATIC)
 
 
             self.state = 450
@@ -3086,7 +3086,7 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==23:
                 self.state = 449
-                self.match(ChronoParser.VIRTUAL)
+                self.match(CHParser.VIRTUAL)
 
 
             self.state = 453
@@ -3094,31 +3094,31 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==24:
                 self.state = 452
-                self.match(ChronoParser.OVERRIDE)
+                self.match(CHParser.OVERRIDE)
 
 
             self.state = 455
-            self.match(ChronoParser.FUNC)
+            self.match(CHParser.FUNC)
             self.state = 456
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 457
-            self.match(ChronoParser.LPAREN)
+            self.match(CHParser.LPAREN)
             self.state = 458
             self.parameters()
             self.state = 459
-            self.match(ChronoParser.RPAREN)
+            self.match(CHParser.RPAREN)
             self.state = 462
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==56:
                 self.state = 460
-                self.match(ChronoParser.ARROW)
+                self.match(CHParser.ARROW)
                 self.state = 461
                 localctx.returnType = self.typeSpecifier()
 
 
             self.state = 464
-            self.match(ChronoParser.SEMIC_TOKEN)
+            self.match(CHParser.SEMIC_TOKEN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -3138,43 +3138,43 @@ class ChronoParser ( Parser ):
             self.returnType = None # TypeSpecifierContext
 
         def FUNC(self):
-            return self.getToken(ChronoParser.FUNC, 0)
+            return self.getToken(CHParser.FUNC, 0)
 
         def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
+            return self.getToken(CHParser.LPAREN, 0)
 
         def parameters(self):
-            return self.getTypedRuleContext(ChronoParser.ParametersContext,0)
+            return self.getTypedRuleContext(CHParser.ParametersContext,0)
 
 
         def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
+            return self.getToken(CHParser.RPAREN, 0)
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def ARROW(self):
-            return self.getToken(ChronoParser.ARROW, 0)
+            return self.getToken(CHParser.ARROW, 0)
 
         def statement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.StatementContext)
+                return self.getTypedRuleContexts(CHParser.StatementContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.StatementContext,i)
+                return self.getTypedRuleContext(CHParser.StatementContext,i)
 
 
         def typeSpecifier(self):
-            return self.getTypedRuleContext(ChronoParser.TypeSpecifierContext,0)
+            return self.getTypedRuleContext(CHParser.TypeSpecifierContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_methodDefinition
+            return CHParser.RULE_methodDefinition
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterMethodDefinition" ):
@@ -3195,33 +3195,33 @@ class ChronoParser ( Parser ):
 
     def methodDefinition(self):
 
-        localctx = ChronoParser.MethodDefinitionContext(self, self._ctx, self.state)
+        localctx = CHParser.MethodDefinitionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 48, self.RULE_methodDefinition)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 466
-            self.match(ChronoParser.FUNC)
+            self.match(CHParser.FUNC)
             self.state = 467
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 468
-            self.match(ChronoParser.LPAREN)
+            self.match(CHParser.LPAREN)
             self.state = 469
             self.parameters()
             self.state = 470
-            self.match(ChronoParser.RPAREN)
+            self.match(CHParser.RPAREN)
             self.state = 473
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==56:
                 self.state = 471
-                self.match(ChronoParser.ARROW)
+                self.match(CHParser.ARROW)
                 self.state = 472
                 localctx.returnType = self.typeSpecifier()
 
 
             self.state = 475
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 479
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -3233,7 +3233,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 482
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -3252,40 +3252,40 @@ class ChronoParser ( Parser ):
             self.baseInit = None # BaseInitializerContext
 
         def INIT(self):
-            return self.getToken(ChronoParser.INIT, 0)
+            return self.getToken(CHParser.INIT, 0)
 
         def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
+            return self.getToken(CHParser.LPAREN, 0)
 
         def parameters(self):
-            return self.getTypedRuleContext(ChronoParser.ParametersContext,0)
+            return self.getTypedRuleContext(CHParser.ParametersContext,0)
 
 
         def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
+            return self.getToken(CHParser.RPAREN, 0)
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def COLON(self):
-            return self.getToken(ChronoParser.COLON, 0)
+            return self.getToken(CHParser.COLON, 0)
 
         def statement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.StatementContext)
+                return self.getTypedRuleContexts(CHParser.StatementContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.StatementContext,i)
+                return self.getTypedRuleContext(CHParser.StatementContext,i)
 
 
         def baseInitializer(self):
-            return self.getTypedRuleContext(ChronoParser.BaseInitializerContext,0)
+            return self.getTypedRuleContext(CHParser.BaseInitializerContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_initDefinition
+            return CHParser.RULE_initDefinition
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterInitDefinition" ):
@@ -3306,31 +3306,31 @@ class ChronoParser ( Parser ):
 
     def initDefinition(self):
 
-        localctx = ChronoParser.InitDefinitionContext(self, self._ctx, self.state)
+        localctx = CHParser.InitDefinitionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 50, self.RULE_initDefinition)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 484
-            self.match(ChronoParser.INIT)
+            self.match(CHParser.INIT)
             self.state = 485
-            self.match(ChronoParser.LPAREN)
+            self.match(CHParser.LPAREN)
             self.state = 486
             self.parameters()
             self.state = 487
-            self.match(ChronoParser.RPAREN)
+            self.match(CHParser.RPAREN)
             self.state = 490
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==85:
                 self.state = 488
-                self.match(ChronoParser.COLON)
+                self.match(CHParser.COLON)
                 self.state = 489
                 localctx.baseInit = self.baseInitializer()
 
 
             self.state = 492
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 496
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -3342,7 +3342,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 499
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -3360,23 +3360,23 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def DEINIT(self):
-            return self.getToken(ChronoParser.DEINIT, 0)
+            return self.getToken(CHParser.DEINIT, 0)
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def statement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.StatementContext)
+                return self.getTypedRuleContexts(CHParser.StatementContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.StatementContext,i)
+                return self.getTypedRuleContext(CHParser.StatementContext,i)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_deinitBlock
+            return CHParser.RULE_deinitBlock
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterDeinitBlock" ):
@@ -3397,15 +3397,15 @@ class ChronoParser ( Parser ):
 
     def deinitBlock(self):
 
-        localctx = ChronoParser.DeinitBlockContext(self, self._ctx, self.state)
+        localctx = CHParser.DeinitBlockContext(self, self._ctx, self.state)
         self.enterRule(localctx, 52, self.RULE_deinitBlock)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 501
-            self.match(ChronoParser.DEINIT)
+            self.match(CHParser.DEINIT)
             self.state = 502
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 506
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -3417,7 +3417,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 509
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -3436,42 +3436,42 @@ class ChronoParser ( Parser ):
 
         def IDENTIFIER(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.IDENTIFIER)
+                return self.getTokens(CHParser.IDENTIFIER)
             else:
-                return self.getToken(ChronoParser.IDENTIFIER, i)
+                return self.getToken(CHParser.IDENTIFIER, i)
 
         def DOT(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.DOT)
+                return self.getTokens(CHParser.DOT)
             else:
-                return self.getToken(ChronoParser.DOT, i)
+                return self.getToken(CHParser.DOT, i)
 
         def SLASH(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.SLASH)
+                return self.getTokens(CHParser.SLASH)
             else:
-                return self.getToken(ChronoParser.SLASH, i)
+                return self.getToken(CHParser.SLASH, i)
 
         def MINUS(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.MINUS)
+                return self.getTokens(CHParser.MINUS)
             else:
-                return self.getToken(ChronoParser.MINUS, i)
+                return self.getToken(CHParser.MINUS, i)
 
         def PLUS(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.PLUS)
+                return self.getTokens(CHParser.PLUS)
             else:
-                return self.getToken(ChronoParser.PLUS, i)
+                return self.getToken(CHParser.PLUS, i)
 
         def DECIMAL_LITERAL(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.DECIMAL_LITERAL)
+                return self.getTokens(CHParser.DECIMAL_LITERAL)
             else:
-                return self.getToken(ChronoParser.DECIMAL_LITERAL, i)
+                return self.getToken(CHParser.DECIMAL_LITERAL, i)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_includeHeaderContent
+            return CHParser.RULE_includeHeaderContent
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterIncludeHeaderContent" ):
@@ -3492,7 +3492,7 @@ class ChronoParser ( Parser ):
 
     def includeHeaderContent(self):
 
-        localctx = ChronoParser.IncludeHeaderContentContext(self, self._ctx, self.state)
+        localctx = CHParser.IncludeHeaderContentContext(self, self._ctx, self.state)
         self.enterRule(localctx, 54, self.RULE_includeHeaderContent)
         self._la = 0 # Token type
         try:
@@ -3534,29 +3534,29 @@ class ChronoParser ( Parser ):
             self.alias = None # Token
 
         def IMPORT(self):
-            return self.getToken(ChronoParser.IMPORT, 0)
+            return self.getToken(CHParser.IMPORT, 0)
 
         def STRING_LITERAL(self):
-            return self.getToken(ChronoParser.STRING_LITERAL, 0)
+            return self.getToken(CHParser.STRING_LITERAL, 0)
 
         def AS(self):
-            return self.getToken(ChronoParser.AS, 0)
+            return self.getToken(CHParser.AS, 0)
 
         def LT(self):
-            return self.getToken(ChronoParser.LT, 0)
+            return self.getToken(CHParser.LT, 0)
 
         def GT(self):
-            return self.getToken(ChronoParser.GT, 0)
+            return self.getToken(CHParser.GT, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def includeHeaderContent(self):
-            return self.getTypedRuleContext(ChronoParser.IncludeHeaderContentContext,0)
+            return self.getTypedRuleContext(CHParser.IncludeHeaderContentContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_importDirective
+            return CHParser.RULE_importDirective
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterImportDirective" ):
@@ -3577,27 +3577,27 @@ class ChronoParser ( Parser ):
 
     def importDirective(self):
 
-        localctx = ChronoParser.ImportDirectiveContext(self, self._ctx, self.state)
+        localctx = CHParser.ImportDirectiveContext(self, self._ctx, self.state)
         self.enterRule(localctx, 56, self.RULE_importDirective)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 516
-            self.match(ChronoParser.IMPORT)
+            self.match(CHParser.IMPORT)
             self.state = 522
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [100]:
                 self.state = 517
-                localctx.pathStr = self.match(ChronoParser.STRING_LITERAL)
+                localctx.pathStr = self.match(CHParser.STRING_LITERAL)
                 pass
             elif token in [71]:
                 self.state = 518
-                self.match(ChronoParser.LT)
+                self.match(CHParser.LT)
                 self.state = 519
                 localctx.pathSeq = self.includeHeaderContent()
                 self.state = 520
-                self.match(ChronoParser.GT)
+                self.match(CHParser.GT)
                 pass
             else:
                 raise NoViableAltException(self)
@@ -3607,9 +3607,9 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==25:
                 self.state = 524
-                self.match(ChronoParser.AS)
+                self.match(CHParser.AS)
                 self.state = 525
-                localctx.alias = self.match(ChronoParser.IDENTIFIER)
+                localctx.alias = self.match(CHParser.IDENTIFIER)
 
 
         except RecognitionException as re:
@@ -3631,23 +3631,23 @@ class ChronoParser ( Parser ):
             self.typeName = None # TypeSpecifierContext
 
         def USING(self):
-            return self.getToken(ChronoParser.USING, 0)
+            return self.getToken(CHParser.USING, 0)
 
         def ASSIGN(self):
-            return self.getToken(ChronoParser.ASSIGN, 0)
+            return self.getToken(CHParser.ASSIGN, 0)
 
         def SEMIC_TOKEN(self):
-            return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
+            return self.getToken(CHParser.SEMIC_TOKEN, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def typeSpecifier(self):
-            return self.getTypedRuleContext(ChronoParser.TypeSpecifierContext,0)
+            return self.getTypedRuleContext(CHParser.TypeSpecifierContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_usingAlias
+            return CHParser.RULE_usingAlias
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterUsingAlias" ):
@@ -3668,20 +3668,20 @@ class ChronoParser ( Parser ):
 
     def usingAlias(self):
 
-        localctx = ChronoParser.UsingAliasContext(self, self._ctx, self.state)
+        localctx = CHParser.UsingAliasContext(self, self._ctx, self.state)
         self.enterRule(localctx, 58, self.RULE_usingAlias)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 528
-            self.match(ChronoParser.USING)
+            self.match(CHParser.USING)
             self.state = 529
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 530
-            self.match(ChronoParser.ASSIGN)
+            self.match(CHParser.ASSIGN)
             self.state = 531
             localctx.typeName = self.typeSpecifier()
             self.state = 532
-            self.match(ChronoParser.SEMIC_TOKEN)
+            self.match(CHParser.SEMIC_TOKEN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -3701,49 +3701,49 @@ class ChronoParser ( Parser ):
             self.returnType = None # TypeSpecifierContext
 
         def FUNC(self):
-            return self.getToken(ChronoParser.FUNC, 0)
+            return self.getToken(CHParser.FUNC, 0)
 
         def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
+            return self.getToken(CHParser.LPAREN, 0)
 
         def parameters(self):
-            return self.getTypedRuleContext(ChronoParser.ParametersContext,0)
+            return self.getTypedRuleContext(CHParser.ParametersContext,0)
 
 
         def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
+            return self.getToken(CHParser.RPAREN, 0)
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def EXTERN(self):
-            return self.getToken(ChronoParser.EXTERN, 0)
+            return self.getToken(CHParser.EXTERN, 0)
 
         def STATIC(self):
-            return self.getToken(ChronoParser.STATIC, 0)
+            return self.getToken(CHParser.STATIC, 0)
 
         def ARROW(self):
-            return self.getToken(ChronoParser.ARROW, 0)
+            return self.getToken(CHParser.ARROW, 0)
 
         def statement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.StatementContext)
+                return self.getTypedRuleContexts(CHParser.StatementContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.StatementContext,i)
+                return self.getTypedRuleContext(CHParser.StatementContext,i)
 
 
         def typeSpecifier(self):
-            return self.getTypedRuleContext(ChronoParser.TypeSpecifierContext,0)
+            return self.getTypedRuleContext(CHParser.TypeSpecifierContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_functionDefinition
+            return CHParser.RULE_functionDefinition
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterFunctionDefinition" ):
@@ -3764,7 +3764,7 @@ class ChronoParser ( Parser ):
 
     def functionDefinition(self):
 
-        localctx = ChronoParser.FunctionDefinitionContext(self, self._ctx, self.state)
+        localctx = CHParser.FunctionDefinitionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 60, self.RULE_functionDefinition)
         self._la = 0 # Token type
         try:
@@ -3774,7 +3774,7 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==29:
                 self.state = 534
-                self.match(ChronoParser.EXTERN)
+                self.match(CHParser.EXTERN)
 
 
             self.state = 538
@@ -3782,31 +3782,31 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==13:
                 self.state = 537
-                self.match(ChronoParser.STATIC)
+                self.match(CHParser.STATIC)
 
 
             self.state = 540
-            self.match(ChronoParser.FUNC)
+            self.match(CHParser.FUNC)
             self.state = 541
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 542
-            self.match(ChronoParser.LPAREN)
+            self.match(CHParser.LPAREN)
             self.state = 543
             self.parameters()
             self.state = 544
-            self.match(ChronoParser.RPAREN)
+            self.match(CHParser.RPAREN)
             self.state = 547
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==56:
                 self.state = 545
-                self.match(ChronoParser.ARROW)
+                self.match(CHParser.ARROW)
                 self.state = 546
                 localctx.returnType = self.typeSpecifier()
 
 
             self.state = 549
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 553
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -3818,7 +3818,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 556
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -3837,19 +3837,19 @@ class ChronoParser ( Parser ):
 
         def parameter(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.ParameterContext)
+                return self.getTypedRuleContexts(CHParser.ParameterContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.ParameterContext,i)
+                return self.getTypedRuleContext(CHParser.ParameterContext,i)
 
 
         def COMMA(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.COMMA)
+                return self.getTokens(CHParser.COMMA)
             else:
-                return self.getToken(ChronoParser.COMMA, i)
+                return self.getToken(CHParser.COMMA, i)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_parameters
+            return CHParser.RULE_parameters
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterParameters" ):
@@ -3870,7 +3870,7 @@ class ChronoParser ( Parser ):
 
     def parameters(self):
 
-        localctx = ChronoParser.ParametersContext(self, self._ctx, self.state)
+        localctx = CHParser.ParametersContext(self, self._ctx, self.state)
         self.enterRule(localctx, 62, self.RULE_parameters)
         self._la = 0 # Token type
         try:
@@ -3886,7 +3886,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
                 while _la==88:
                     self.state = 559
-                    self.match(ChronoParser.COMMA)
+                    self.match(CHParser.COMMA)
                     self.state = 560
                     self.parameter()
                     self.state = 565
@@ -3914,17 +3914,17 @@ class ChronoParser ( Parser ):
             self.typeName = None # TypeSpecifierContext
 
         def COLON(self):
-            return self.getToken(ChronoParser.COLON, 0)
+            return self.getToken(CHParser.COLON, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def typeSpecifier(self):
-            return self.getTypedRuleContext(ChronoParser.TypeSpecifierContext,0)
+            return self.getTypedRuleContext(CHParser.TypeSpecifierContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_parameter
+            return CHParser.RULE_parameter
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterParameter" ):
@@ -3945,14 +3945,14 @@ class ChronoParser ( Parser ):
 
     def parameter(self):
 
-        localctx = ChronoParser.ParameterContext(self, self._ctx, self.state)
+        localctx = CHParser.ParameterContext(self, self._ctx, self.state)
         self.enterRule(localctx, 64, self.RULE_parameter)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 568
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 569
-            self.match(ChronoParser.COLON)
+            self.match(CHParser.COLON)
             self.state = 570
             localctx.typeName = self.typeSpecifier()
         except RecognitionException as re:
@@ -3972,19 +3972,19 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def AT_CPP(self):
-            return self.getToken(ChronoParser.AT_CPP, 0)
+            return self.getToken(CHParser.AT_CPP, 0)
 
         def AT_END(self):
-            return self.getToken(ChronoParser.AT_END, 0)
+            return self.getToken(CHParser.AT_END, 0)
 
         def CPP_BODY(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.CPP_BODY)
+                return self.getTokens(CHParser.CPP_BODY)
             else:
-                return self.getToken(ChronoParser.CPP_BODY, i)
+                return self.getToken(CHParser.CPP_BODY, i)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_cppBlock
+            return CHParser.RULE_cppBlock
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterCppBlock" ):
@@ -4005,25 +4005,25 @@ class ChronoParser ( Parser ):
 
     def cppBlock(self):
 
-        localctx = ChronoParser.CppBlockContext(self, self._ctx, self.state)
+        localctx = CHParser.CppBlockContext(self, self._ctx, self.state)
         self.enterRule(localctx, 66, self.RULE_cppBlock)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 572
-            self.match(ChronoParser.AT_CPP)
+            self.match(CHParser.AT_CPP)
             self.state = 576
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while _la==107:
                 self.state = 573
-                self.match(ChronoParser.CPP_BODY)
+                self.match(CHParser.CPP_BODY)
                 self.state = 578
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
             self.state = 579
-            self.match(ChronoParser.AT_END)
+            self.match(CHParser.AT_END)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -4041,17 +4041,17 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def RETURN(self):
-            return self.getToken(ChronoParser.RETURN, 0)
+            return self.getToken(CHParser.RETURN, 0)
 
         def SEMIC_TOKEN(self):
-            return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
+            return self.getToken(CHParser.SEMIC_TOKEN, 0)
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_returnStatement
+            return CHParser.RULE_returnStatement
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterReturnStatement" ):
@@ -4072,13 +4072,13 @@ class ChronoParser ( Parser ):
 
     def returnStatement(self):
 
-        localctx = ChronoParser.ReturnStatementContext(self, self._ctx, self.state)
+        localctx = CHParser.ReturnStatementContext(self, self._ctx, self.state)
         self.enterRule(localctx, 68, self.RULE_returnStatement)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 581
-            self.match(ChronoParser.RETURN)
+            self.match(CHParser.RETURN)
             self.state = 583
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -4088,7 +4088,7 @@ class ChronoParser ( Parser ):
 
 
             self.state = 585
-            self.match(ChronoParser.SEMIC_TOKEN)
+            self.match(CHParser.SEMIC_TOKEN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -4106,25 +4106,25 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def ASSIGN(self):
-            return self.getToken(ChronoParser.ASSIGN, 0)
+            return self.getToken(CHParser.ASSIGN, 0)
 
         def PLUS_ASSIGN(self):
-            return self.getToken(ChronoParser.PLUS_ASSIGN, 0)
+            return self.getToken(CHParser.PLUS_ASSIGN, 0)
 
         def MINUS_ASSIGN(self):
-            return self.getToken(ChronoParser.MINUS_ASSIGN, 0)
+            return self.getToken(CHParser.MINUS_ASSIGN, 0)
 
         def STAR_ASSIGN(self):
-            return self.getToken(ChronoParser.STAR_ASSIGN, 0)
+            return self.getToken(CHParser.STAR_ASSIGN, 0)
 
         def SLASH_ASSIGN(self):
-            return self.getToken(ChronoParser.SLASH_ASSIGN, 0)
+            return self.getToken(CHParser.SLASH_ASSIGN, 0)
 
         def MOD_ASSIGN(self):
-            return self.getToken(ChronoParser.MOD_ASSIGN, 0)
+            return self.getToken(CHParser.MOD_ASSIGN, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_assignmentOperator
+            return CHParser.RULE_assignmentOperator
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterAssignmentOperator" ):
@@ -4145,7 +4145,7 @@ class ChronoParser ( Parser ):
 
     def assignmentOperator(self):
 
-        localctx = ChronoParser.AssignmentOperatorContext(self, self._ctx, self.state)
+        localctx = CHParser.AssignmentOperatorContext(self, self._ctx, self.state)
         self.enterRule(localctx, 70, self.RULE_assignmentOperator)
         self._la = 0 # Token type
         try:
@@ -4174,22 +4174,22 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def assignableExpression(self):
-            return self.getTypedRuleContext(ChronoParser.AssignableExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.AssignableExpressionContext,0)
 
 
         def assignmentOperator(self):
-            return self.getTypedRuleContext(ChronoParser.AssignmentOperatorContext,0)
+            return self.getTypedRuleContext(CHParser.AssignmentOperatorContext,0)
 
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def SEMIC_TOKEN(self):
-            return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
+            return self.getToken(CHParser.SEMIC_TOKEN, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_assignment
+            return CHParser.RULE_assignment
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterAssignment" ):
@@ -4210,7 +4210,7 @@ class ChronoParser ( Parser ):
 
     def assignment(self):
 
-        localctx = ChronoParser.AssignmentContext(self, self._ctx, self.state)
+        localctx = CHParser.AssignmentContext(self, self._ctx, self.state)
         self.enterRule(localctx, 72, self.RULE_assignment)
         try:
             self.enterOuterAlt(localctx, 1)
@@ -4221,7 +4221,7 @@ class ChronoParser ( Parser ):
             self.state = 591
             self.expression()
             self.state = 592
-            self.match(ChronoParser.SEMIC_TOKEN)
+            self.match(CHParser.SEMIC_TOKEN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -4239,54 +4239,54 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def assignablePrimary(self):
-            return self.getTypedRuleContext(ChronoParser.AssignablePrimaryContext,0)
+            return self.getTypedRuleContext(CHParser.AssignablePrimaryContext,0)
 
 
         def DOT(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.DOT)
+                return self.getTokens(CHParser.DOT)
             else:
-                return self.getToken(ChronoParser.DOT, i)
+                return self.getToken(CHParser.DOT, i)
 
         def IDENTIFIER(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.IDENTIFIER)
+                return self.getTokens(CHParser.IDENTIFIER)
             else:
-                return self.getToken(ChronoParser.IDENTIFIER, i)
+                return self.getToken(CHParser.IDENTIFIER, i)
 
         def ARROW(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.ARROW)
+                return self.getTokens(CHParser.ARROW)
             else:
-                return self.getToken(ChronoParser.ARROW, i)
+                return self.getToken(CHParser.ARROW, i)
 
         def COLON_COLON(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.COLON_COLON)
+                return self.getTokens(CHParser.COLON_COLON)
             else:
-                return self.getToken(ChronoParser.COLON_COLON, i)
+                return self.getToken(CHParser.COLON_COLON, i)
 
         def LBRACK(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.LBRACK)
+                return self.getTokens(CHParser.LBRACK)
             else:
-                return self.getToken(ChronoParser.LBRACK, i)
+                return self.getToken(CHParser.LBRACK, i)
 
         def expression(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.ExpressionContext)
+                return self.getTypedRuleContexts(CHParser.ExpressionContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.ExpressionContext,i)
+                return self.getTypedRuleContext(CHParser.ExpressionContext,i)
 
 
         def RBRACK(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.RBRACK)
+                return self.getTokens(CHParser.RBRACK)
             else:
-                return self.getToken(ChronoParser.RBRACK, i)
+                return self.getToken(CHParser.RBRACK, i)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_assignableExpression
+            return CHParser.RULE_assignableExpression
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterAssignableExpression" ):
@@ -4307,7 +4307,7 @@ class ChronoParser ( Parser ):
 
     def assignableExpression(self):
 
-        localctx = ChronoParser.AssignableExpressionContext(self, self._ctx, self.state)
+        localctx = CHParser.AssignableExpressionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 74, self.RULE_assignableExpression)
         self._la = 0 # Token type
         try:
@@ -4323,29 +4323,29 @@ class ChronoParser ( Parser ):
                 token = self._input.LA(1)
                 if token in [87]:
                     self.state = 595
-                    self.match(ChronoParser.DOT)
+                    self.match(CHParser.DOT)
                     self.state = 596
-                    self.match(ChronoParser.IDENTIFIER)
+                    self.match(CHParser.IDENTIFIER)
                     pass
                 elif token in [56]:
                     self.state = 597
-                    self.match(ChronoParser.ARROW)
+                    self.match(CHParser.ARROW)
                     self.state = 598
-                    self.match(ChronoParser.IDENTIFIER)
+                    self.match(CHParser.IDENTIFIER)
                     pass
                 elif token in [55]:
                     self.state = 599
-                    self.match(ChronoParser.COLON_COLON)
+                    self.match(CHParser.COLON_COLON)
                     self.state = 600
-                    self.match(ChronoParser.IDENTIFIER)
+                    self.match(CHParser.IDENTIFIER)
                     pass
                 elif token in [83]:
                     self.state = 601
-                    self.match(ChronoParser.LBRACK)
+                    self.match(CHParser.LBRACK)
                     self.state = 602
                     self.expression()
                     self.state = 603
-                    self.match(ChronoParser.RBRACK)
+                    self.match(CHParser.RBRACK)
                     pass
                 else:
                     raise NoViableAltException(self)
@@ -4371,33 +4371,33 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def THIS(self):
-            return self.getToken(ChronoParser.THIS, 0)
+            return self.getToken(CHParser.THIS, 0)
 
         def STAR(self):
-            return self.getToken(ChronoParser.STAR, 0)
+            return self.getToken(CHParser.STAR, 0)
 
         def assignablePrimary(self):
-            return self.getTypedRuleContext(ChronoParser.AssignablePrimaryContext,0)
+            return self.getTypedRuleContext(CHParser.AssignablePrimaryContext,0)
 
 
         def BIT_AND(self):
-            return self.getToken(ChronoParser.BIT_AND, 0)
+            return self.getToken(CHParser.BIT_AND, 0)
 
         def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
+            return self.getToken(CHParser.LPAREN, 0)
 
         def assignableExpression(self):
-            return self.getTypedRuleContext(ChronoParser.AssignableExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.AssignableExpressionContext,0)
 
 
         def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
+            return self.getToken(CHParser.RPAREN, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_assignablePrimary
+            return CHParser.RULE_assignablePrimary
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterAssignablePrimary" ):
@@ -4418,7 +4418,7 @@ class ChronoParser ( Parser ):
 
     def assignablePrimary(self):
 
-        localctx = ChronoParser.AssignablePrimaryContext(self, self._ctx, self.state)
+        localctx = CHParser.AssignablePrimaryContext(self, self._ctx, self.state)
         self.enterRule(localctx, 76, self.RULE_assignablePrimary)
         try:
             self.state = 620
@@ -4427,35 +4427,35 @@ class ChronoParser ( Parser ):
             if token in [99]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 610
-                self.match(ChronoParser.IDENTIFIER)
+                self.match(CHParser.IDENTIFIER)
                 pass
             elif token in [12]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 611
-                self.match(ChronoParser.THIS)
+                self.match(CHParser.THIS)
                 pass
             elif token in [63]:
                 self.enterOuterAlt(localctx, 3)
                 self.state = 612
-                self.match(ChronoParser.STAR)
+                self.match(CHParser.STAR)
                 self.state = 613
                 self.assignablePrimary()
                 pass
             elif token in [74]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 614
-                self.match(ChronoParser.BIT_AND)
+                self.match(CHParser.BIT_AND)
                 self.state = 615
                 self.assignablePrimary()
                 pass
             elif token in [79]:
                 self.enterOuterAlt(localctx, 5)
                 self.state = 616
-                self.match(ChronoParser.LPAREN)
+                self.match(CHParser.LPAREN)
                 self.state = 617
                 self.assignableExpression()
                 self.state = 618
-                self.match(ChronoParser.RPAREN)
+                self.match(CHParser.RPAREN)
                 pass
             else:
                 raise NoViableAltException(self)
@@ -4480,35 +4480,35 @@ class ChronoParser ( Parser ):
             self.else_block = None # ElseBlockContext
 
         def IF(self):
-            return self.getToken(ChronoParser.IF, 0)
+            return self.getToken(CHParser.IF, 0)
 
         def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
+            return self.getToken(CHParser.LPAREN, 0)
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
+            return self.getToken(CHParser.RPAREN, 0)
 
         def ifBlock(self):
-            return self.getTypedRuleContext(ChronoParser.IfBlockContext,0)
+            return self.getTypedRuleContext(CHParser.IfBlockContext,0)
 
 
         def ELSE(self):
-            return self.getToken(ChronoParser.ELSE, 0)
+            return self.getToken(CHParser.ELSE, 0)
 
         def ifStatement(self):
-            return self.getTypedRuleContext(ChronoParser.IfStatementContext,0)
+            return self.getTypedRuleContext(CHParser.IfStatementContext,0)
 
 
         def elseBlock(self):
-            return self.getTypedRuleContext(ChronoParser.ElseBlockContext,0)
+            return self.getTypedRuleContext(CHParser.ElseBlockContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_ifStatement
+            return CHParser.RULE_ifStatement
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterIfStatement" ):
@@ -4529,19 +4529,19 @@ class ChronoParser ( Parser ):
 
     def ifStatement(self):
 
-        localctx = ChronoParser.IfStatementContext(self, self._ctx, self.state)
+        localctx = CHParser.IfStatementContext(self, self._ctx, self.state)
         self.enterRule(localctx, 78, self.RULE_ifStatement)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 622
-            self.match(ChronoParser.IF)
+            self.match(CHParser.IF)
             self.state = 623
-            self.match(ChronoParser.LPAREN)
+            self.match(CHParser.LPAREN)
             self.state = 624
             self.expression()
             self.state = 625
-            self.match(ChronoParser.RPAREN)
+            self.match(CHParser.RPAREN)
             self.state = 626
             localctx.if_block = self.ifBlock()
             self.state = 632
@@ -4549,7 +4549,7 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==15:
                 self.state = 627
-                self.match(ChronoParser.ELSE)
+                self.match(CHParser.ELSE)
                 self.state = 630
                 self._errHandler.sync(self)
                 token = self._input.LA(1)
@@ -4583,20 +4583,20 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def statement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.StatementContext)
+                return self.getTypedRuleContexts(CHParser.StatementContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.StatementContext,i)
+                return self.getTypedRuleContext(CHParser.StatementContext,i)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_ifBlock
+            return CHParser.RULE_ifBlock
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterIfBlock" ):
@@ -4617,13 +4617,13 @@ class ChronoParser ( Parser ):
 
     def ifBlock(self):
 
-        localctx = ChronoParser.IfBlockContext(self, self._ctx, self.state)
+        localctx = CHParser.IfBlockContext(self, self._ctx, self.state)
         self.enterRule(localctx, 80, self.RULE_ifBlock)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 634
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 638
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -4635,7 +4635,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 641
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -4653,20 +4653,20 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def statement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.StatementContext)
+                return self.getTypedRuleContexts(CHParser.StatementContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.StatementContext,i)
+                return self.getTypedRuleContext(CHParser.StatementContext,i)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_elseBlock
+            return CHParser.RULE_elseBlock
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterElseBlock" ):
@@ -4687,13 +4687,13 @@ class ChronoParser ( Parser ):
 
     def elseBlock(self):
 
-        localctx = ChronoParser.ElseBlockContext(self, self._ctx, self.state)
+        localctx = CHParser.ElseBlockContext(self, self._ctx, self.state)
         self.enterRule(localctx, 82, self.RULE_elseBlock)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 643
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 647
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -4705,7 +4705,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 650
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -4723,33 +4723,33 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def WHILE(self):
-            return self.getToken(ChronoParser.WHILE, 0)
+            return self.getToken(CHParser.WHILE, 0)
 
         def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
+            return self.getToken(CHParser.LPAREN, 0)
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
+            return self.getToken(CHParser.RPAREN, 0)
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def statement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.StatementContext)
+                return self.getTypedRuleContexts(CHParser.StatementContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.StatementContext,i)
+                return self.getTypedRuleContext(CHParser.StatementContext,i)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_whileStatement
+            return CHParser.RULE_whileStatement
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterWhileStatement" ):
@@ -4770,21 +4770,21 @@ class ChronoParser ( Parser ):
 
     def whileStatement(self):
 
-        localctx = ChronoParser.WhileStatementContext(self, self._ctx, self.state)
+        localctx = CHParser.WhileStatementContext(self, self._ctx, self.state)
         self.enterRule(localctx, 84, self.RULE_whileStatement)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 652
-            self.match(ChronoParser.WHILE)
+            self.match(CHParser.WHILE)
             self.state = 653
-            self.match(ChronoParser.LPAREN)
+            self.match(CHParser.LPAREN)
             self.state = 654
             self.expression()
             self.state = 655
-            self.match(ChronoParser.RPAREN)
+            self.match(CHParser.RPAREN)
             self.state = 656
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 660
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -4796,7 +4796,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 663
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -4814,57 +4814,57 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def variableDeclaration(self):
-            return self.getTypedRuleContext(ChronoParser.VariableDeclarationContext,0)
+            return self.getTypedRuleContext(CHParser.VariableDeclarationContext,0)
 
 
         def assignment(self):
-            return self.getTypedRuleContext(ChronoParser.AssignmentContext,0)
+            return self.getTypedRuleContext(CHParser.AssignmentContext,0)
 
 
         def returnStatement(self):
-            return self.getTypedRuleContext(ChronoParser.ReturnStatementContext,0)
+            return self.getTypedRuleContext(CHParser.ReturnStatementContext,0)
 
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def SEMIC_TOKEN(self):
-            return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
+            return self.getToken(CHParser.SEMIC_TOKEN, 0)
 
         def cppBlock(self):
-            return self.getTypedRuleContext(ChronoParser.CppBlockContext,0)
+            return self.getTypedRuleContext(CHParser.CppBlockContext,0)
 
 
         def ifStatement(self):
-            return self.getTypedRuleContext(ChronoParser.IfStatementContext,0)
+            return self.getTypedRuleContext(CHParser.IfStatementContext,0)
 
 
         def whileStatement(self):
-            return self.getTypedRuleContext(ChronoParser.WhileStatementContext,0)
+            return self.getTypedRuleContext(CHParser.WhileStatementContext,0)
 
 
         def deleteStatement(self):
-            return self.getTypedRuleContext(ChronoParser.DeleteStatementContext,0)
+            return self.getTypedRuleContext(CHParser.DeleteStatementContext,0)
 
 
         def forStatement(self):
-            return self.getTypedRuleContext(ChronoParser.ForStatementContext,0)
+            return self.getTypedRuleContext(CHParser.ForStatementContext,0)
 
 
         def blockStatement(self):
-            return self.getTypedRuleContext(ChronoParser.BlockStatementContext,0)
+            return self.getTypedRuleContext(CHParser.BlockStatementContext,0)
 
 
         def switchStatement(self):
-            return self.getTypedRuleContext(ChronoParser.SwitchStatementContext,0)
+            return self.getTypedRuleContext(CHParser.SwitchStatementContext,0)
 
 
         def CPP_DIRECTIVE(self):
-            return self.getToken(ChronoParser.CPP_DIRECTIVE, 0)
+            return self.getToken(CHParser.CPP_DIRECTIVE, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_statement
+            return CHParser.RULE_statement
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterStatement" ):
@@ -4885,7 +4885,7 @@ class ChronoParser ( Parser ):
 
     def statement(self):
 
-        localctx = ChronoParser.StatementContext(self, self._ctx, self.state)
+        localctx = CHParser.StatementContext(self, self._ctx, self.state)
         self.enterRule(localctx, 86, self.RULE_statement)
         try:
             self.state = 679
@@ -4914,7 +4914,7 @@ class ChronoParser ( Parser ):
                 self.state = 668
                 self.expression()
                 self.state = 669
-                self.match(ChronoParser.SEMIC_TOKEN)
+                self.match(CHParser.SEMIC_TOKEN)
                 pass
 
             elif la_ == 5:
@@ -4962,7 +4962,7 @@ class ChronoParser ( Parser ):
             elif la_ == 12:
                 self.enterOuterAlt(localctx, 12)
                 self.state = 678
-                self.match(ChronoParser.CPP_DIRECTIVE)
+                self.match(CHParser.CPP_DIRECTIVE)
                 pass
 
 
@@ -4983,20 +4983,20 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def statement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.StatementContext)
+                return self.getTypedRuleContexts(CHParser.StatementContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.StatementContext,i)
+                return self.getTypedRuleContext(CHParser.StatementContext,i)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_blockStatement
+            return CHParser.RULE_blockStatement
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterBlockStatement" ):
@@ -5017,13 +5017,13 @@ class ChronoParser ( Parser ):
 
     def blockStatement(self):
 
-        localctx = ChronoParser.BlockStatementContext(self, self._ctx, self.state)
+        localctx = CHParser.BlockStatementContext(self, self._ctx, self.state)
         self.enterRule(localctx, 88, self.RULE_blockStatement)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 681
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 685
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -5035,7 +5035,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 688
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -5053,27 +5053,27 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def CASE(self):
-            return self.getToken(ChronoParser.CASE, 0)
+            return self.getToken(CHParser.CASE, 0)
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def statement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.StatementContext)
+                return self.getTypedRuleContexts(CHParser.StatementContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.StatementContext,i)
+                return self.getTypedRuleContext(CHParser.StatementContext,i)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_caseBlock
+            return CHParser.RULE_caseBlock
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterCaseBlock" ):
@@ -5094,17 +5094,17 @@ class ChronoParser ( Parser ):
 
     def caseBlock(self):
 
-        localctx = ChronoParser.CaseBlockContext(self, self._ctx, self.state)
+        localctx = CHParser.CaseBlockContext(self, self._ctx, self.state)
         self.enterRule(localctx, 90, self.RULE_caseBlock)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 690
-            self.match(ChronoParser.CASE)
+            self.match(CHParser.CASE)
             self.state = 691
             self.expression()
             self.state = 692
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 696
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -5116,7 +5116,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 699
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -5134,23 +5134,23 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def DEFAULT(self):
-            return self.getToken(ChronoParser.DEFAULT, 0)
+            return self.getToken(CHParser.DEFAULT, 0)
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def statement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.StatementContext)
+                return self.getTypedRuleContexts(CHParser.StatementContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.StatementContext,i)
+                return self.getTypedRuleContext(CHParser.StatementContext,i)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_defaultBlock
+            return CHParser.RULE_defaultBlock
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterDefaultBlock" ):
@@ -5171,15 +5171,15 @@ class ChronoParser ( Parser ):
 
     def defaultBlock(self):
 
-        localctx = ChronoParser.DefaultBlockContext(self, self._ctx, self.state)
+        localctx = CHParser.DefaultBlockContext(self, self._ctx, self.state)
         self.enterRule(localctx, 92, self.RULE_defaultBlock)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 701
-            self.match(ChronoParser.DEFAULT)
+            self.match(CHParser.DEFAULT)
             self.state = 702
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 706
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -5191,7 +5191,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 709
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -5209,37 +5209,37 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def SWITCH(self):
-            return self.getToken(ChronoParser.SWITCH, 0)
+            return self.getToken(CHParser.SWITCH, 0)
 
         def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
+            return self.getToken(CHParser.LPAREN, 0)
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
+            return self.getToken(CHParser.RPAREN, 0)
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def caseBlock(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.CaseBlockContext)
+                return self.getTypedRuleContexts(CHParser.CaseBlockContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.CaseBlockContext,i)
+                return self.getTypedRuleContext(CHParser.CaseBlockContext,i)
 
 
         def defaultBlock(self):
-            return self.getTypedRuleContext(ChronoParser.DefaultBlockContext,0)
+            return self.getTypedRuleContext(CHParser.DefaultBlockContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_switchStatement
+            return CHParser.RULE_switchStatement
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterSwitchStatement" ):
@@ -5260,21 +5260,21 @@ class ChronoParser ( Parser ):
 
     def switchStatement(self):
 
-        localctx = ChronoParser.SwitchStatementContext(self, self._ctx, self.state)
+        localctx = CHParser.SwitchStatementContext(self, self._ctx, self.state)
         self.enterRule(localctx, 94, self.RULE_switchStatement)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 711
-            self.match(ChronoParser.SWITCH)
+            self.match(CHParser.SWITCH)
             self.state = 712
-            self.match(ChronoParser.LPAREN)
+            self.match(CHParser.LPAREN)
             self.state = 713
             self.expression()
             self.state = 714
-            self.match(ChronoParser.RPAREN)
+            self.match(CHParser.RPAREN)
             self.state = 715
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 719
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -5294,7 +5294,7 @@ class ChronoParser ( Parser ):
 
 
             self.state = 725
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -5312,17 +5312,17 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def DELETE(self):
-            return self.getToken(ChronoParser.DELETE, 0)
+            return self.getToken(CHParser.DELETE, 0)
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def SEMIC_TOKEN(self):
-            return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
+            return self.getToken(CHParser.SEMIC_TOKEN, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_deleteStatement
+            return CHParser.RULE_deleteStatement
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterDeleteStatement" ):
@@ -5343,16 +5343,16 @@ class ChronoParser ( Parser ):
 
     def deleteStatement(self):
 
-        localctx = ChronoParser.DeleteStatementContext(self, self._ctx, self.state)
+        localctx = CHParser.DeleteStatementContext(self, self._ctx, self.state)
         self.enterRule(localctx, 96, self.RULE_deleteStatement)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 727
-            self.match(ChronoParser.DELETE)
+            self.match(CHParser.DELETE)
             self.state = 728
             self.expression()
             self.state = 729
-            self.match(ChronoParser.SEMIC_TOKEN)
+            self.match(CHParser.SEMIC_TOKEN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -5373,47 +5373,47 @@ class ChronoParser ( Parser ):
             self.incr = None # ForIncrementContext
 
         def FOR(self):
-            return self.getToken(ChronoParser.FOR, 0)
+            return self.getToken(CHParser.FOR, 0)
 
         def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
+            return self.getToken(CHParser.LPAREN, 0)
 
         def SEMIC_TOKEN(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.SEMIC_TOKEN)
+                return self.getTokens(CHParser.SEMIC_TOKEN)
             else:
-                return self.getToken(ChronoParser.SEMIC_TOKEN, i)
+                return self.getToken(CHParser.SEMIC_TOKEN, i)
 
         def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
+            return self.getToken(CHParser.RPAREN, 0)
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def statement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.StatementContext)
+                return self.getTypedRuleContexts(CHParser.StatementContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.StatementContext,i)
+                return self.getTypedRuleContext(CHParser.StatementContext,i)
 
 
         def forInit(self):
-            return self.getTypedRuleContext(ChronoParser.ForInitContext,0)
+            return self.getTypedRuleContext(CHParser.ForInitContext,0)
 
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def forIncrement(self):
-            return self.getTypedRuleContext(ChronoParser.ForIncrementContext,0)
+            return self.getTypedRuleContext(CHParser.ForIncrementContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_forStatement
+            return CHParser.RULE_forStatement
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterForStatement" ):
@@ -5434,15 +5434,15 @@ class ChronoParser ( Parser ):
 
     def forStatement(self):
 
-        localctx = ChronoParser.ForStatementContext(self, self._ctx, self.state)
+        localctx = CHParser.ForStatementContext(self, self._ctx, self.state)
         self.enterRule(localctx, 98, self.RULE_forStatement)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 731
-            self.match(ChronoParser.FOR)
+            self.match(CHParser.FOR)
             self.state = 732
-            self.match(ChronoParser.LPAREN)
+            self.match(CHParser.LPAREN)
             self.state = 734
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -5452,7 +5452,7 @@ class ChronoParser ( Parser ):
 
 
             self.state = 736
-            self.match(ChronoParser.SEMIC_TOKEN)
+            self.match(CHParser.SEMIC_TOKEN)
             self.state = 738
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -5462,7 +5462,7 @@ class ChronoParser ( Parser ):
 
 
             self.state = 740
-            self.match(ChronoParser.SEMIC_TOKEN)
+            self.match(CHParser.SEMIC_TOKEN)
             self.state = 742
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -5472,9 +5472,9 @@ class ChronoParser ( Parser ):
 
 
             self.state = 744
-            self.match(ChronoParser.RPAREN)
+            self.match(CHParser.RPAREN)
             self.state = 745
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 749
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -5486,7 +5486,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 752
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -5504,15 +5504,15 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def variableDeclaration_no_semicolon(self):
-            return self.getTypedRuleContext(ChronoParser.VariableDeclaration_no_semicolonContext,0)
+            return self.getTypedRuleContext(CHParser.VariableDeclaration_no_semicolonContext,0)
 
 
         def assignment_no_semicolon(self):
-            return self.getTypedRuleContext(ChronoParser.Assignment_no_semicolonContext,0)
+            return self.getTypedRuleContext(CHParser.Assignment_no_semicolonContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_forInit
+            return CHParser.RULE_forInit
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterForInit" ):
@@ -5533,7 +5533,7 @@ class ChronoParser ( Parser ):
 
     def forInit(self):
 
-        localctx = ChronoParser.ForInitContext(self, self._ctx, self.state)
+        localctx = CHParser.ForInitContext(self, self._ctx, self.state)
         self.enterRule(localctx, 100, self.RULE_forInit)
         try:
             self.state = 756
@@ -5569,15 +5569,15 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def assignment_no_semicolon(self):
-            return self.getTypedRuleContext(ChronoParser.Assignment_no_semicolonContext,0)
+            return self.getTypedRuleContext(CHParser.Assignment_no_semicolonContext,0)
 
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_forIncrement
+            return CHParser.RULE_forIncrement
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterForIncrement" ):
@@ -5598,7 +5598,7 @@ class ChronoParser ( Parser ):
 
     def forIncrement(self):
 
-        localctx = ChronoParser.ForIncrementContext(self, self._ctx, self.state)
+        localctx = CHParser.ForIncrementContext(self, self._ctx, self.state)
         self.enterRule(localctx, 102, self.RULE_forIncrement)
         try:
             self.state = 760
@@ -5636,40 +5636,40 @@ class ChronoParser ( Parser ):
             self.returnType = None # TypeSpecifierContext
 
         def FUNC(self):
-            return self.getToken(ChronoParser.FUNC, 0)
+            return self.getToken(CHParser.FUNC, 0)
 
         def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
+            return self.getToken(CHParser.LPAREN, 0)
 
         def parameters(self):
-            return self.getTypedRuleContext(ChronoParser.ParametersContext,0)
+            return self.getTypedRuleContext(CHParser.ParametersContext,0)
 
 
         def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
+            return self.getToken(CHParser.RPAREN, 0)
 
         def SEMIC_TOKEN(self):
-            return self.getToken(ChronoParser.SEMIC_TOKEN, 0)
+            return self.getToken(CHParser.SEMIC_TOKEN, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def AT_OPTIONAL(self):
-            return self.getToken(ChronoParser.AT_OPTIONAL, 0)
+            return self.getToken(CHParser.AT_OPTIONAL, 0)
 
         def accessModifier(self):
-            return self.getTypedRuleContext(ChronoParser.AccessModifierContext,0)
+            return self.getTypedRuleContext(CHParser.AccessModifierContext,0)
 
 
         def ARROW(self):
-            return self.getToken(ChronoParser.ARROW, 0)
+            return self.getToken(CHParser.ARROW, 0)
 
         def typeSpecifier(self):
-            return self.getTypedRuleContext(ChronoParser.TypeSpecifierContext,0)
+            return self.getTypedRuleContext(CHParser.TypeSpecifierContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_methodSignature
+            return CHParser.RULE_methodSignature
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterMethodSignature" ):
@@ -5690,7 +5690,7 @@ class ChronoParser ( Parser ):
 
     def methodSignature(self):
 
-        localctx = ChronoParser.MethodSignatureContext(self, self._ctx, self.state)
+        localctx = CHParser.MethodSignatureContext(self, self._ctx, self.state)
         self.enterRule(localctx, 104, self.RULE_methodSignature)
         self._la = 0 # Token type
         try:
@@ -5700,7 +5700,7 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==21:
                 self.state = 762
-                self.match(ChronoParser.AT_OPTIONAL)
+                self.match(CHParser.AT_OPTIONAL)
 
 
             self.state = 766
@@ -5712,27 +5712,27 @@ class ChronoParser ( Parser ):
 
 
             self.state = 768
-            self.match(ChronoParser.FUNC)
+            self.match(CHParser.FUNC)
             self.state = 769
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 770
-            self.match(ChronoParser.LPAREN)
+            self.match(CHParser.LPAREN)
             self.state = 771
             self.parameters()
             self.state = 772
-            self.match(ChronoParser.RPAREN)
+            self.match(CHParser.RPAREN)
             self.state = 775
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==56:
                 self.state = 773
-                self.match(ChronoParser.ARROW)
+                self.match(CHParser.ARROW)
                 self.state = 774
                 localctx.returnType = self.typeSpecifier()
 
 
             self.state = 777
-            self.match(ChronoParser.SEMIC_TOKEN)
+            self.match(CHParser.SEMIC_TOKEN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -5751,33 +5751,33 @@ class ChronoParser ( Parser ):
             self.name = None # Token
 
         def INTERFACE(self):
-            return self.getToken(ChronoParser.INTERFACE, 0)
+            return self.getToken(CHParser.INTERFACE, 0)
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def methodSignature(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.MethodSignatureContext)
+                return self.getTypedRuleContexts(CHParser.MethodSignatureContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.MethodSignatureContext,i)
+                return self.getTypedRuleContext(CHParser.MethodSignatureContext,i)
 
 
         def cppBlock(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.CppBlockContext)
+                return self.getTypedRuleContexts(CHParser.CppBlockContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.CppBlockContext,i)
+                return self.getTypedRuleContext(CHParser.CppBlockContext,i)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_interfaceDefinition
+            return CHParser.RULE_interfaceDefinition
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterInterfaceDefinition" ):
@@ -5798,17 +5798,17 @@ class ChronoParser ( Parser ):
 
     def interfaceDefinition(self):
 
-        localctx = ChronoParser.InterfaceDefinitionContext(self, self._ctx, self.state)
+        localctx = CHParser.InterfaceDefinitionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 106, self.RULE_interfaceDefinition)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 779
-            self.match(ChronoParser.INTERFACE)
+            self.match(CHParser.INTERFACE)
             self.state = 780
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 781
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 786
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -5832,7 +5832,7 @@ class ChronoParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 789
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -5852,33 +5852,33 @@ class ChronoParser ( Parser ):
             self.typeName = None # TypeSpecifierContext
 
         def CONST(self):
-            return self.getToken(ChronoParser.CONST, 0)
+            return self.getToken(CHParser.CONST, 0)
 
         def VAR(self):
-            return self.getToken(ChronoParser.VAR, 0)
+            return self.getToken(CHParser.VAR, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def EXTERN(self):
-            return self.getToken(ChronoParser.EXTERN, 0)
+            return self.getToken(CHParser.EXTERN, 0)
 
         def COLON(self):
-            return self.getToken(ChronoParser.COLON, 0)
+            return self.getToken(CHParser.COLON, 0)
 
         def ASSIGN(self):
-            return self.getToken(ChronoParser.ASSIGN, 0)
+            return self.getToken(CHParser.ASSIGN, 0)
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def typeSpecifier(self):
-            return self.getTypedRuleContext(ChronoParser.TypeSpecifierContext,0)
+            return self.getTypedRuleContext(CHParser.TypeSpecifierContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_variableDeclaration_no_semicolon
+            return CHParser.RULE_variableDeclaration_no_semicolon
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterVariableDeclaration_no_semicolon" ):
@@ -5899,7 +5899,7 @@ class ChronoParser ( Parser ):
 
     def variableDeclaration_no_semicolon(self):
 
-        localctx = ChronoParser.VariableDeclaration_no_semicolonContext(self, self._ctx, self.state)
+        localctx = CHParser.VariableDeclaration_no_semicolonContext(self, self._ctx, self.state)
         self.enterRule(localctx, 108, self.RULE_variableDeclaration_no_semicolon)
         self._la = 0 # Token type
         try:
@@ -5909,7 +5909,7 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==29:
                 self.state = 791
-                self.match(ChronoParser.EXTERN)
+                self.match(CHParser.EXTERN)
 
 
             self.state = 794
@@ -5920,13 +5920,13 @@ class ChronoParser ( Parser ):
                 self._errHandler.reportMatch(self)
                 self.consume()
             self.state = 795
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 798
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==85:
                 self.state = 796
-                self.match(ChronoParser.COLON)
+                self.match(CHParser.COLON)
                 self.state = 797
                 localctx.typeName = self.typeSpecifier()
 
@@ -5936,7 +5936,7 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             if _la==86:
                 self.state = 800
-                self.match(ChronoParser.ASSIGN)
+                self.match(CHParser.ASSIGN)
                 self.state = 801
                 self.expression()
 
@@ -5958,19 +5958,19 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def assignableExpression(self):
-            return self.getTypedRuleContext(ChronoParser.AssignableExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.AssignableExpressionContext,0)
 
 
         def assignmentOperator(self):
-            return self.getTypedRuleContext(ChronoParser.AssignmentOperatorContext,0)
+            return self.getTypedRuleContext(CHParser.AssignmentOperatorContext,0)
 
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_assignment_no_semicolon
+            return CHParser.RULE_assignment_no_semicolon
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterAssignment_no_semicolon" ):
@@ -5991,7 +5991,7 @@ class ChronoParser ( Parser ):
 
     def assignment_no_semicolon(self):
 
-        localctx = ChronoParser.Assignment_no_semicolonContext(self, self._ctx, self.state)
+        localctx = CHParser.Assignment_no_semicolonContext(self, self._ctx, self.state)
         self.enterRule(localctx, 110, self.RULE_assignment_no_semicolon)
         try:
             self.enterOuterAlt(localctx, 1)
@@ -6020,20 +6020,20 @@ class ChronoParser ( Parser ):
             self.args = None # ExpressionListContext
 
         def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
+            return self.getToken(CHParser.LPAREN, 0)
 
         def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
+            return self.getToken(CHParser.RPAREN, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def expressionList(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionListContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionListContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_baseInitializer
+            return CHParser.RULE_baseInitializer
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterBaseInitializer" ):
@@ -6054,15 +6054,15 @@ class ChronoParser ( Parser ):
 
     def baseInitializer(self):
 
-        localctx = ChronoParser.BaseInitializerContext(self, self._ctx, self.state)
+        localctx = CHParser.BaseInitializerContext(self, self._ctx, self.state)
         self.enterRule(localctx, 112, self.RULE_baseInitializer)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 808
-            localctx.name = self.match(ChronoParser.IDENTIFIER)
+            localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 809
-            self.match(ChronoParser.LPAREN)
+            self.match(CHParser.LPAREN)
             self.state = 811
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -6072,7 +6072,7 @@ class ChronoParser ( Parser ):
 
 
             self.state = 813
-            self.match(ChronoParser.RPAREN)
+            self.match(CHParser.RPAREN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -6091,121 +6091,121 @@ class ChronoParser ( Parser ):
 
         def unaryExpression(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.UnaryExpressionContext)
+                return self.getTypedRuleContexts(CHParser.UnaryExpressionContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.UnaryExpressionContext,i)
+                return self.getTypedRuleContext(CHParser.UnaryExpressionContext,i)
 
 
         def EQ(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.EQ)
+                return self.getTokens(CHParser.EQ)
             else:
-                return self.getToken(ChronoParser.EQ, i)
+                return self.getToken(CHParser.EQ, i)
 
         def NEQ(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.NEQ)
+                return self.getTokens(CHParser.NEQ)
             else:
-                return self.getToken(ChronoParser.NEQ, i)
+                return self.getToken(CHParser.NEQ, i)
 
         def LT(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.LT)
+                return self.getTokens(CHParser.LT)
             else:
-                return self.getToken(ChronoParser.LT, i)
+                return self.getToken(CHParser.LT, i)
 
         def GT(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.GT)
+                return self.getTokens(CHParser.GT)
             else:
-                return self.getToken(ChronoParser.GT, i)
+                return self.getToken(CHParser.GT, i)
 
         def LTE(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.LTE)
+                return self.getTokens(CHParser.LTE)
             else:
-                return self.getToken(ChronoParser.LTE, i)
+                return self.getToken(CHParser.LTE, i)
 
         def GTE(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.GTE)
+                return self.getTokens(CHParser.GTE)
             else:
-                return self.getToken(ChronoParser.GTE, i)
+                return self.getToken(CHParser.GTE, i)
 
         def PLUS(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.PLUS)
+                return self.getTokens(CHParser.PLUS)
             else:
-                return self.getToken(ChronoParser.PLUS, i)
+                return self.getToken(CHParser.PLUS, i)
 
         def MINUS(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.MINUS)
+                return self.getTokens(CHParser.MINUS)
             else:
-                return self.getToken(ChronoParser.MINUS, i)
+                return self.getToken(CHParser.MINUS, i)
 
         def STAR(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.STAR)
+                return self.getTokens(CHParser.STAR)
             else:
-                return self.getToken(ChronoParser.STAR, i)
+                return self.getToken(CHParser.STAR, i)
 
         def SLASH(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.SLASH)
+                return self.getTokens(CHParser.SLASH)
             else:
-                return self.getToken(ChronoParser.SLASH, i)
+                return self.getToken(CHParser.SLASH, i)
 
         def MODULO(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.MODULO)
+                return self.getTokens(CHParser.MODULO)
             else:
-                return self.getToken(ChronoParser.MODULO, i)
+                return self.getToken(CHParser.MODULO, i)
 
         def AND_OP(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.AND_OP)
+                return self.getTokens(CHParser.AND_OP)
             else:
-                return self.getToken(ChronoParser.AND_OP, i)
+                return self.getToken(CHParser.AND_OP, i)
 
         def OR_OP(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.OR_OP)
+                return self.getTokens(CHParser.OR_OP)
             else:
-                return self.getToken(ChronoParser.OR_OP, i)
+                return self.getToken(CHParser.OR_OP, i)
 
         def BIT_AND(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.BIT_AND)
+                return self.getTokens(CHParser.BIT_AND)
             else:
-                return self.getToken(ChronoParser.BIT_AND, i)
+                return self.getToken(CHParser.BIT_AND, i)
 
         def BIT_OR(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.BIT_OR)
+                return self.getTokens(CHParser.BIT_OR)
             else:
-                return self.getToken(ChronoParser.BIT_OR, i)
+                return self.getToken(CHParser.BIT_OR, i)
 
         def BIT_XOR(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.BIT_XOR)
+                return self.getTokens(CHParser.BIT_XOR)
             else:
-                return self.getToken(ChronoParser.BIT_XOR, i)
+                return self.getToken(CHParser.BIT_XOR, i)
 
         def LSHIFT(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.LSHIFT)
+                return self.getTokens(CHParser.LSHIFT)
             else:
-                return self.getToken(ChronoParser.LSHIFT, i)
+                return self.getToken(CHParser.LSHIFT, i)
 
         def RSHIFT(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.RSHIFT)
+                return self.getTokens(CHParser.RSHIFT)
             else:
-                return self.getToken(ChronoParser.RSHIFT, i)
+                return self.getToken(CHParser.RSHIFT, i)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_expression
+            return CHParser.RULE_expression
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterExpression" ):
@@ -6226,7 +6226,7 @@ class ChronoParser ( Parser ):
 
     def expression(self):
 
-        localctx = ChronoParser.ExpressionContext(self, self._ctx, self.state)
+        localctx = CHParser.ExpressionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 114, self.RULE_expression)
         self._la = 0 # Token type
         try:
@@ -6267,33 +6267,33 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def unaryExpression(self):
-            return self.getTypedRuleContext(ChronoParser.UnaryExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.UnaryExpressionContext,0)
 
 
         def PLUS(self):
-            return self.getToken(ChronoParser.PLUS, 0)
+            return self.getToken(CHParser.PLUS, 0)
 
         def MINUS(self):
-            return self.getToken(ChronoParser.MINUS, 0)
+            return self.getToken(CHParser.MINUS, 0)
 
         def NOT_OP(self):
-            return self.getToken(ChronoParser.NOT_OP, 0)
+            return self.getToken(CHParser.NOT_OP, 0)
 
         def BIT_NOT(self):
-            return self.getToken(ChronoParser.BIT_NOT, 0)
+            return self.getToken(CHParser.BIT_NOT, 0)
 
         def BIT_AND(self):
-            return self.getToken(ChronoParser.BIT_AND, 0)
+            return self.getToken(CHParser.BIT_AND, 0)
 
         def STAR(self):
-            return self.getToken(ChronoParser.STAR, 0)
+            return self.getToken(CHParser.STAR, 0)
 
         def castExpression(self):
-            return self.getTypedRuleContext(ChronoParser.CastExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.CastExpressionContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_unaryExpression
+            return CHParser.RULE_unaryExpression
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterUnaryExpression" ):
@@ -6314,7 +6314,7 @@ class ChronoParser ( Parser ):
 
     def unaryExpression(self):
 
-        localctx = ChronoParser.UnaryExpressionContext(self, self._ctx, self.state)
+        localctx = CHParser.UnaryExpressionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 116, self.RULE_unaryExpression)
         self._la = 0 # Token type
         try:
@@ -6336,14 +6336,14 @@ class ChronoParser ( Parser ):
             elif token in [74]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 825
-                self.match(ChronoParser.BIT_AND)
+                self.match(CHParser.BIT_AND)
                 self.state = 826
                 self.unaryExpression()
                 pass
             elif token in [63]:
                 self.enterOuterAlt(localctx, 3)
                 self.state = 827
-                self.match(ChronoParser.STAR)
+                self.match(CHParser.STAR)
                 self.state = 828
                 self.unaryExpression()
                 pass
@@ -6372,24 +6372,24 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def simpleExpression(self):
-            return self.getTypedRuleContext(ChronoParser.SimpleExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.SimpleExpressionContext,0)
 
 
         def AS(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.AS)
+                return self.getTokens(CHParser.AS)
             else:
-                return self.getToken(ChronoParser.AS, i)
+                return self.getToken(CHParser.AS, i)
 
         def typeSpecifier(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.TypeSpecifierContext)
+                return self.getTypedRuleContexts(CHParser.TypeSpecifierContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.TypeSpecifierContext,i)
+                return self.getTypedRuleContext(CHParser.TypeSpecifierContext,i)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_castExpression
+            return CHParser.RULE_castExpression
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterCastExpression" ):
@@ -6410,7 +6410,7 @@ class ChronoParser ( Parser ):
 
     def castExpression(self):
 
-        localctx = ChronoParser.CastExpressionContext(self, self._ctx, self.state)
+        localctx = CHParser.CastExpressionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 118, self.RULE_castExpression)
         self._la = 0 # Token type
         try:
@@ -6422,7 +6422,7 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             while _la==25:
                 self.state = 833
-                self.match(ChronoParser.AS)
+                self.match(CHParser.AS)
                 self.state = 834
                 self.typeSpecifier()
                 self.state = 839
@@ -6447,102 +6447,102 @@ class ChronoParser ( Parser ):
             self.dynMethodName = None # Token
 
         def primary(self):
-            return self.getTypedRuleContext(ChronoParser.PrimaryContext,0)
+            return self.getTypedRuleContext(CHParser.PrimaryContext,0)
 
 
         def functionCallExpression(self):
-            return self.getTypedRuleContext(ChronoParser.FunctionCallExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.FunctionCallExpressionContext,0)
 
 
         def IDENTIFIER(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.IDENTIFIER)
+                return self.getTokens(CHParser.IDENTIFIER)
             else:
-                return self.getToken(ChronoParser.IDENTIFIER, i)
+                return self.getToken(CHParser.IDENTIFIER, i)
 
         def LBRACK(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.LBRACK)
+                return self.getTokens(CHParser.LBRACK)
             else:
-                return self.getToken(ChronoParser.LBRACK, i)
+                return self.getToken(CHParser.LBRACK, i)
 
         def expression(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.ExpressionContext)
+                return self.getTypedRuleContexts(CHParser.ExpressionContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.ExpressionContext,i)
+                return self.getTypedRuleContext(CHParser.ExpressionContext,i)
 
 
         def RBRACK(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.RBRACK)
+                return self.getTokens(CHParser.RBRACK)
             else:
-                return self.getToken(ChronoParser.RBRACK, i)
+                return self.getToken(CHParser.RBRACK, i)
 
         def TILDE_ARROW(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.TILDE_ARROW)
+                return self.getTokens(CHParser.TILDE_ARROW)
             else:
-                return self.getToken(ChronoParser.TILDE_ARROW, i)
+                return self.getToken(CHParser.TILDE_ARROW, i)
 
         def LPAREN(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.LPAREN)
+                return self.getTokens(CHParser.LPAREN)
             else:
-                return self.getToken(ChronoParser.LPAREN, i)
+                return self.getToken(CHParser.LPAREN, i)
 
         def RPAREN(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.RPAREN)
+                return self.getTokens(CHParser.RPAREN)
             else:
-                return self.getToken(ChronoParser.RPAREN, i)
+                return self.getToken(CHParser.RPAREN, i)
 
         def DOT(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.DOT)
+                return self.getTokens(CHParser.DOT)
             else:
-                return self.getToken(ChronoParser.DOT, i)
+                return self.getToken(CHParser.DOT, i)
 
         def ARROW(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.ARROW)
+                return self.getTokens(CHParser.ARROW)
             else:
-                return self.getToken(ChronoParser.ARROW, i)
+                return self.getToken(CHParser.ARROW, i)
 
         def COLON_COLON(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.COLON_COLON)
+                return self.getTokens(CHParser.COLON_COLON)
             else:
-                return self.getToken(ChronoParser.COLON_COLON, i)
+                return self.getToken(CHParser.COLON_COLON, i)
 
         def LT(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.LT)
+                return self.getTokens(CHParser.LT)
             else:
-                return self.getToken(ChronoParser.LT, i)
+                return self.getToken(CHParser.LT, i)
 
         def typeList(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.TypeListContext)
+                return self.getTypedRuleContexts(CHParser.TypeListContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.TypeListContext,i)
+                return self.getTypedRuleContext(CHParser.TypeListContext,i)
 
 
         def GT(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.GT)
+                return self.getTokens(CHParser.GT)
             else:
-                return self.getToken(ChronoParser.GT, i)
+                return self.getToken(CHParser.GT, i)
 
         def expressionList(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.ExpressionListContext)
+                return self.getTypedRuleContexts(CHParser.ExpressionListContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.ExpressionListContext,i)
+                return self.getTypedRuleContext(CHParser.ExpressionListContext,i)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_simpleExpression
+            return CHParser.RULE_simpleExpression
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterSimpleExpression" ):
@@ -6563,7 +6563,7 @@ class ChronoParser ( Parser ):
 
     def simpleExpression(self):
 
-        localctx = ChronoParser.SimpleExpressionContext(self, self._ctx, self.state)
+        localctx = CHParser.SimpleExpressionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 120, self.RULE_simpleExpression)
         self._la = 0 # Token type
         try:
@@ -6598,17 +6598,17 @@ class ChronoParser ( Parser ):
                         self._errHandler.reportMatch(self)
                         self.consume()
                     self.state = 845
-                    self.match(ChronoParser.IDENTIFIER)
+                    self.match(CHParser.IDENTIFIER)
                     self.state = 850
                     self._errHandler.sync(self)
                     la_ = self._interp.adaptivePredict(self._input,108,self._ctx)
                     if la_ == 1:
                         self.state = 846
-                        self.match(ChronoParser.LT)
+                        self.match(CHParser.LT)
                         self.state = 847
                         self.typeList()
                         self.state = 848
-                        self.match(ChronoParser.GT)
+                        self.match(CHParser.GT)
 
 
                     self.state = 857
@@ -6616,7 +6616,7 @@ class ChronoParser ( Parser ):
                     _la = self._input.LA(1)
                     if _la==79:
                         self.state = 852
-                        self.match(ChronoParser.LPAREN)
+                        self.match(CHParser.LPAREN)
                         self.state = 854
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)
@@ -6626,25 +6626,25 @@ class ChronoParser ( Parser ):
 
 
                         self.state = 856
-                        self.match(ChronoParser.RPAREN)
+                        self.match(CHParser.RPAREN)
 
 
                     pass
                 elif token in [83]:
                     self.state = 859
-                    self.match(ChronoParser.LBRACK)
+                    self.match(CHParser.LBRACK)
                     self.state = 860
                     self.expression()
                     self.state = 861
-                    self.match(ChronoParser.RBRACK)
+                    self.match(CHParser.RBRACK)
                     pass
                 elif token in [46]:
                     self.state = 863
-                    self.match(ChronoParser.TILDE_ARROW)
+                    self.match(CHParser.TILDE_ARROW)
                     self.state = 864
-                    localctx.dynMethodName = self.match(ChronoParser.IDENTIFIER)
+                    localctx.dynMethodName = self.match(CHParser.IDENTIFIER)
                     self.state = 865
-                    self.match(ChronoParser.LPAREN)
+                    self.match(CHParser.LPAREN)
                     self.state = 867
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
@@ -6654,7 +6654,7 @@ class ChronoParser ( Parser ):
 
 
                     self.state = 869
-                    self.match(ChronoParser.RPAREN)
+                    self.match(CHParser.RPAREN)
                     pass
                 else:
                     raise NoViableAltException(self)
@@ -6680,67 +6680,67 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def NEW(self):
-            return self.getToken(ChronoParser.NEW, 0)
+            return self.getToken(CHParser.NEW, 0)
 
         def baseType(self):
-            return self.getTypedRuleContext(ChronoParser.BaseTypeContext,0)
+            return self.getTypedRuleContext(CHParser.BaseTypeContext,0)
 
 
         def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
+            return self.getToken(CHParser.LPAREN, 0)
 
         def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
+            return self.getToken(CHParser.RPAREN, 0)
 
         def expressionList(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionListContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionListContext,0)
 
 
         def LT(self):
-            return self.getToken(ChronoParser.LT, 0)
+            return self.getToken(CHParser.LT, 0)
 
         def typeSpecifier(self):
-            return self.getTypedRuleContext(ChronoParser.TypeSpecifierContext,0)
+            return self.getTypedRuleContext(CHParser.TypeSpecifierContext,0)
 
 
         def GT(self):
-            return self.getToken(ChronoParser.GT, 0)
+            return self.getToken(CHParser.GT, 0)
 
         def AT_MAKE_UNIQUE(self):
-            return self.getToken(ChronoParser.AT_MAKE_UNIQUE, 0)
+            return self.getToken(CHParser.AT_MAKE_UNIQUE, 0)
 
         def AT_MAKE_SHARED(self):
-            return self.getToken(ChronoParser.AT_MAKE_SHARED, 0)
+            return self.getToken(CHParser.AT_MAKE_SHARED, 0)
 
         def STATIC_CAST(self):
-            return self.getToken(ChronoParser.STATIC_CAST, 0)
+            return self.getToken(CHParser.STATIC_CAST, 0)
 
         def REINTERPRET_CAST(self):
-            return self.getToken(ChronoParser.REINTERPRET_CAST, 0)
+            return self.getToken(CHParser.REINTERPRET_CAST, 0)
 
         def CONST_CAST(self):
-            return self.getToken(ChronoParser.CONST_CAST, 0)
+            return self.getToken(CHParser.CONST_CAST, 0)
 
         def literal(self):
-            return self.getTypedRuleContext(ChronoParser.LiteralContext,0)
+            return self.getTypedRuleContext(CHParser.LiteralContext,0)
 
 
         def initializerList(self):
-            return self.getTypedRuleContext(ChronoParser.InitializerListContext,0)
+            return self.getTypedRuleContext(CHParser.InitializerListContext,0)
 
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def THIS(self):
-            return self.getToken(ChronoParser.THIS, 0)
+            return self.getToken(CHParser.THIS, 0)
 
         def expression(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_primary
+            return CHParser.RULE_primary
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterPrimary" ):
@@ -6761,7 +6761,7 @@ class ChronoParser ( Parser ):
 
     def primary(self):
 
-        localctx = ChronoParser.PrimaryContext(self, self._ctx, self.state)
+        localctx = CHParser.PrimaryContext(self, self._ctx, self.state)
         self.enterRule(localctx, 122, self.RULE_primary)
         self._la = 0 # Token type
         try:
@@ -6771,11 +6771,11 @@ class ChronoParser ( Parser ):
             if la_ == 1:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 875
-                self.match(ChronoParser.NEW)
+                self.match(CHParser.NEW)
                 self.state = 876
                 self.baseType()
                 self.state = 877
-                self.match(ChronoParser.LPAREN)
+                self.match(CHParser.LPAREN)
                 self.state = 879
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
@@ -6785,7 +6785,7 @@ class ChronoParser ( Parser ):
 
 
                 self.state = 881
-                self.match(ChronoParser.RPAREN)
+                self.match(CHParser.RPAREN)
                 pass
 
             elif la_ == 2:
@@ -6798,13 +6798,13 @@ class ChronoParser ( Parser ):
                     self._errHandler.reportMatch(self)
                     self.consume()
                 self.state = 884
-                self.match(ChronoParser.LT)
+                self.match(CHParser.LT)
                 self.state = 885
                 self.typeSpecifier()
                 self.state = 886
-                self.match(ChronoParser.GT)
+                self.match(CHParser.GT)
                 self.state = 887
-                self.match(ChronoParser.LPAREN)
+                self.match(CHParser.LPAREN)
                 self.state = 889
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
@@ -6814,7 +6814,7 @@ class ChronoParser ( Parser ):
 
 
                 self.state = 891
-                self.match(ChronoParser.RPAREN)
+                self.match(CHParser.RPAREN)
                 pass
 
             elif la_ == 3:
@@ -6827,13 +6827,13 @@ class ChronoParser ( Parser ):
                     self._errHandler.reportMatch(self)
                     self.consume()
                 self.state = 894
-                self.match(ChronoParser.LT)
+                self.match(CHParser.LT)
                 self.state = 895
                 self.typeSpecifier()
                 self.state = 896
-                self.match(ChronoParser.GT)
+                self.match(CHParser.GT)
                 self.state = 897
-                self.match(ChronoParser.LPAREN)
+                self.match(CHParser.LPAREN)
                 self.state = 899
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
@@ -6843,7 +6843,7 @@ class ChronoParser ( Parser ):
 
 
                 self.state = 901
-                self.match(ChronoParser.RPAREN)
+                self.match(CHParser.RPAREN)
                 pass
 
             elif la_ == 4:
@@ -6861,23 +6861,23 @@ class ChronoParser ( Parser ):
             elif la_ == 6:
                 self.enterOuterAlt(localctx, 6)
                 self.state = 905
-                self.match(ChronoParser.IDENTIFIER)
+                self.match(CHParser.IDENTIFIER)
                 pass
 
             elif la_ == 7:
                 self.enterOuterAlt(localctx, 7)
                 self.state = 906
-                self.match(ChronoParser.THIS)
+                self.match(CHParser.THIS)
                 pass
 
             elif la_ == 8:
                 self.enterOuterAlt(localctx, 8)
                 self.state = 907
-                self.match(ChronoParser.LPAREN)
+                self.match(CHParser.LPAREN)
                 self.state = 908
                 self.expression()
                 self.state = 909
-                self.match(ChronoParser.RPAREN)
+                self.match(CHParser.RPAREN)
                 pass
 
 
@@ -6898,17 +6898,17 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def LBRACE(self):
-            return self.getToken(ChronoParser.LBRACE, 0)
+            return self.getToken(CHParser.LBRACE, 0)
 
         def RBRACE(self):
-            return self.getToken(ChronoParser.RBRACE, 0)
+            return self.getToken(CHParser.RBRACE, 0)
 
         def expressionList(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionListContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionListContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_initializerList
+            return CHParser.RULE_initializerList
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterInitializerList" ):
@@ -6929,13 +6929,13 @@ class ChronoParser ( Parser ):
 
     def initializerList(self):
 
-        localctx = ChronoParser.InitializerListContext(self, self._ctx, self.state)
+        localctx = CHParser.InitializerListContext(self, self._ctx, self.state)
         self.enterRule(localctx, 124, self.RULE_initializerList)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 913
-            self.match(ChronoParser.LBRACE)
+            self.match(CHParser.LBRACE)
             self.state = 915
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -6945,7 +6945,7 @@ class ChronoParser ( Parser ):
 
 
             self.state = 917
-            self.match(ChronoParser.RBRACE)
+            self.match(CHParser.RBRACE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -6964,26 +6964,26 @@ class ChronoParser ( Parser ):
             self.funcName = None # Token
 
         def LPAREN(self):
-            return self.getToken(ChronoParser.LPAREN, 0)
+            return self.getToken(CHParser.LPAREN, 0)
 
         def RPAREN(self):
-            return self.getToken(ChronoParser.RPAREN, 0)
+            return self.getToken(CHParser.RPAREN, 0)
 
         def IDENTIFIER(self):
-            return self.getToken(ChronoParser.IDENTIFIER, 0)
+            return self.getToken(CHParser.IDENTIFIER, 0)
 
         def AT_MOVE(self):
-            return self.getToken(ChronoParser.AT_MOVE, 0)
+            return self.getToken(CHParser.AT_MOVE, 0)
 
         def AT_UNSAFE_MOVE(self):
-            return self.getToken(ChronoParser.AT_UNSAFE_MOVE, 0)
+            return self.getToken(CHParser.AT_UNSAFE_MOVE, 0)
 
         def expressionList(self):
-            return self.getTypedRuleContext(ChronoParser.ExpressionListContext,0)
+            return self.getTypedRuleContext(CHParser.ExpressionListContext,0)
 
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_functionCallExpression
+            return CHParser.RULE_functionCallExpression
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterFunctionCallExpression" ):
@@ -7004,7 +7004,7 @@ class ChronoParser ( Parser ):
 
     def functionCallExpression(self):
 
-        localctx = ChronoParser.FunctionCallExpressionContext(self, self._ctx, self.state)
+        localctx = CHParser.FunctionCallExpressionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 126, self.RULE_functionCallExpression)
         self._la = 0 # Token type
         try:
@@ -7018,7 +7018,7 @@ class ChronoParser ( Parser ):
                 self._errHandler.reportMatch(self)
                 self.consume()
             self.state = 920
-            self.match(ChronoParser.LPAREN)
+            self.match(CHParser.LPAREN)
             self.state = 922
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -7028,7 +7028,7 @@ class ChronoParser ( Parser ):
 
 
             self.state = 924
-            self.match(ChronoParser.RPAREN)
+            self.match(CHParser.RPAREN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -7047,19 +7047,19 @@ class ChronoParser ( Parser ):
 
         def expression(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(ChronoParser.ExpressionContext)
+                return self.getTypedRuleContexts(CHParser.ExpressionContext)
             else:
-                return self.getTypedRuleContext(ChronoParser.ExpressionContext,i)
+                return self.getTypedRuleContext(CHParser.ExpressionContext,i)
 
 
         def COMMA(self, i:int=None):
             if i is None:
-                return self.getTokens(ChronoParser.COMMA)
+                return self.getTokens(CHParser.COMMA)
             else:
-                return self.getToken(ChronoParser.COMMA, i)
+                return self.getToken(CHParser.COMMA, i)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_expressionList
+            return CHParser.RULE_expressionList
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterExpressionList" ):
@@ -7080,7 +7080,7 @@ class ChronoParser ( Parser ):
 
     def expressionList(self):
 
-        localctx = ChronoParser.ExpressionListContext(self, self._ctx, self.state)
+        localctx = CHParser.ExpressionListContext(self, self._ctx, self.state)
         self.enterRule(localctx, 128, self.RULE_expressionList)
         self._la = 0 # Token type
         try:
@@ -7092,7 +7092,7 @@ class ChronoParser ( Parser ):
             _la = self._input.LA(1)
             while _la==88:
                 self.state = 927
-                self.match(ChronoParser.COMMA)
+                self.match(CHParser.COMMA)
                 self.state = 928
                 self.expression()
                 self.state = 933
@@ -7116,46 +7116,46 @@ class ChronoParser ( Parser ):
             self.parser = parser
 
         def DECIMAL_LITERAL(self):
-            return self.getToken(ChronoParser.DECIMAL_LITERAL, 0)
+            return self.getToken(CHParser.DECIMAL_LITERAL, 0)
 
         def HEX_LITERAL(self):
-            return self.getToken(ChronoParser.HEX_LITERAL, 0)
+            return self.getToken(CHParser.HEX_LITERAL, 0)
 
         def BINARY_LITERAL(self):
-            return self.getToken(ChronoParser.BINARY_LITERAL, 0)
+            return self.getToken(CHParser.BINARY_LITERAL, 0)
 
         def OCTAL_LITERAL(self):
-            return self.getToken(ChronoParser.OCTAL_LITERAL, 0)
+            return self.getToken(CHParser.OCTAL_LITERAL, 0)
 
         def FLOAT_LITERAL(self):
-            return self.getToken(ChronoParser.FLOAT_LITERAL, 0)
+            return self.getToken(CHParser.FLOAT_LITERAL, 0)
 
         def BYTE_LITERAL(self):
-            return self.getToken(ChronoParser.BYTE_LITERAL, 0)
+            return self.getToken(CHParser.BYTE_LITERAL, 0)
 
         def STRING_LITERAL(self):
-            return self.getToken(ChronoParser.STRING_LITERAL, 0)
+            return self.getToken(CHParser.STRING_LITERAL, 0)
 
         def BOOL_LITERAL(self):
-            return self.getToken(ChronoParser.BOOL_LITERAL, 0)
+            return self.getToken(CHParser.BOOL_LITERAL, 0)
 
         def CHAR_LITERAL(self):
-            return self.getToken(ChronoParser.CHAR_LITERAL, 0)
+            return self.getToken(CHParser.CHAR_LITERAL, 0)
 
         def U8_STRING_LITERAL(self):
-            return self.getToken(ChronoParser.U8_STRING_LITERAL, 0)
+            return self.getToken(CHParser.U8_STRING_LITERAL, 0)
 
         def U_STRING_LITERAL(self):
-            return self.getToken(ChronoParser.U_STRING_LITERAL, 0)
+            return self.getToken(CHParser.U_STRING_LITERAL, 0)
 
         def U_STRING_LITERAL_CAP(self):
-            return self.getToken(ChronoParser.U_STRING_LITERAL_CAP, 0)
+            return self.getToken(CHParser.U_STRING_LITERAL_CAP, 0)
 
         def L_STRING_LITERAL_CAP(self):
-            return self.getToken(ChronoParser.L_STRING_LITERAL_CAP, 0)
+            return self.getToken(CHParser.L_STRING_LITERAL_CAP, 0)
 
         def getRuleIndex(self):
-            return ChronoParser.RULE_literal
+            return CHParser.RULE_literal
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterLiteral" ):
@@ -7176,7 +7176,7 @@ class ChronoParser ( Parser ):
 
     def literal(self):
 
-        localctx = ChronoParser.LiteralContext(self, self._ctx, self.state)
+        localctx = CHParser.LiteralContext(self, self._ctx, self.state)
         self.enterRule(localctx, 130, self.RULE_literal)
         self._la = 0 # Token type
         try:

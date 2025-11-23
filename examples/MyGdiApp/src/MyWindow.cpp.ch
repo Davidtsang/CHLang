@@ -9,7 +9,7 @@ import <iostream>
 
 implement MyWindow {
 
-    init(app: Application*, w: int, h: int) : Window(L"Chrono Showcase", app, w, h) {
+    init(app: Application*, w: int, h: int) : Window(L"CH Showcase", app, w, h) {
         this->m_bgColor = Color(255, 255, 255, 255);
     }
 

@@ -5,7 +5,7 @@
 
 import <iostream>
 import <cstdint> // For int32_t
-import "runtime/ChronoObject.h"
+import "runtime/CHObject.h"
 
 func main() -> int {
     @cpp std::cout << "--- Bitwise Ops Test ---" << std::endl; @end

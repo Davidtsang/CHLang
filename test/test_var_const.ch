@@ -2,7 +2,7 @@
 // 目的: 验证 var/const/auto 声明 (适配显式语法)
 
 import <iostream>
-import "runtime/ChronoObject.h"
+import "runtime/CHObject.h"
 
 struct TestStruct {
     // 1. 成员变量 (显式, 可变)
@@ -47,8 +47,8 @@ func main() -> int {
     }
 
     // 9. 指针类型推导
-    // new ChronoObject() 返回的是 ChronoObject* (原始指针)
-    var s = new ChronoObject();
+    // new CHObject() 返回的是 CHObject* (原始指针)
+    var s = new CHObject();
 
     // [关键修改]
     // 因为 s 是指针类型，在新的严格语法下，必须显式使用 -> 访问成员

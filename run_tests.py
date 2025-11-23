@@ -21,7 +21,7 @@ CPP_COMPILE_COMMAND = [
     "/EHsc",
     f"/I{RUNTIME_DIR}",  # /I 和 "runtime" 之间没有空格
     "/nologo",
-    os.path.join(RUNTIME_DIR, "ChronoString.cpp")
+    os.path.join(RUNTIME_DIR, "CHString.cpp")
 ]
 CPP_LINK_COMMAND = [
     "/link",
@@ -68,7 +68,7 @@ def print_color(text, color_code):
 
 
 def run_test(test_file_path):
-    """运行一个单独的 Chrono 测试文件"""
+    """运行一个单独的 CH 测试文件"""
 
     test_name = os.path.basename(test_file_path).replace(".ch", "")
     print(f"[TEST] Running: {test_name}")
@@ -158,7 +158,7 @@ def run_test(test_file_path):
 
 def main():
     print("===================================")
-    print("= Chrono Language Test Suite (Python)")
+    print("= CH Language Test Suite (Python)")
     print("===================================")
 
     # 确保 build 目录存在

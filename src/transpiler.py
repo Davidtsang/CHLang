@@ -7,11 +7,11 @@ from antlr4 import *
 from antlr4.error.ErrorListener import ErrorListener
 
 # 导入生成的 Parser/Lexer
-from parser.ChronoLexer import ChronoLexer
-from parser.ChronoParser import ChronoParser
+from parser.CHLexer import CHLexer
+from parser.CHParser import CHParser
 
 # 导入我们的新组件
-from ChronoVisitor import ChronoVisitor
+from CHVisitor import CHVisitor
 # from TypemapScanner import TypemapScanner
 from CompileContext import CompileContext
 
@@ -24,7 +24,7 @@ from CompileContext import CompileContext
 global_context = CompileContext()
 
 
-class ChronoErrorListener(ErrorListener):
+class CHErrorListener(ErrorListener):
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
         raise Exception(f"NO OK! ANTLR Parse Error at Line {line}:{column} - {msg}")
 
@@ -92,11 +92,11 @@ def translate(input_file, output_file):
             data = f.read()
 
         input_stream = InputStream(data)
-        lexer = ChronoLexer(input_stream)
+        lexer = CHLexer(input_stream)
         stream = CommonTokenStream(lexer)
-        parser = ChronoParser(stream)
+        parser = CHParser(stream)
         parser.removeErrorListeners()
-        parser.addErrorListener(ChronoErrorListener())
+        parser.addErrorListener(CHErrorListener())
 
         tree = parser.program()
 
@@ -108,7 +108,7 @@ def translate(input_file, output_file):
 
         # 3. 运行主 Visitor
         # 传入 global_context (可能已包含之前扫描的内容) 和 回调
-        visitor = ChronoVisitor(global_context, import_callback)
+        visitor = CHVisitor(global_context, import_callback)
         final_cpp_code = visitor.visit(tree)
 
         # 4. 输出

@@ -8,7 +8,7 @@ import <iostream>
 import <functional>
 import <cstdint>
 import <string>
-import "runtime/ChronoObject.h"
+import "runtime/CHObject.h"
 
 @cpp
 // 目标 C++ 函数

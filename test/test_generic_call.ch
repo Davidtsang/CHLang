@@ -41,7 +41,7 @@ func main() -> int {
     // [ [ 关键测试 1: 显式类型 ] ]
     //
     // C++ (丑陋): std::shared_ptr<People> p1 = std::make_shared<People>("Alice", 30);
-    // Chrono (优雅):
+    // CH (优雅):
     //
     // [验证] visitTypeSpecifier 必须能解析 std.shared_ptr[People]
     // [验证] visitSimpleExpression 必须能解析 std.make_shared[People]
@@ -50,7 +50,7 @@ func main() -> int {
     // [ [ 关键测试 2: 类型推导 (如果 'var' 已实现) ] ]
     //
     // C++ (丑陋): auto p2 = std::make_shared<People>("Bob", 40);
-    // Chrono (优雅):
+    // CH (优雅):
     //
     // [验证] visitSimpleExpression 必须能解析 std.make_shared[People]
     // [验证] 'var' (如果已实现) 必须能正确推导类型

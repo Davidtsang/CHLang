@@ -1,15 +1,15 @@
 // file: test/test_class_members.ch
 // 目的: 验证 'public', 'static func', 构造器调用, 和默认 private
 
-import "runtime/ChronoObject.h"
-import "runtime/ChronoString.h"
-import "runtime/ChronoInt.h"
-import "runtime/Chrono.h"
+import "runtime/CHObject.h"
+import "runtime/CHString.h"
+import "runtime/CHInt.h"
+import "runtime/CH.h"
 import <iostream> // C++ 库
 
 
 
-class MemberTest : ChronoObject {
+class MemberTest : CHObject {
 
     // -------------------------------------------
     // 属性 (Properties)
@@ -55,8 +55,8 @@ implement MemberTest{
 
     // [关键] 必须标记为 'public' 才能被 'main' 调用
     func printAll() {
-        Chrono::log(this->x);
-        Chrono::log(this->s);  // <-- [已修复] 必须使用 $s
+        CH::log(this->x);
+        CH::log(this->s);  // <-- [已修复] 必须使用 $s
     }
 
     // (默认 private)

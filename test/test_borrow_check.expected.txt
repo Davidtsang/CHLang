@@ -1,4 +1,4 @@
---- Chrono Borrow Checker Test ---
+--- CH Borrow Checker Test ---
 [1] Created Box A (id=100)
 [1] Moved A to B. A is now empty.
 [2] Inside Loop...

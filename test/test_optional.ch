@@ -1,4 +1,4 @@
-import "runtime/ChronoObject.h"
+import "runtime/CHObject.h"
 import <iostream>
 import <string>
 
@@ -14,7 +14,7 @@ interface Delegate {
 
 // --- 2. 场景 A: 全能工 (实现了所有方法) ---
 @dynamic
-class FullWorker : ChronoObject with Delegate {
+class FullWorker : CHObject with Delegate {
     public init();
 
     // 实现必须方法 (C++ override)
@@ -39,7 +39,7 @@ implement FullWorker {
 
 // --- 3. 场景 B: 懒惰工 (只实现了必须方法) ---
 @dynamic
-class LazyWorker : ChronoObject with Delegate {
+class LazyWorker : CHObject with Delegate {
     public init();
 
     // 只实现必须的，不写 optional，C++ 编译器不应该报错
@@ -77,7 +77,7 @@ func main() -> int {
     // d1->doOptional("Fail");
 
     // 3. 动态调用测试 (~>)
-    // 我们把它们都当作 dyn (ChronoObject*)
+    // 我们把它们都当作 dyn (CHObject*)
     var dyn1: dyn = full;
     var dyn2: dyn = lazy;
 

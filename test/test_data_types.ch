@@ -6,9 +6,9 @@ import <iostream>
 import <string>
 import <cstdint> // <-- [关键] 确保 (u)int8_t 可用于 @cpp
 
-// 2. 导入 Chrono 运行时 (为了 main)
-import "runtime/ChronoObject.h"
-import "runtime/Chrono.h" // (虽然不用 print, 但导入是好习惯)
+// 2. 导入 CH 运行时 (为了 main)
+import "runtime/CHObject.h"
+import "runtime/CH.h" // (虽然不用 print, 但导入是好习惯)
 
 func main() -> int {
 

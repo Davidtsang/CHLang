@@ -1,5 +1,5 @@
 // file: test/test_smart_ptr.ch
-// 目的: 验证 Chrono 的新内置智能指针语法
+// 目的: 验证 CH 的新内置智能指针语法
 //
 // 验证:
 // - 内置泛型调用: @make[T](), @make_shared[T]()

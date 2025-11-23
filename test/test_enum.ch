@@ -3,7 +3,7 @@
 
 import <iostream>
 import <cstdint>
-import "runtime/ChronoObject.h" // [新增] 导入基类
+import "runtime/CHObject.h" // [新增] 导入基类
 
 // 1. 传统枚举 (Unscoped)
 enum Color {
@@ -20,7 +20,7 @@ enum class State : u8 {
 }
 
 // 3. 类定义 (只包含声明)
-class Machine : ChronoObject{
+class Machine : CHObject{
     // 类内部定义枚举 (允许)
     public enum class Mode {
         Auto,

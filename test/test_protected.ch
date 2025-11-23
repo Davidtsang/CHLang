@@ -1,7 +1,7 @@
-import "runtime/ChronoObject.h"
+import "runtime/CHObject.h"
 import <iostream>
 
-class Parent : ChronoObject {
+class Parent : CHObject {
     // 私有
     var secret: i32;
 

@@ -1,4 +1,4 @@
---- Chrono Dynamic Test ---
+--- CH Dynamic Test ---
 Talker says: Hello World
 Sum: 30
-[ChronoRuntime] Selector ID {{HASH}} not recognized.
+[CHRuntime] Selector ID {{HASH}} not recognized.

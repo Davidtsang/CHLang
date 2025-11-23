@@ -1,15 +1,15 @@
-﻿# src/ChronoVisitor.py
+﻿# src/CHVisitor.py
 import os
 from CompileContext import CompileContext
 
-from parser.ChronoParser import ChronoParser
-from parser.ChronoParserVisitor import ChronoParserVisitor as BaseChronoVisitor
+from parser.CHParser import CHParser
+from parser.CHParserVisitor import CHParserVisitor as BaseCHVisitor
 from antlr4.tree.Tree import TerminalNodeImpl  # 导入 TerminalNodeImpl
 
 INDENT = "    "
 
 
-class ChronoVisitor(BaseChronoVisitor):
+class CHVisitor(BaseCHVisitor):
 
     def __init__(self, context: CompileContext = None, import_loader_callback=None):
         super().__init__()
@@ -57,7 +57,7 @@ class ChronoVisitor(BaseChronoVisitor):
         suffixes.sort(key=lambda x: x.getSymbol().tokenIndex)
         return suffixes
 
-    def visitTypeSpecifier(self, ctx: ChronoParser.TypeSpecifierContext):
+    def visitTypeSpecifier(self, ctx: CHParser.TypeSpecifierContext):
         """
         [重构] 访问 'typeSpecifier' 规则。
         处理泛型 < >，C++函数类型 Ret(Args)，以及 C-Style 数组/指针转换。
@@ -131,7 +131,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return f"{core_type}{suffix_str}"
 
-    def visitBaseType(self, ctx: ChronoParser.BaseTypeContext):
+    def visitBaseType(self, ctx: CHParser.BaseTypeContext):
         raw_text = ctx.getText()
 
         # 2. 直接替换 :: (如果是新语法) 或者 . (如果是旧语法) 为 ::
@@ -143,9 +143,9 @@ class ChronoVisitor(BaseChronoVisitor):
             parts[0] = self._alias_to_namespace_map[parts[0]]
 
         final_type = "::".join(parts)
-        return self._chrono_to_cpp_type(final_type)
+        return self._CH_to_cpp_type(final_type)
 
-    def visitNamespaceStatement(self, ctx: ChronoParser.NamespaceStatementContext):
+    def visitNamespaceStatement(self, ctx: CHParser.NamespaceStatementContext):
         self._namespace_is_open = True
         namespace_name = ctx.name.getText()
 
@@ -156,10 +156,10 @@ class ChronoVisitor(BaseChronoVisitor):
         open_block = f"namespace {namespace_name.replace('.', ' { namespace ')} {{\n\n"
         return open_block
 
-    def visitEndNamespaceStatement(self, ctx: ChronoParser.EndNamespaceStatementContext):
+    def visitEndNamespaceStatement(self, ctx: CHParser.EndNamespaceStatementContext):
         if not self._namespace_is_open:
             raise Exception(
-                f"Chrono Translation Error (Line {ctx.start.line}): 'endnamespace;' called without a matching 'namespace' statement.")
+                f"CH Translation Error (Line {ctx.start.line}): 'endnamespace;' called without a matching 'namespace' statement.")
 
         depth = self._current_namespace_str.count('::')
         closing_braces = "}" * depth
@@ -170,7 +170,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return f"\n{closing_braces} // namespace {comment_name}\n\n"
 
-    def visitImplementationBlock(self, ctx: ChronoParser.ImplementationBlockContext):
+    def visitImplementationBlock(self, ctx: CHParser.ImplementationBlockContext):
         self._in_implementation_block = True
         self._current_class_name = ctx.name.text
         self._in_class = True
@@ -183,9 +183,9 @@ class ChronoVisitor(BaseChronoVisitor):
 
         body_code = ""
         for child in ctx.children:
-            if isinstance(child, (ChronoParser.MethodDefinitionContext,
-                                  ChronoParser.InitDefinitionContext,
-                                  ChronoParser.DeinitBlockContext)):
+            if isinstance(child, (CHParser.MethodDefinitionContext,
+                                  CHParser.InitDefinitionContext,
+                                  CHParser.DeinitBlockContext)):
                 body_code += self.visit(child)
 
         # [核心逻辑] 如果是动态类，自动生成反射胶水代码
@@ -200,7 +200,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return body_code
 
-    def visitMethodDefinition(self, ctx: ChronoParser.MethodDefinitionContext):
+    def visitMethodDefinition(self, ctx: CHParser.MethodDefinitionContext):
         self._in_class_method = True
         self._enter_scope()
         self._add_variable("this", {"cpp_name": "this", "cpp_type": f"{self._current_class_name}*"})
@@ -235,15 +235,15 @@ class ChronoVisitor(BaseChronoVisitor):
             return f"\n{return_type} {self._current_class_name}::{func_name}({params_code}) {{\n{body_code}{INDENT}}}\n"
         else:
             # 内联
-            access = getattr(ctx, '_chrono_access', 'public')
+            access = getattr(ctx, '_CH_access', 'public')
             self._class_sections[
                 access] += f"\n{INDENT}{return_type} {func_name}({params_code}) {{\n{body_code}{INDENT}}}\n"
             return ""
 
     def _generate_dynamic_glue_code(self):
         class_name = self._current_class_name
-        code = f"\n// --- Chrono Runtime Glue Code for {class_name} ---\n"
-        code += f"ChronoObject::MethodTrampoline {class_name}::findMethodImpl(SelectorID sel) {{\n"
+        code = f"\n// --- CH Runtime Glue Code for {class_name} ---\n"
+        code += f"CHObject::MethodTrampoline {class_name}::findMethodImpl(SelectorID sel) {{\n"
 
         for func_name, param_types, ret_type in self._current_impl_methods:
             code += f"{INDENT}if (sel == _SEL(\"{func_name}\")) {{\n"
@@ -269,13 +269,13 @@ class ChronoVisitor(BaseChronoVisitor):
             code += f"{INDENT}{INDENT}}};\n"
             code += f"{INDENT}}}\n"
 
-        # [修复 2/2] 使用记录的基类，而不是硬编码 ChronoObject
-        parent_class = self._inheritance_map.get(class_name, "ChronoObject")
+        # [修复 2/2] 使用记录的基类，而不是硬编码 CHObject
+        parent_class = self._inheritance_map.get(class_name, "CHObject")
         code += f"{INDENT}return {parent_class}::findMethodImpl(sel);\n"
         code += "}\n"
         return code
 
-    def visitFunctionDefinition(self, ctx: ChronoParser.FunctionDefinitionContext):
+    def visitFunctionDefinition(self, ctx: CHParser.FunctionDefinitionContext):
 
         line_comment = f"\n// Line {ctx.start.line} (func {ctx.name.text})\n"
         # 这是一个全局函数 (不在类中或 implement 块中)
@@ -307,7 +307,7 @@ class ChronoVisitor(BaseChronoVisitor):
         self._exit_scope()
         return func_def_code
 
-    def visitParameter(self, ctx: ChronoParser.ParameterContext):
+    def visitParameter(self, ctx: CHParser.ParameterContext):
         """
         [重构] 访问 'parameter' 规则。
         [修复] 正确处理带 {NAME} 占位符的数组/函数指针类型。
@@ -346,14 +346,14 @@ class ChronoVisitor(BaseChronoVisitor):
         return f"{cpp_final_type} {cpp_name}"
 
 
-    def visitFunctionCallExpression(self, ctx: ChronoParser.FunctionCallExpressionContext):
+    def visitFunctionCallExpression(self, ctx: CHParser.FunctionCallExpressionContext):
         name_token = ctx.funcName
 
         # @move 检查
-        is_safe_move = (name_token.type == ChronoParser.AT_MOVE)
+        is_safe_move = (name_token.type == CHParser.AT_MOVE)
         is_unsafe_move = False
-        if hasattr(ChronoParser, 'AT_UNSAFE_MOVE'):
-            is_unsafe_move = (name_token.type == ChronoParser.AT_UNSAFE_MOVE)
+        if hasattr(CHParser, 'AT_UNSAFE_MOVE'):
+            is_unsafe_move = (name_token.type == CHParser.AT_UNSAFE_MOVE)
 
         if is_safe_move or is_unsafe_move:
             var_name = ""
@@ -363,11 +363,11 @@ class ChronoVisitor(BaseChronoVisitor):
             var_info = self._find_variable(var_name)
             if var_info:
                 if var_info.get('state') == 'Moved':
-                    raise Exception(f"\n[Chrono Borrow Error] Variable '{var_name}' ALREADY moved!")
+                    raise Exception(f"\n[CH Borrow Error] Variable '{var_name}' ALREADY moved!")
                 var_depth = var_info.get('def_depth', 0)
                 current_depth = self._control_flow_depth
                 if is_safe_move and (current_depth > var_depth):
-                    raise Exception(f"\n[Chrono Safety Error] Cannot safely @move('{var_name}') inside loop.")
+                    raise Exception(f"\n[CH Safety Error] Cannot safely @move('{var_name}') inside loop.")
                 var_info['state'] = 'Moved'
                 return f"std::move({var_name})"
 
@@ -375,7 +375,7 @@ class ChronoVisitor(BaseChronoVisitor):
         raw_name = name_token.text
 
         # [新增] 类型映射，支持构造函数简写 (e.g. string() -> std::string())
-        cpp_func_name = "std::move" if name_token.type == ChronoParser.AT_MOVE else self._chrono_to_cpp_type(raw_name)
+        cpp_func_name = "std::move" if name_token.type == CHParser.AT_MOVE else self._CH_to_cpp_type(raw_name)
 
         args_list = []
         if ctx.expressionList():
@@ -416,14 +416,14 @@ class ChronoVisitor(BaseChronoVisitor):
         else:
             if not ctx.expression():
                 raise Exception(
-                    f"Chrono Error (Line {ctx.start.line}): Declaration of '{var_name}' must have an explicit type or an initializer.")
+                    f"CH Error (Line {ctx.start.line}): Declaration of '{var_name}' must have an explicit type or an initializer.")
             base_type_cpp = "auto"
             cpp_final_type = "auto"
 
         # --- 4. 验证 Const ---
         if is_const and not ctx.expression():
             raise Exception(
-                f"Chrono Error (Line {ctx.start.line}): Constant declaration '{var_name}' must be initialized.")
+                f"CH Error (Line {ctx.start.line}): Constant declaration '{var_name}' must be initialized.")
 
         # --- 5. 确定是指针/引用/数组 ---
         is_pointer = False
@@ -450,7 +450,7 @@ class ChronoVisitor(BaseChronoVisitor):
                 pass
 
             is_factory_call = False
-            if primary_node and isinstance(primary_node, ChronoParser.PrimaryContext):
+            if primary_node and isinstance(primary_node, CHParser.PrimaryContext):
                 if primary_node.NEW():
                     is_factory_call = True
                 elif primary_node.AT_MAKE_UNIQUE():
@@ -486,7 +486,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         # --- 9. 确定是局部还是成员 ---
         is_member_variable = (self._in_class or self._in_struct) and not self._in_class_method
-        access = getattr(ctx, '_chrono_access', 'private')
+        access = getattr(ctx, '_CH_access', 'private')
 
         # --- 10. 生成核心 C++ 代码 ---
         core_cpp = ""
@@ -512,39 +512,39 @@ class ChronoVisitor(BaseChronoVisitor):
 
     def _get_op_string_from_token_type(self, token_type):
         """根据 ANTLR 词元类型返回操作符的 C++ 字符串"""
-        if token_type == ChronoParser.PLUS: return "+"
-        if token_type == ChronoParser.MINUS: return "-"
-        if token_type == ChronoParser.STAR: return "*"
-        if token_type == ChronoParser.SLASH: return "/"
-        if token_type == ChronoParser.MODULO: return "%"
-        if token_type == ChronoParser.EQ: return "=="
-        if token_type == ChronoParser.NEQ: return "!="
-        if token_type == ChronoParser.LT: return "<"
-        if token_type == ChronoParser.GT: return ">"
-        if token_type == ChronoParser.LTE: return "<="
-        if token_type == ChronoParser.GTE: return ">="
-        if token_type == ChronoParser.AND_OP: return "&&"
-        if token_type == ChronoParser.OR_OP: return "||"
-        if token_type == ChronoParser.BIT_AND: return "&"
-        if token_type == ChronoParser.BIT_OR: return "|"
-        if token_type == ChronoParser.BIT_XOR: return "^"
-        if token_type == ChronoParser.LSHIFT: return "<<"
-        if token_type == ChronoParser.RSHIFT: return ">>"
+        if token_type == CHParser.PLUS: return "+"
+        if token_type == CHParser.MINUS: return "-"
+        if token_type == CHParser.STAR: return "*"
+        if token_type == CHParser.SLASH: return "/"
+        if token_type == CHParser.MODULO: return "%"
+        if token_type == CHParser.EQ: return "=="
+        if token_type == CHParser.NEQ: return "!="
+        if token_type == CHParser.LT: return "<"
+        if token_type == CHParser.GT: return ">"
+        if token_type == CHParser.LTE: return "<="
+        if token_type == CHParser.GTE: return ">="
+        if token_type == CHParser.AND_OP: return "&&"
+        if token_type == CHParser.OR_OP: return "||"
+        if token_type == CHParser.BIT_AND: return "&"
+        if token_type == CHParser.BIT_OR: return "|"
+        if token_type == CHParser.BIT_XOR: return "^"
+        if token_type == CHParser.LSHIFT: return "<<"
+        if token_type == CHParser.RSHIFT: return ">>"
         raise Exception(f"Unknown operator token type: {token_type}")
 
-    def _add_variable(self, chrono_name, metadata):
-        """在*当前*作用域中定义一个新变量 (使用 Chrono 名字 $s 或 s 作为 Key)"""
+    def _add_variable(self, CH_name, metadata):
+        """在*当前*作用域中定义一个新变量 (使用 CH 名字 $s 或 s 作为 Key)"""
         # [新增] 初始化借用状态元数据
         metadata['state'] = 'Alive'  # 状态: Alive / Moved
         metadata['def_depth'] = self._control_flow_depth  # 出生时的深度
 
-        self._scope_stack[-1][chrono_name] = metadata
+        self._scope_stack[-1][CH_name] = metadata
 
-    def _find_variable(self, chrono_name):
-        """从当前作用域开始，向外(全局)查找一个变量 (使用 Chrono 名字 $s 或 s)"""
+    def _find_variable(self, CH_name):
+        """从当前作用域开始，向外(全局)查找一个变量 (使用 CH 名字 $s 或 s)"""
         for scope in reversed(self._scope_stack):
-            if chrono_name in scope:
-                return scope[chrono_name]
+            if CH_name in scope:
+                return scope[CH_name]
         return None  # 未找到
 
     def _safe_iterate_statements(self, statement_ctx_or_list):
@@ -562,45 +562,45 @@ class ChronoVisitor(BaseChronoVisitor):
         else:
             return [statement_ctx_or_list]
 
-    def _chrono_to_cpp_type(self, chrono_type_name):
+    def _CH_to_cpp_type(self, CH_type_name):
         """
         [重构] 新增智能指针关键字的翻译
         """
-        if chrono_type_name == "bool":
+        if CH_type_name == "bool":
             return "bool"
-        if chrono_type_name == "unique":
+        if CH_type_name == "unique":
             return "std::unique_ptr"
-        if chrono_type_name == "shared":
+        if CH_type_name == "shared":
             return "std::shared_ptr"
-        if chrono_type_name == "weak":
+        if CH_type_name == "weak":
             return "std::weak_ptr"
-        if chrono_type_name == "i8":
+        if CH_type_name == "i8":
             return "int8_t"
-        if chrono_type_name == "u8":
+        if CH_type_name == "u8":
             return "uint8_t"
-        if chrono_type_name == "i16":
+        if CH_type_name == "i16":
             return "int16_t"
-        if chrono_type_name == "u16":
+        if CH_type_name == "u16":
             return "uint16_t"
-        if chrono_type_name == "int":
+        if CH_type_name == "int":
             return "int"
-        if chrono_type_name == "i32":
+        if CH_type_name == "i32":
             return "int32_t"
-        if chrono_type_name == "u32":
+        if CH_type_name == "u32":
             return "uint32_t"
-        if chrono_type_name == "i64":
+        if CH_type_name == "i64":
             return "int64_t"
-        if chrono_type_name == "u64":
+        if CH_type_name == "u64":
             return "uint64_t"
-        if chrono_type_name == "f32" or chrono_type_name == "float":
+        if CH_type_name == "f32" or CH_type_name == "float":
             return "float"
-        if chrono_type_name == "f64":
+        if CH_type_name == "f64":
             return "double"
         # [新增] 动态类型映射
-        if chrono_type_name == "dyn":
+        if CH_type_name == "dyn":
             return "dyn"
 
-        return chrono_type_name
+        return CH_type_name
 
     def _get_access_level(self, ctx, default_level='private'):
         """检查上下文是否包含访问修饰符，返回 'public', 'protected' 或默认值。"""
@@ -631,7 +631,7 @@ class ChronoVisitor(BaseChronoVisitor):
         return default_level
 
     # --- 顶层规则 ---
-    def visitProgram(self, ctx: ChronoParser.ProgramContext):
+    def visitProgram(self, ctx: CHParser.ProgramContext):
 
         # [ [ [ 修复：恢复“优雅”的顺序循环 ] ] ]
         all_code = ""
@@ -641,7 +641,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
             # A. 处理顶层的 # 指令 (来自 topLevelImport)
             if isinstance(child, TerminalNodeImpl):
-                if child.getSymbol().type == ChronoParser.CPP_DIRECTIVE:
+                if child.getSymbol().type == CHParser.CPP_DIRECTIVE:
                     all_code += self.visit(child)
                 continue  # (忽略其他终端节点，如 EOF)
 
@@ -655,11 +655,11 @@ class ChronoVisitor(BaseChronoVisitor):
         if self._namespace_is_open:
             # 抛出一个硬错误，而不是自动闭合
             raise Exception(
-                "Chrono Translation Error: 'namespace' was declared, but 'endnamespace;' was missing before the end of the file.")
+                "CH Translation Error: 'namespace' was declared, but 'endnamespace;' was missing before the end of the file.")
 
         return all_code.strip()
 
-    def visitImportDirective(self, ctx: ChronoParser.ImportDirectiveContext):
+    def visitImportDirective(self, ctx: CHParser.ImportDirectiveContext):
 
         line_comment = f"\n// Line {ctx.start.line} \n"
 
@@ -713,7 +713,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return f"// ERROR: Invalid import path {path_text}\n"
 
-    def visitUsingAlias(self, ctx: ChronoParser.UsingAliasContext):
+    def visitUsingAlias(self, ctx: CHParser.UsingAliasContext):
         line_comment = f"\n// Line {ctx.start.line} \n"
         name = ctx.name.text
         cpp_type_pattern = self.visit(ctx.typeName)
@@ -733,7 +733,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return f"{line_comment}using {name} = {cpp_type};\n"
 
-    def visitParameters(self, ctx: ChronoParser.ParametersContext):
+    def visitParameters(self, ctx: CHParser.ParametersContext):
         """
         [恢复] 处理参数列表 (p1, p2, p3)
         防止无参数时返回 None
@@ -745,7 +745,7 @@ class ChronoVisitor(BaseChronoVisitor):
         return ", ".join(params_list)
 
     # [ [ [ 新增：访问基类初始化器 ] ] ]
-    def visitBaseInitializer(self, ctx: ChronoParser.BaseInitializerContext):
+    def visitBaseInitializer(self, ctx: CHParser.BaseInitializerContext):
         """
         访问 'baseInitializer' 规则 (例如 : Window(args) )
         并将其翻译为 C++ 字符串 "Window(args)"
@@ -754,7 +754,7 @@ class ChronoVisitor(BaseChronoVisitor):
         args_code = self.visit(ctx.args) if ctx.args else ""
         return f"{base_name}({args_code})"
 
-    def visitMethodSignature(self, ctx: ChronoParser.MethodSignatureContext):
+    def visitMethodSignature(self, ctx: CHParser.MethodSignatureContext):
         func_name = ctx.name.text
         cpp_func_name = func_name
         params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
@@ -764,13 +764,13 @@ class ChronoVisitor(BaseChronoVisitor):
             cpp_return_type = "void"
         return f"{INDENT}virtual {cpp_return_type} {cpp_func_name}({params_code}) = 0;\n"
 
-    def visitInterfaceDefinition(self, ctx: ChronoParser.InterfaceDefinitionContext):
+    def visitInterfaceDefinition(self, ctx: CHParser.InterfaceDefinitionContext):
         interface_name = ctx.name.text
         body_code = ""
 
         # 遍历子节点
         for child in ctx.children:
-            if isinstance(child, ChronoParser.MethodSignatureContext):
+            if isinstance(child, CHParser.MethodSignatureContext):
                 # [核心逻辑] 检查是否有 @optional
                 is_optional = bool(child.AT_OPTIONAL())
 
@@ -778,7 +778,7 @@ class ChronoVisitor(BaseChronoVisitor):
                     # 如果是可选的，生成注释，或者完全不生成 C++ 代码
                     # 这样 C++ 编译器就不会因为没实现它而报错
                     func_name = child.name.text
-                    body_code += f"{INDENT}// virtual void {func_name}(...) // @optional in Chrono\n"
+                    body_code += f"{INDENT}// virtual void {func_name}(...) // @optional in CH\n"
                 else:
                     # 必须实现的，生成纯虚函数
                     body_code += self.visit(child)
@@ -790,7 +790,7 @@ class ChronoVisitor(BaseChronoVisitor):
         code += "};\n"
         return code
 
-    def visitFunctionSignature(self, ctx: ChronoParser.FunctionSignatureContext):
+    def visitFunctionSignature(self, ctx: CHParser.FunctionSignatureContext):
         line_comment = f"\n// Line {ctx.start.line} \n"
 
         func_name = ctx.name.text
@@ -799,7 +799,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         if self._in_class or self._in_struct:
             default_access = 'public' if self._in_struct else 'private'
-            access = getattr(ctx, '_chrono_access', default_access)
+            access = getattr(ctx, '_CH_access', default_access)
 
             # 1. 获取修饰符状态
             # (STATIC)? 来自 Parser
@@ -810,7 +810,7 @@ class ChronoVisitor(BaseChronoVisitor):
             is_override = bool(ctx.OVERRIDE()) if hasattr(ctx, 'OVERRIDE') and ctx.OVERRIDE() else False
 
             # 如果是从 classBodyStatement 传下来的 static 标志 (兼容旧逻辑)
-            if getattr(ctx, '_chrono_static', False):
+            if getattr(ctx, '_CH_static', False):
                 is_static = True
 
             # 2. 构建前缀/后缀
@@ -837,10 +837,10 @@ class ChronoVisitor(BaseChronoVisitor):
             extern_prefix = "extern " if is_extern else ""
             return f"{line_comment}{extern_prefix}{static_prefix}{return_type} {self._current_namespace_str}{func_name}({params_code});\n"
 
-    def visitInitSignature(self, ctx: ChronoParser.InitSignatureContext):
+    def visitInitSignature(self, ctx: CHParser.InitSignatureContext):
         line_comment = f"\n// Line {ctx.start.line} \n"
         default_access = 'public' if self._in_struct else 'private'
-        access = getattr(ctx, '_chrono_access', default_access)
+        access = getattr(ctx, '_CH_access', default_access)
 
         func_name = self._current_class_name
         params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
@@ -849,7 +849,7 @@ class ChronoVisitor(BaseChronoVisitor):
         self._class_sections[access] += decl
         return ""
 
-    def visitDeinitSignature(self, ctx: ChronoParser.DeinitSignatureContext):
+    def visitDeinitSignature(self, ctx: CHParser.DeinitSignatureContext):
         line_comment = f"\n// Line {ctx.start.line} \n"
 
         access = "public"  # Deinit 总是 public
@@ -859,7 +859,7 @@ class ChronoVisitor(BaseChronoVisitor):
         self._class_sections[access] += decl
         return ""
 
-    def visitCastExpression(self, ctx: ChronoParser.CastExpressionContext):
+    def visitCastExpression(self, ctx: CHParser.CastExpressionContext):
         # 1. 获取左侧表达式 (simpleExpression)
         code = self.visit(ctx.simpleExpression())
 
@@ -875,7 +875,7 @@ class ChronoVisitor(BaseChronoVisitor):
             # [智能修正]
             # 如果用户写 "as Button"，生成 "dynamic_cast<Button*>"
             # 如果用户写 "as Button*"，生成 "dynamic_cast<Button*>"
-            # 我们默认 Chrono 的类转换都是指针转换
+            # 我们默认 CH 的类转换都是指针转换
             if not target_type.endswith('*'):
                 target_type += "*"
 
@@ -885,14 +885,14 @@ class ChronoVisitor(BaseChronoVisitor):
         return code
 
 
-    def visitClassDefinition(self, ctx: ChronoParser.ClassDefinitionContext):
+    def visitClassDefinition(self, ctx: CHParser.ClassDefinitionContext):
         self._current_class_members = {}
         self._in_class = True
         self._in_struct = False
         class_name = ctx.name.text
 
         # [修复 1/2] 记录继承关系
-        base_name = "ChronoObject"
+        base_name = "CHObject"
         if ctx.base:
             base_name = ctx.base.text
         self._inheritance_map[class_name] = base_name
@@ -934,7 +934,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
 
 
-    def visitClassBodyStatement(self, ctx: ChronoParser.ClassBodyStatementContext):
+    def visitClassBodyStatement(self, ctx: CHParser.ClassBodyStatementContext):
         # [ [ [ 关键修复 ] ] ]
         # 修复了 static 关键字的检测。
         is_static = False
@@ -951,9 +951,9 @@ class ChronoVisitor(BaseChronoVisitor):
         access = self._get_access_level(ctx, default_level='private')
 
         if ctx.variableDeclaration():
-            ctx.variableDeclaration()._chrono_access = access
+            ctx.variableDeclaration()._CH_access = access
             # 传递 static 状态 (尽管 G4 不支持 static var)
-            ctx.variableDeclaration()._chrono_static = is_static
+            ctx.variableDeclaration()._CH_static = is_static
             return self.visit(ctx.variableDeclaration())
 
             # [新增] 处理嵌套枚举
@@ -964,17 +964,17 @@ class ChronoVisitor(BaseChronoVisitor):
             return ""
 
         elif ctx.functionSignature():
-            ctx.functionSignature()._chrono_access = access
-            ctx.functionSignature()._chrono_static = is_static  # <--- 传递合并后的 'is_static' 状态
+            ctx.functionSignature()._CH_access = access
+            ctx.functionSignature()._CH_static = is_static  # <--- 传递合并后的 'is_static' 状态
             return self.visit(ctx.functionSignature())
 
         elif ctx.initSignature():
-            ctx.initSignature()._chrono_access = access
+            ctx.initSignature()._CH_access = access
             return self.visit(ctx.initSignature())
 
         elif ctx.deinitSignature():
             # deinit 总是 public
-            ctx.deinitSignature()._chrono_access = 'public'
+            ctx.deinitSignature()._CH_access = 'public'
             return self.visit(ctx.deinitSignature())
 
 
@@ -983,7 +983,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return ""
 
-    def visitInitDefinition(self, ctx: ChronoParser.InitDefinitionContext):
+    def visitInitDefinition(self, ctx: CHParser.InitDefinitionContext):
 
         line_comment = f"\n// Line {ctx.start.line} (init)\n"
         self._in_class_method = True
@@ -1006,7 +1006,7 @@ class ChronoVisitor(BaseChronoVisitor):
         base_init_code = ""
         if ctx.baseInit:
             # ctx.baseInit 是 BaseInitializerContext
-            # visit(ctx.baseInit) 将返回 "Window(L\"My Chrono GDI+ Window\", app)"
+            # visit(ctx.baseInit) 将返回 "Window(L\"My CH GDI+ Window\", app)"
             base_init_code = f" : {self.visit(ctx.baseInit)}"
         # [ [ [ 新增结束 ] ] ]
 
@@ -1015,9 +1015,9 @@ class ChronoVisitor(BaseChronoVisitor):
             # [修复 A-4]
             cpp_func_name = f"{self._current_class_name}::{self._current_class_name}"
         else:
-            access = getattr(ctx, '_chrono_access', 'private')
+            access = getattr(ctx, '_CH_access', 'private')
             if self._in_struct:
-                access = getattr(ctx, '_chrono_access', 'public')
+                access = getattr(ctx, '_CH_access', 'public')
 
         params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
         body_code = "".join(self.visit(s) for s in self._safe_iterate_statements(ctx.statement()))
@@ -1038,7 +1038,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return init_code if self._in_implementation_block else ""
 
-    def visitDeinitBlock(self, ctx: ChronoParser.DeinitBlockContext):
+    def visitDeinitBlock(self, ctx: CHParser.DeinitBlockContext):
 
         line_comment = f"\n// Line {ctx.start.line} (deinit)\n"
 
@@ -1069,7 +1069,7 @@ class ChronoVisitor(BaseChronoVisitor):
             cpp_func_name = f"{self._current_class_name}::{cpp_func_name}"
             deinit_code = (
                 f"{line_comment}\n{cpp_func_name}() {{\n"
-                f"{INDENT}// --- Chrono Deinit Block ---\n"
+                f"{INDENT}// --- CH Deinit Block ---\n"
                 f"{body_code}"
                 f"{INDENT}// --- Deinit End ---\n"
                 f"{INDENT}}}\n"
@@ -1078,7 +1078,7 @@ class ChronoVisitor(BaseChronoVisitor):
             access = "public"  # Deinit 总是 public
             deinit_code = (
                 f"{line_comment}\n{INDENT}virtual {cpp_func_name}() {{\n"
-                f"{INDENT}// --- Chrono Deinit Block ---\n"
+                f"{INDENT}// --- CH Deinit Block ---\n"
                 f"{body_code}"
                 f"{INDENT}// --- Deinit End ---\n"
                 f"{INDENT}}}\n"
@@ -1090,22 +1090,22 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return deinit_code if self._in_implementation_block else ""
 
-    def visitTypeList(self, ctx: ChronoParser.TypeListContext):
+    def visitTypeList(self, ctx: CHParser.TypeListContext):
         arg_list = [self.visit(t) for t in ctx.templateArgument()]
         return ", ".join(arg_list)
 
-    def visitTemplateArgument(self, ctx: ChronoParser.TemplateArgumentContext):
+    def visitTemplateArgument(self, ctx: CHParser.TemplateArgumentContext):
         if ctx.typeSpecifier():
             return self.visit(ctx.typeSpecifier())
         if ctx.literal():
             return self.visit(ctx.literal())
         return ""
 
-    def visitInitializerList(self, ctx: ChronoParser.InitializerListContext):
+    def visitInitializerList(self, ctx: CHParser.InitializerListContext):
         args_code = self.visit(ctx.expressionList()) if ctx.expressionList() else ""
         return f"{{{args_code}}}"
 
-    def visitSimpleExpression(self, ctx: ChronoParser.SimpleExpressionContext):
+    def visitSimpleExpression(self, ctx: CHParser.SimpleExpressionContext):
         """
         [重构] 支持 . / -> / :: / [] / ~>
         """
@@ -1126,7 +1126,7 @@ class ChronoVisitor(BaseChronoVisitor):
             token_type = node.getSymbol().type
 
             # A. 访问符 (., ->, ::)
-            if token_type in [ChronoParser.DOT, ChronoParser.ARROW, ChronoParser.COLON_COLON]:
+            if token_type in [CHParser.DOT, CHParser.ARROW, CHParser.COLON_COLON]:
                 op = node.getText()  # ., ->, ::
                 i += 1
                 ident = child_nodes[i].getText()
@@ -1136,47 +1136,47 @@ class ChronoVisitor(BaseChronoVisitor):
                 if var_info:
                     ident = var_info["cpp_name"]
                 else:
-                    ident = self._chrono_to_cpp_type(ident)  # 类型映射 (支持 string::npos)
+                    ident = self._CH_to_cpp_type(ident)  # 类型映射 (支持 string::npos)
 
                 current_code += f"{op}{ident}"
                 i += 1
 
                 # Template <T>
-                if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LT:
+                if i < len(child_nodes) and child_nodes[i].getSymbol().type == CHParser.LT:
                     i += 1  # <
-                    if i < len(child_nodes) and isinstance(child_nodes[i], ChronoParser.TypeListContext):
+                    if i < len(child_nodes) and isinstance(child_nodes[i], CHParser.TypeListContext):
                         current_code += f"<{self.visit(child_nodes[i])}>"
                         i += 1
                     i += 1  # >
 
                 # Call (...)
-                if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LPAREN:
+                if i < len(child_nodes) and child_nodes[i].getSymbol().type == CHParser.LPAREN:
                     i += 1  # (
                     args = ""
-                    if i < len(child_nodes) and isinstance(child_nodes[i], ChronoParser.ExpressionListContext):
+                    if i < len(child_nodes) and isinstance(child_nodes[i], CHParser.ExpressionListContext):
                         args = self.visit(child_nodes[i])
                         i += 1
                     i += 1  # )
                     current_code += f"({args})"
 
             # B. 数组索引 [ ]
-            elif token_type == ChronoParser.LBRACK:
+            elif token_type == CHParser.LBRACK:
                 i += 1
                 idx = self.visit(child_nodes[i])
                 i += 2
                 current_code += f"[{idx}]"
 
             # C. [新增] 动态调用 ~>
-            elif token_type == ChronoParser.TILDE_ARROW:
+            elif token_type == CHParser.TILDE_ARROW:
                 i += 1  # skip ~>
 
                 method_name = child_nodes[i].getText()
                 i += 1
 
                 args_code = ""
-                if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.LPAREN:
+                if i < len(child_nodes) and child_nodes[i].getSymbol().type == CHParser.LPAREN:
                     i += 1  # (
-                    if i < len(child_nodes) and isinstance(child_nodes[i], ChronoParser.ExpressionListContext):
+                    if i < len(child_nodes) and isinstance(child_nodes[i], CHParser.ExpressionListContext):
                         # 特殊处理：参数装箱
                         boxed_args = []
                         for expr in child_nodes[i].expression():
@@ -1198,7 +1198,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return current_code
 
-    def visitPrimary(self, ctx: ChronoParser.PrimaryContext):
+    def visitPrimary(self, ctx: CHParser.PrimaryContext):
         if ctx.NEW():
             type_name = self.visit(ctx.baseType())
             args = self.visit(ctx.expressionList()) if ctx.expressionList() else ""
@@ -1238,13 +1238,13 @@ class ChronoVisitor(BaseChronoVisitor):
                 return self._alias_to_namespace_map[text]
 
             # [新增] 类型映射 (e.g. string::npos -> std::string::npos)
-            mapped = self._chrono_to_cpp_type(text)
+            mapped = self._CH_to_cpp_type(text)
             return mapped
 
         if ctx.THIS(): return "this"
         if ctx.LPAREN(): return f"({self.visit(ctx.expression())})"
         return ""
-    def visitStatement(self, ctx: ChronoParser.StatementContext):
+    def visitStatement(self, ctx: CHParser.StatementContext):
         if ctx.variableDeclaration():
             return self.visit(ctx.variableDeclaration())
         if ctx.assignment():
@@ -1271,14 +1271,14 @@ class ChronoVisitor(BaseChronoVisitor):
             return self.visit(ctx.blockStatement())
         return ""
 
-    def visitReturnStatement(self, ctx: ChronoParser.ReturnStatementContext):
+    def visitReturnStatement(self, ctx: CHParser.ReturnStatementContext):
         line_comment = f"{INDENT}// Line {ctx.start.line}\n"
         if ctx.expression():  # [修复] return 可以是空的
             return_value = self.visit(ctx.expression())
             return f"{line_comment}{INDENT}return {return_value};\n"
         return f"{line_comment}{INDENT}return;\n"  # 空 return
 
-    def visitCppBlock(self, ctx: ChronoParser.CppBlockContext):
+    def visitCppBlock(self, ctx: CHParser.CppBlockContext):
         token_list = ctx.CPP_BODY()
         if token_list is None: token_list = []
         raw_cpp = "".join(token.getText() for token in token_list)
@@ -1288,7 +1288,7 @@ class ChronoVisitor(BaseChronoVisitor):
             f"{INDENT}// --- @cpp Block End ---\n\n"
         )
 
-    def visitAssignment(self, ctx: ChronoParser.AssignmentContext):
+    def visitAssignment(self, ctx: CHParser.AssignmentContext):
         line_comment = f"{INDENT}// Line {ctx.start.line}\n"
 
         # [修改] 移除了“复活逻辑”
@@ -1304,7 +1304,7 @@ class ChronoVisitor(BaseChronoVisitor):
         op_str = self.visit(ctx.assignmentOperator())
         return f"{line_comment}{INDENT}{target} {op_str} {value};\n"
 
-    def visitAssignableExpression(self, ctx: ChronoParser.AssignableExpressionContext):
+    def visitAssignableExpression(self, ctx: CHParser.AssignableExpressionContext):
         """
         [重构 - 纯净模式]
         赋值左值处理。完全遵照用户输入的访问符。
@@ -1320,14 +1320,14 @@ class ChronoVisitor(BaseChronoVisitor):
             token_type = node.getSymbol().type
 
             # --- 情况 A: 访问符 ---
-            if token_type in [ChronoParser.DOT, ChronoParser.ARROW, ChronoParser.COLON_COLON]:
+            if token_type in [CHParser.DOT, CHParser.ARROW, CHParser.COLON_COLON]:
                 # 1. 映射
                 op_str = ""
-                if token_type == ChronoParser.DOT:
+                if token_type == CHParser.DOT:
                     op_str = "."
-                elif token_type == ChronoParser.ARROW:
+                elif token_type == CHParser.ARROW:
                     op_str = "->"
-                elif token_type == ChronoParser.COLON_COLON:
+                elif token_type == CHParser.COLON_COLON:
                     op_str = "::"
 
                 # 2. 标识符
@@ -1343,11 +1343,11 @@ class ChronoVisitor(BaseChronoVisitor):
                 i += 1
 
             # --- 情况 B: 数组索引 ---
-            elif token_type == ChronoParser.LBRACK:
+            elif token_type == CHParser.LBRACK:
                 i += 1  # [
                 index_expr = self.visit(child_nodes[i])
                 i += 1  # expr
-                if i < len(child_nodes) and child_nodes[i].getSymbol().type == ChronoParser.RBRACK:
+                if i < len(child_nodes) and child_nodes[i].getSymbol().type == CHParser.RBRACK:
                     i += 1  # ]
                 current_code = f"{current_code}[{index_expr}]"
 
@@ -1356,7 +1356,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return current_code
 
-    def visitForStatement(self, ctx: ChronoParser.ForStatementContext):
+    def visitForStatement(self, ctx: CHParser.ForStatementContext):
         self._enter_scope()
         init_code = self.visit(ctx.init) if ctx.init else ""
 
@@ -1377,14 +1377,14 @@ class ChronoVisitor(BaseChronoVisitor):
         code += f"{INDENT}}}\n"
         return code
 
-    def visitForInit(self, ctx: ChronoParser.ForInitContext):
+    def visitForInit(self, ctx: CHParser.ForInitContext):
         if ctx.variableDeclaration_no_semicolon():
             return self.visit(ctx.variableDeclaration_no_semicolon())
         if ctx.assignment_no_semicolon():
             return self.visit(ctx.assignment_no_semicolon())
         return ""
 
-    def visitForIncrement(self, ctx: ChronoParser.ForIncrementContext):
+    def visitForIncrement(self, ctx: CHParser.ForIncrementContext):
         if ctx.assignment_no_semicolon():
             return self.visit(ctx.assignment_no_semicolon())
         if ctx.expression():
@@ -1404,11 +1404,11 @@ class ChronoVisitor(BaseChronoVisitor):
     def _process_block_children(self, children):
         body_code = ""
         for child in children:
-            if isinstance(child, ChronoParser.StatementContext):
+            if isinstance(child, CHParser.StatementContext):
                 body_code += self.visit(child)
         return body_code
 
-    def visitAssignmentOperator(self, ctx: ChronoParser.AssignmentOperatorContext):
+    def visitAssignmentOperator(self, ctx: CHParser.AssignmentOperatorContext):
         if ctx.ASSIGN(): return "="
         if ctx.PLUS_ASSIGN(): return "+="
         if ctx.MINUS_ASSIGN(): return "-="
@@ -1417,7 +1417,7 @@ class ChronoVisitor(BaseChronoVisitor):
         if ctx.MOD_ASSIGN(): return "%="
         return "="
 
-    def visitIfStatement(self, ctx: ChronoParser.IfStatementContext):
+    def visitIfStatement(self, ctx: CHParser.IfStatementContext):
         condition = self.visit(ctx.expression())
 
         # 进入 IF 块 -> 深度 +1
@@ -1439,21 +1439,21 @@ class ChronoVisitor(BaseChronoVisitor):
                 code += f"{INDENT}else {{\n{else_body}{INDENT}}}\n"
         return code
 
-    def visitIfBlock(self, ctx: ChronoParser.IfBlockContext):
+    def visitIfBlock(self, ctx: CHParser.IfBlockContext):
         self._enter_scope()
         statements = self._safe_iterate_statements(ctx.statement())
         body_code = "".join(self.visit(s) for s in statements)
         self._exit_scope()
         return body_code
 
-    def visitElseBlock(self, ctx: ChronoParser.ElseBlockContext):
+    def visitElseBlock(self, ctx: CHParser.ElseBlockContext):
         self._enter_scope()
         statements = self._safe_iterate_statements(ctx.statement())
         body_code = "".join(self.visit(s) for s in statements)
         self._exit_scope()
         return body_code
 
-    def visitWhileStatement(self, ctx: ChronoParser.WhileStatementContext):
+    def visitWhileStatement(self, ctx: CHParser.WhileStatementContext):
         # While 也算控制流
         self._control_flow_depth += 1
         condition = self.visit(ctx.expression())
@@ -1470,7 +1470,7 @@ class ChronoVisitor(BaseChronoVisitor):
         code += f"{INDENT}}}\n"
         return code
 
-    def visitExpression(self, ctx: ChronoParser.ExpressionContext):
+    def visitExpression(self, ctx: CHParser.ExpressionContext):
         operand_nodes = ctx.unaryExpression()
         current_code = self.visit(operand_nodes[0])
 
@@ -1504,7 +1504,7 @@ class ChronoVisitor(BaseChronoVisitor):
         # print(current_code)
         return current_code
 
-    def visitUnaryExpression(self, ctx: ChronoParser.UnaryExpressionContext):
+    def visitUnaryExpression(self, ctx: CHParser.UnaryExpressionContext):
         if ctx.castExpression():
             return self.visit(ctx.castExpression())
         op = ""
@@ -1526,11 +1526,11 @@ class ChronoVisitor(BaseChronoVisitor):
         else:
             return f"{op}{operand}"
 
-    def visitDeleteStatement(self, ctx: ChronoParser.DeleteStatementContext):
+    def visitDeleteStatement(self, ctx: CHParser.DeleteStatementContext):
         target = self.visit(ctx.expression())
         return f"{INDENT}delete {target};\n"
 
-    def visitAssignablePrimary(self, ctx: ChronoParser.AssignablePrimaryContext):
+    def visitAssignablePrimary(self, ctx: CHParser.AssignablePrimaryContext):
         if ctx.IDENTIFIER():
             primary_text = ctx.IDENTIFIER().getText()
             variable_info = self._find_variable(primary_text)
@@ -1540,7 +1540,7 @@ class ChronoVisitor(BaseChronoVisitor):
                 # 即使是赋值操作 (a->id = 200)，如果 a 已经 Moved，也是非法的！
                 if variable_info.get('state') == 'Moved':
                     raise Exception(
-                        f"\n[Chrono Safety Error] Line {ctx.start.line}: Use of moved variable '{primary_text}'.\n"
+                        f"\n[CH Safety Error] Line {ctx.start.line}: Use of moved variable '{primary_text}'.\n"
                         f"Hint: Ownership was transferred via @move/@unsafe_move. This variable is now invalid (null).\n"
 
                     )
@@ -1550,7 +1550,7 @@ class ChronoVisitor(BaseChronoVisitor):
                 else:
                     return variable_info["cpp_name"]  # [修复] 移除了 '_'
             else:
-                return self._chrono_to_cpp_type(primary_text)
+                return self._CH_to_cpp_type(primary_text)
 
         if ctx.THIS():
             return "this"
@@ -1562,10 +1562,10 @@ class ChronoVisitor(BaseChronoVisitor):
             return f"({self.visit(ctx.assignableExpression())})"
         return ""
 
-    def visitExpressionList(self, ctx: ChronoParser.ExpressionListContext):
+    def visitExpressionList(self, ctx: CHParser.ExpressionListContext):
         return ", ".join(self.visit(e) for e in ctx.expression())
 
-    def visitLiteral(self, ctx: ChronoParser.LiteralContext):
+    def visitLiteral(self, ctx: CHParser.LiteralContext):
         if ctx.BOOL_LITERAL():
             return ctx.BOOL_LITERAL().getText()
         if ctx.CHAR_LITERAL():
@@ -1593,37 +1593,37 @@ class ChronoVisitor(BaseChronoVisitor):
             return ctx.FLOAT_LITERAL().getText()
         return ctx.getText()
 
-    def visitAssignment_no_semicolon(self, ctx: ChronoParser.Assignment_no_semicolonContext):
+    def visitAssignment_no_semicolon(self, ctx: CHParser.Assignment_no_semicolonContext):
         target = self.visit(ctx.assignableExpression())
         value = self.visit(ctx.expression())
         op_str = self.visit(ctx.assignmentOperator())
         return f"{target} {op_str} {value}"
 
-    def visitStructBodyStatement(self, ctx: ChronoParser.StructBodyStatementContext):
+    def visitStructBodyStatement(self, ctx: CHParser.StructBodyStatementContext):
         # struct 成员默认是 public
         access = self._get_access_level(ctx, default_level='public')
 
         if ctx.variableDeclaration():
-            ctx.variableDeclaration()._chrono_access = access
+            ctx.variableDeclaration()._CH_access = access
             # (Structs 在 C++ 中通常不支持 static 成员变量)
-            ctx.variableDeclaration()._chrono_static = False
+            ctx.variableDeclaration()._CH_static = False
             return self.visit(ctx.variableDeclaration())
 
 
         # 不再查找 ...Definition，而是查找 ...Signature
         elif ctx.functionSignature():
-            ctx.functionSignature()._chrono_access = access
+            ctx.functionSignature()._CH_access = access
             # [修复] 允许 struct 拥有静态方法
             is_static = bool(ctx.functionSignature().STATIC())
-            ctx.functionSignature()._chrono_static = is_static
+            ctx.functionSignature()._CH_static = is_static
             return self.visit(ctx.functionSignature())
 
         elif ctx.initSignature():
-            ctx.initSignature()._chrono_access = access
+            ctx.initSignature()._CH_access = access
             return self.visit(ctx.initSignature())
 
         elif ctx.deinitSignature():
-            ctx.deinitSignature()._chrono_access = 'public'
+            ctx.deinitSignature()._CH_access = 'public'
             return self.visit(ctx.deinitSignature())
 
         elif ctx.cppBlock():
@@ -1634,7 +1634,7 @@ class ChronoVisitor(BaseChronoVisitor):
 
         return ""
 
-    def visitStructDefinition(self, ctx: ChronoParser.StructDefinitionContext):
+    def visitStructDefinition(self, ctx: CHParser.StructDefinitionContext):
         struct_name = ctx.name.text
         # [ [ [ 修复 B-2: 添加 struct 的成员字典重置 ] ] ]
         self._current_class_members = {}
@@ -1668,7 +1668,7 @@ class ChronoVisitor(BaseChronoVisitor):
             f"}};\n"
         )
 
-    def visitVariableDeclaration(self, ctx: ChronoParser.VariableDeclarationContext):
+    def visitVariableDeclaration(self, ctx: CHParser.VariableDeclarationContext):
         line_comment = f"{INDENT}// Line {ctx.start.line}\n"
 
         is_extern = bool(ctx.EXTERN())
@@ -1691,11 +1691,11 @@ class ChronoVisitor(BaseChronoVisitor):
         else:
             return f"{line_comment}{INDENT}{extern_prefix}{core_cpp};\n"
 
-    def visitVariableDeclaration_no_semicolon(self, ctx: ChronoParser.VariableDeclaration_no_semicolonContext):
+    def visitVariableDeclaration_no_semicolon(self, ctx: CHParser.VariableDeclaration_no_semicolonContext):
         core_cpp, _, _, _, _ = self._translate_variable_declaration(ctx)
         return core_cpp
 
-    def visitBlockStatement(self, ctx: ChronoParser.BlockStatementContext):
+    def visitBlockStatement(self, ctx: CHParser.BlockStatementContext):
         self._enter_scope()
         statements = self._safe_iterate_statements(ctx.statement())
         body_code = "".join(self.visit(s) for s in statements)
@@ -1705,7 +1705,7 @@ class ChronoVisitor(BaseChronoVisitor):
         final_code += f"{INDENT}}}\n"
         return final_code
 
-    def visitSwitchStatement(self, ctx: ChronoParser.SwitchStatementContext):
+    def visitSwitchStatement(self, ctx: CHParser.SwitchStatementContext):
         self._control_flow_depth += 1
 
         expr = self.visit(ctx.expression())
@@ -1720,7 +1720,7 @@ class ChronoVisitor(BaseChronoVisitor):
         code += f"{INDENT}}}\n"
         return code
 
-    def visitCaseBlock(self, ctx: ChronoParser.CaseBlockContext):
+    def visitCaseBlock(self, ctx: CHParser.CaseBlockContext):
         """
         [新增] 访问 'caseBlock' 规则
         e.g., case 1 { ... }
@@ -1753,7 +1753,7 @@ class ChronoVisitor(BaseChronoVisitor):
         code += f"{INDENT}}}\n"
         return code
 
-    def visitDefaultBlock(self, ctx: ChronoParser.DefaultBlockContext):
+    def visitDefaultBlock(self, ctx: CHParser.DefaultBlockContext):
         """
         [新增] 访问 'defaultBlock' 规则
         e.g., default { ... }
@@ -1772,7 +1772,7 @@ class ChronoVisitor(BaseChronoVisitor):
         # 3. [ [ 修复 ] ] 检查最后一条语句
         ends_with_return = False
         if statements:  # 确保语句列表不为空
-            if isinstance(statements[-1], ChronoParser.ReturnStatementContext):
+            if isinstance(statements[-1], CHParser.ReturnStatementContext):
                 ends_with_return = True
 
         # 4. 组装 C++
@@ -1795,7 +1795,7 @@ class ChronoVisitor(BaseChronoVisitor):
         'topLevelStatement', 'statement', 'classBodyStatement' 等规则中。
         """
 
-        if node.getSymbol().type == ChronoParser.CPP_DIRECTIVE:
+        if node.getSymbol().type == CHParser.CPP_DIRECTIVE:
             # 1:1 翻译，原样输出
 
             # 确定是否需要缩进 (在方法/类/struct内部)
@@ -1814,24 +1814,24 @@ class ChronoVisitor(BaseChronoVisitor):
         # 否则我们可能会意外地打印出 'EOF' 或其他词元。
         return ""
 
-    def visitForwardDeclaration(self, ctx: ChronoParser.ForwardDeclarationContext):
+    def visitForwardDeclaration(self, ctx: CHParser.ForwardDeclarationContext):
         # 1. 获取名字
         name = ctx.name.text
 
         # 2. 获取种类 (class 或 struct)
         kind_keyword = ""
-        if ctx.kind.type == ChronoParser.CLASS:
+        if ctx.kind.type == CHParser.CLASS:
             kind_keyword = "class"
-        elif ctx.kind.type == ChronoParser.STRUCT:
+        elif ctx.kind.type == CHParser.STRUCT:
             kind_keyword = "struct"
 
         # 3. 生成 C++ 代码 (struct Child;)
         line_comment = f"\n// Line {ctx.start.line} (forward decl)\n"
         return f"{line_comment}{kind_keyword} {name};\n"
 
-    # src/ChronoVisitor.py
+    # src/CHVisitor.py
 
-    def visitEnumDefinition(self, ctx: ChronoParser.EnumDefinitionContext):
+    def visitEnumDefinition(self, ctx: CHParser.EnumDefinitionContext):
         line_comment = f"\n// Line {ctx.start.line} (enum)\n"
 
         # 1. 确定是 enum 还是 enum class
@@ -1872,7 +1872,7 @@ class ChronoVisitor(BaseChronoVisitor):
         )
         return code
 
-    def visitEnumItem(self, ctx: ChronoParser.EnumItemContext):
+    def visitEnumItem(self, ctx: CHParser.EnumItemContext):
         name = ctx.name.text
         if ctx.expression():
             val = self.visit(ctx.expression())

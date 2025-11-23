@@ -1,5 +1,5 @@
 # build.py
-# 位于 Chrono 项目的根目录 (与 src/, runtime/ 同级)
+# 位于 CH 项目的根目录 (与 src/, runtime/ 同级)
 
 import os
 import sys
@@ -8,7 +8,7 @@ import subprocess
 import argparse  # <-- [新增] 用于解析命令行参数
 
 # --- 配置 ---
-CONFIG_FILE_NAME = "chrono.json"
+CONFIG_FILE_NAME = "CH.json"
 PYTHON_EXE = "python3"
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -20,7 +20,7 @@ def print_color(text, color_code):
 
 def load_config(project_dir):
     """
-    加载并验证 chrono.json 配置文件。
+    加载并验证 CH.json 配置文件。
     """
     config_path = os.path.join(project_dir, CONFIG_FILE_NAME)
     if not os.path.exists(config_path):
@@ -48,7 +48,7 @@ def run_transpile(config, project_dir):
     """
     递归扫描 src_dir 并翻译所有 .ch 文件。
     """
-    print_color("--- [Chrono] 翻译阶段 (.ch -> .cpp/.h) ---", 32)
+    print_color("--- [CH] 翻译阶段 (.ch -> .cpp/.h) ---", 32)
 
     # 1. 解析路径
     src_dir = os.path.join(project_dir, config["src_dir"])
@@ -122,7 +122,7 @@ def run_transpile(config, project_dir):
 
 def main():
     # 1. 设置命令行解析 (满足您的 'build.py transpile -d <dir>' 需求)
-    parser = argparse.ArgumentParser(description="Chrono 构建脚本")
+    parser = argparse.ArgumentParser(description="CH 构建脚本")
 
     # 'transpile' 是一个子命令
     subparsers = parser.add_subparsers(dest='command', required=True, help='构建命令')
@@ -130,7 +130,7 @@ def main():
     # 'transpile' 子命令的参数
     transpile_parser = subparsers.add_parser(
         'transpile',
-        help='翻译 Chrono 源码 (.ch) 到 C++ (.cpp/.h)'
+        help='翻译 CH 源码 (.ch) 到 C++ (.cpp/.h)'
     )
     transpile_parser.add_argument(
         '-d', '--directory',
@@ -147,7 +147,7 @@ def main():
     if not config:
         sys.exit(1)
 
-    print_color(f"=== 正在翻译 Chrono 项目 ===", 32)
+    print_color(f"=== 正在翻译 CH 项目 ===", 32)
 
     # 3. 执行 'transpile' 命令
     if args.command == 'transpile':

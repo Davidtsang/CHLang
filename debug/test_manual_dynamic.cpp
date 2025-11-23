@@ -3,10 +3,10 @@
 
 #include <iostream>
 #include <string>
-#include "runtime/ChronoObject.h"
+#include "runtime/CHObject.h"
 
 // --- 模拟用户定义的类 ---
-class Person : public ChronoObject {
+class Person : public CHObject {
 public:
     // 普通的 C++ 方法
     void sayHello(std::string name) {
@@ -18,7 +18,7 @@ public:
     }
 
     // --- 模拟 @dynamic 自动生成的胶水代码 ---
-    // 未来这段代码由 ChronoVisitor 自动生成
+    // 未来这段代码由 CHVisitor 自动生成
     virtual MethodTrampoline findMethodImpl(SelectorID sel) override {
 
         // 映射 1: "sayHello"
@@ -46,7 +46,7 @@ public:
         }
 
         // 默认查父类
-        return ChronoObject::findMethodImpl(sel);
+        return CHObject::findMethodImpl(sel);
     }
 };
 
@@ -59,11 +59,11 @@ int main() {
     // 2. 转换为动态类型 (dyn)
     dyn d = p;
 
-    // 3. 模拟 d~>sayHello("Chrono")
+    // 3. 模拟 d~>sayHello("CH")
     std::cout << "[1] Testing sayHello..." << std::endl;
     {
         ArgsList args;
-        args.push_back(std::string("Chrono")); // 装箱
+        args.push_back(std::string("CH")); // 装箱
 
         // 发送消息
         d->msgSend(_SEL("sayHello"), args);

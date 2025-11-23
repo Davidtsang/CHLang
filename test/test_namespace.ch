@@ -12,8 +12,8 @@
 
 // 2. 导入
 import <iostream>
-import "runtime/ChronoObject.h"
-import "runtime/Chrono.h"
+import "runtime/CHObject.h"
+import "runtime/CH.h"
 
 namespace Test.Internal;
 // 3. 命名空间中的 Struct
@@ -24,7 +24,7 @@ struct MyStruct {
 
 // 4. 命名空间中的 Class
 // (C++: namespace Test { namespace Internal { class MyClass ... } })
-class MyClass : ChronoObject {
+class MyClass : CHObject {
     public var s: MyStruct;
     public init();
     public func testMethod(val: i32);
@@ -33,7 +33,7 @@ class MyClass : ChronoObject {
 // 5. 命名空间中的 Global Function
 // (C++: namespace Test { namespace Internal { void globalFunc() { ... } } })
 func globalFunc() {
-    Chrono::log("  (globalFunc in Test::Internal)");
+    CH::log("  (globalFunc in Test::Internal)");
 }
 
 // 6. 命名空间中的 Class 实现
@@ -46,11 +46,11 @@ implement MyClass {
 
     func testMethod(val: i32) {
         // Line 53
-        Chrono::log("  (MyClass::testMethod)");
+        CH::log("  (MyClass::testMethod)");
         // Line 55
         this->s.x = this->s.x + val;
         // Line 57
-        Chrono::log(this->s.x);
+        CH::log(this->s.x);
     }
 }
 
@@ -60,7 +60,7 @@ endnamespace;
 // (C++: int main() { ... } -- 必须在全局!)
 func main() -> int {
     // Line 65
-    Chrono::log("--- Namespace Test Start ---");
+    CH::log("--- Namespace Test Start ---");
 
     // 调用全局 namespaced 函数
     // (C++: Test::Internal::globalFunc();)
@@ -82,7 +82,7 @@ func main() -> int {
     c->release();
 
     // Line 87
-    Chrono::log("--- Namespace Test End ---");
+    CH::log("--- Namespace Test End ---");
     // Line 89
     return 0;
 }

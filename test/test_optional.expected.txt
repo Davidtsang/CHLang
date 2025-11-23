@@ -5,4 +5,4 @@
 2. Dynamic Call (Optional on Full):
 [Full] Optional task: Hello World
 3. Dynamic Call (Optional on Lazy):
-[ChronoRuntime] Selector ID {{HASH}} not recognized.
+[CHRuntime] Selector ID {{HASH}} not recognized.

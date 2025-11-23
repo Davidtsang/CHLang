@@ -67,12 +67,12 @@ implement Button {
         this->m_id = id;
 
         // 调用基类辅助函数
-        // 1. 类名: L"ChronoCustomButton"
+        // 1. 类名: L"CHCustomButton"
         // 2. 光标: IDC_HAND (手型)
         // 3. 样式: WS_CHILD | WS_VISIBLE (无剪裁)
         this->createStandardWindow(
             parent,
-            L"ChronoCustomButton",
+            L"CHCustomButton",
             IDC_HAND,
             WS_CHILD | WS_VISIBLE
         );

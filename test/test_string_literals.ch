@@ -8,7 +8,7 @@ import <string>
 import <type_traits> // [关键] 用于 static_assert 和 std::is_same_v
 import <cwchar>      // [关键] 用于 C++ 打印 L"..." (std::wcout)
 import <cuchar>      // [关键] 用于 char16_t, char32_t
-import "runtime/ChronoObject.h" // (用于 main)
+import "runtime/CHObject.h" // (用于 main)
 
 func main() -> int {
 

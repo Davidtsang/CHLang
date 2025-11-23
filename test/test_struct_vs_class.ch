@@ -4,7 +4,7 @@
 // [1] 导入我们自己的头文件
 // [2] 导入 main() 所需的私有依赖
 import <iostream>
-import "runtime/ChronoObject.h" // (用于 class)
+import "runtime/CHObject.h" // (用于 class)
 
 // ---
 // 1. 值类型 STRUCT 声明
@@ -24,7 +24,7 @@ struct Point {
 // ---
 // 2. 引用类型 CLASS 声明
 // ---
-class RefPoint : ChronoObject {
+class RefPoint : CHObject {
 
     // 默认 private
     var x: i32;
@@ -77,7 +77,7 @@ implement RefPoint {
 // 3. 应用程序入口点
 // ---
 func main() -> int {
-    // [关键改进] 直接使用 Chrono 语法调用 std::cout，无需 @cpp
+    // [关键改进] 直接使用 CH 语法调用 std::cout，无需 @cpp
     // 因为 :: 和 << 现在都是原生支持的操作符
     std::cout << "--- Struct vs Class Test ---" << std::endl;
 

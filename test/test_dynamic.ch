@@ -1,10 +1,10 @@
-import "runtime/ChronoObject.h"
+import "runtime/CHObject.h"
 import <iostream>
 import <string>
 
 // 1. 定义动态类
 @dynamic
-class Talker : ChronoObject {
+class Talker : CHObject {
     public init();
     public func say(msg: std::string);
     public func add(a: i32, b: i32);
@@ -24,7 +24,7 @@ implement Talker {
 }
 
 func main() -> int {
-    @cpp std::cout << "--- Chrono Dynamic Test ---" << std::endl; @end
+    @cpp std::cout << "--- CH Dynamic Test ---" << std::endl; @end
 
     var d: dyn = new Talker();
     //var d: dyn = t;

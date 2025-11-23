@@ -1,7 +1,7 @@
 # [ [ 1. 替换 ] ]
 # 'visitMethodDefinition' 必须移除 lstrip('$')
 #
-def visitMethodDefinition(self, ctx: ChronoParser.MethodDefinitionContext):
+def visitMethodDefinition(self, ctx: CHParser.MethodDefinitionContext):
     self._in_class_method = True
     self._enter_scope()
 
@@ -21,8 +21,8 @@ def visitMethodDefinition(self, ctx: ChronoParser.MethodDefinitionContext):
     statements = self._safe_iterate_statements(ctx.statement())
     body_code = "".join(self.visit(s) for s in statements)
 
-    is_static = getattr(ctx, '_chrono_static', False)
-    access = getattr(ctx, '_chrono_access', 'private')
+    is_static = getattr(ctx, '_CH_static', False)
+    access = getattr(ctx, '_CH_access', 'private')
 
     if ctx.returnType:
         cpp_return_type = self.visit(ctx.returnType)
@@ -54,7 +54,7 @@ def visitMethodDefinition(self, ctx: ChronoParser.MethodDefinitionContext):
 # [ [ 2. 替换 ] ]
 # 'visitFunctionDefinition' 必须移除 lstrip('$')
 #
-def visitFunctionDefinition(self, ctx: ChronoParser.FunctionDefinitionContext):
+def visitFunctionDefinition(self, ctx: CHParser.FunctionDefinitionContext):
     self._enter_scope()
 
     func_name = ctx.name.text

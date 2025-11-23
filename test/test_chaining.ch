@@ -1,13 +1,13 @@
 // file: test/test_chaining.ch
 // 目的: 验证 'public' 关键字, '$' 标记和链式调用
 
-import "runtime/ChronoObject.h"
-import "runtime/ChronoString.h"
-import "runtime/ChronoInt.h"
-import "runtime/Chrono.h" // <-- [新增]
+import "runtime/CHObject.h"
+import "runtime/CHString.h"
+import "runtime/CHInt.h"
+import "runtime/CH.h" // <-- [新增]
 
 // 1. 定义一个用于 'this' 链测试的类
-class Wrapper : ChronoObject {
+class Wrapper : CHObject {
     var s: String*; // <-- [更改] 's' 是一个指针 ($)
 
     // 默认 private (只能被 'create' 调用)
@@ -48,13 +48,13 @@ func main() -> int { // 'Int' 或 'i32' 都可以, 都会被转为 C++ 'int'
 
     // [ 测试点 B ] 静态 -> 实例 -> 实例
     var len1: Int* = String::create("Hello World")->toUpper()->length(); // <-- [更改]
-    Chrono::log(len1); // 应该输出 11 // <-- [更改]
+    CH::log(len1); // 应该输出 11 // <-- [更改]
     len1->release(); // <-- [更改]
 
     // [ 测试点 C ] 实例 -> 实例 (赋值)
     var s: String* = String::create("lowercase"); // <-- [更改]
     var upper: String* = s->toUpper(); // <-- [更改]
-    Chrono::log(upper); // 应该输出 "LOWERCASE" // <-- [更改]
+    CH::log(upper); // 应该输出 "LOWERCASE" // <-- [更改]
     s->release(); // <-- [更改]
     upper->release(); // <-- [更改]
 
@@ -66,7 +66,7 @@ func main() -> int { // 'Int' 或 'i32' 都可以, 都会被转为 C++ 'int'
 
     // (现在可以调用，因为 getUpperLength 是 public)
     var len2: Int* = w->getUpperLength(); // <-- [更改]
-    Chrono::log(len2); // 应该输出 7 // <-- [更改]
+    CH::log(len2); // 应该输出 7 // <-- [更改]
 
     // 清理
     w_str->release(); // <-- [更改]

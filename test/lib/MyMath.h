@@ -5,7 +5,7 @@
 //    以便我们的 "自动别名" 逻辑可以正确推断它
 namespace MyMath {
 
-    // 2. 定义两个我们将从 Chrono 调用的函数
+    // 2. 定义两个我们将从 CH 调用的函数
     inline int32_t add(int32_t a, int32_t b) {
         return a + b;
     }

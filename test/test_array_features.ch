@@ -4,7 +4,7 @@
 
 import <iostream>
 import <cstdint>
-import "runtime/ChronoObject.h"
+import "runtime/CHObject.h"
 
 // ---
 // 场景 1: 数组作为函数参数
@@ -19,7 +19,7 @@ func printSum(arr: [i32; 3]) {
 // ---
 // 场景 2: 数组作为类成员
 // ---
-class ArrayTester : ChronoObject {
+class ArrayTester : CHObject {
 
     var data: [i32; 3];
     var matrix: [[i32; 2]; 2];

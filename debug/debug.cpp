@@ -11,7 +11,7 @@ public:
 int main() {
 
   // --- @cpp Block Start ---
-  std::cout << "--- Chrono Borrow Checker Test ---" << std::endl;
+  std::cout << "--- CH Borrow Checker Test ---" << std::endl;
   // --- @cpp Block End ---
 
   // Line 19

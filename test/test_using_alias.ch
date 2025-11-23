@@ -6,11 +6,11 @@ import <functional> // 用于 std::function
 import <cstdint>
 import <string>
 import <vector>     // 用于 std::vector
-import "runtime/ChronoObject.h"
+import "runtime/CHObject.h"
 
-// [重构] 使用 Chrono 定义全局函数 (会被翻译为标准的 C++ 函数)
+// [重构] 使用 CH 定义全局函数 (会被翻译为标准的 C++ 函数)
 func global_add_func(a: i32, b: i32) -> i32 {
-     std::cout << "  [Chrono] global_add_func called." << std::endl; 
+     std::cout << "  [CH] global_add_func called." << std::endl;
     return a + b;
 }
 

@@ -1,8 +1,8 @@
 // -----------------------------------------------------------------------------
-// Chrono Parser (ChronoParser.g4) - Final Correct Version
+// CH Parser (CHParser.g4) - Final Correct Version
 // -----------------------------------------------------------------------------
-parser grammar ChronoParser;
-options { tokenVocab = ChronoLexer; }
+parser grammar CHParser;
+options { tokenVocab = CHLexer; }
 
 // --- Top Level Rules ---
 program : topLevelStatement+ EOF ;

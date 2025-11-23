@@ -3,7 +3,7 @@
 
 import <iostream>
 import <cstdint>
-import "runtime/ChronoObject.h" // (用于 main 函数)
+import "runtime/CHObject.h" // (用于 main 函数)
 
 func main() -> int {
 

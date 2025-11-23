@@ -1,10 +1,10 @@
-import "runtime/ChronoObject.h"
+import "runtime/CHObject.h"
 import <iostream>
 import <string>
 import <any> // 必须导入，因为我们要操作返回值
 
 @dynamic
-class Calculator : ChronoObject {
+class Calculator : CHObject {
     public init();
     public func add(a: i32, b: i32) -> i32;
     public func getName() -> std::string;
@@ -20,7 +20,7 @@ implement Calculator {
     }
 
     func getName() -> std::string {
-        return "Chrono Calc";
+        return "CH Calc";
     }
 
     func doNothing() {
@@ -72,7 +72,7 @@ func main() -> int {
     @cpp
     try {
         std::string s = std::any_cast<std::string>(strRes);
-        if (s == "Chrono Calc") {
+        if (s == "CH Calc") {
             std::cout << "PASS: Result is '" << s << "'" << std::endl;
         } else {
             std::cout << "FAIL: Result is '" << s << "'" << std::endl;

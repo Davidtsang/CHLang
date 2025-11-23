@@ -10,7 +10,7 @@ import <windows.h>
 import <iostream>
 import <functional> // [ [ [ 修复 1 ] ] ] (解决 'std::function' 错误)
 import <vector>     // [ [ [ 修复 2 ] ] ] (解决 'std::vector' 错误)
-import "runtime/ChronoObject.h" // (用于 main)
+import "runtime/CHObject.h" // (用于 main)
 
 // --- 2. 链接 Win32 库 (如果需要调用 API) ---
 
@@ -27,15 +27,15 @@ import "runtime/ChronoObject.h" // (用于 main)
 #define C_INT int
 
 
-// --- 4. 使用 'using' (Chrono 类型别名) ---
-// (只用于纯 Chrono 类型)
+// --- 4. 使用 'using' (CH 类型别名) ---
+// (只用于纯 CH 类型)
 // (这些行是导致 C2039 错误的原因)
 using MyInt = i32;
 
 using AddFunc = (i32) -> i32;
 using IntVector = std.vector<i32>;
 
-// --- 5. 编写 Chrono 函数 (100% 干净) ---
+// --- 5. 编写 CH 函数 (100% 干净) ---
 
 func WindowProc(
     hwnd: C_HWND
@@ -47,26 +47,26 @@ func WindowProc(
 // [ [ [ 修复 3 ] ] ]
 // (解决 C2731 'WinMain' 重载错误)
 // 必须重命名此函数，以避免与 <windows.h> 中的 WinMain 冲突
-func MyChronoWinMainTest(
+func MyCHWinMainTest(
     hInstance: C_IN_HINSTANCE,
     nCmdShow: C_INT,
     myCount: MyInt
 ) -> C_INT_WINAPI
 {
     @cpp
-        std::cout << "MyChronoWinMainTest function compiled." << std::endl;
+        std::cout << "MyCHWinMainTest function compiled." << std::endl;
     @end
     return 0;
 }
 
-// --- 6. Chrono 入口点 ---
+// --- 6. CH 入口点 ---
 func main() -> int {
     @cpp
         std::cout << "--- Win32 Minimal Test ---" << std::endl;
     @end
 
     // 调用我们修复后的函数
-    MyChronoWinMainTest(0, 0, 10);
+    MyCHWinMainTest(0, 0, 10);
 
     @cpp
         std::cout << "Test passed (Compilation)." << std::endl;

@@ -52,7 +52,7 @@ implement Window {
         wc.hIconSm = LoadIcon(app->getHInstance(), MAKEINTRESOURCE(IDI_MAIN_ICON));
 
         wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-        wc.lpszClassName = L"ChronoWindowClass";
+        wc.lpszClassName = L"CHWindowClass";
         wc.hbrBackground = NULL;
 
         RegisterClassEx(&wc); // 忽略重复注册错误
@@ -63,7 +63,7 @@ implement Window {
         // 赋值给基类的 m_hWnd
         this->m_hWnd = CreateWindowExW(
             0,
-            L"ChronoWindowClass",
+            L"CHWindowClass",
             title,
             WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT, CW_USEDEFAULT,

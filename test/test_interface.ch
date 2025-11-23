@@ -3,7 +3,7 @@
 
 import <iostream>
 import <string>
-import "runtime/ChronoObject.h"
+import "runtime/CHObject.h"
 
 // ---
 // 1. 接口定义
@@ -25,9 +25,9 @@ interface IShape {
 // ---
 
 // 类 A: "Circle"
-// - 继承自 ChronoObject (用于 MRC)
+// - 继承自 CHObject (用于 MRC)
 // - 实现 ILoggable 和 IShape
-class Circle : ChronoObject with ILoggable, IShape {
+class Circle : CHObject with ILoggable, IShape {
 
     var radius: f32;
 //    var radius: unique[Cat] = @make[Cat]();
@@ -66,9 +66,9 @@ implement Circle{
     }
 }
 // 类 B: "Square"
-// - 继承自 ChronoObject (用于 MRC)
+// - 继承自 CHObject (用于 MRC)
 // - 只实现 IShape
-class Square : ChronoObject with IShape {
+class Square : CHObject with IShape {
 
     var side: f32;
 

@@ -1,5 +1,5 @@
 ﻿// file: gdiplus_demo.ch
-// 目的: 完整的 GDI+ 演示程序 (Chrono Refactored Version)
+// 目的: 完整的 GDI+ 演示程序 (CH Refactored Version)
 
 #define UNICODE
 #define _UNICODE
@@ -25,7 +25,7 @@ import <cstdint>
 var g_gdiplusToken: ULONG_PTR;
 
 // --- 5. [typemap] C++ 互操作性映射 ---
-// 映射 Chrono 解析器无法识别的复杂 C++ 类型修饰符
+// 映射 CH 解析器无法识别的复杂 C++ 类型修饰符
 typemap C_LRESULT_CALLBACK = "LRESULT CALLBACK";
 typemap C_INT_WINAPI = "int WINAPI";
 typemap C_IN_HINSTANCE = "_In_ HINSTANCE";
@@ -104,7 +104,7 @@ func WinMain(
     var hWnd: HWND = CreateWindowEx(
         WS_EX_CLIENTEDGE,
         L"GDIPlusDemoWindow",
-        L"纯 Chrono GDI+ 演示 (翻译版)",
+        L"纯 CH GDI+ 演示 (翻译版)",
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, 640, 480,
         NULL, NULL, hInstance, NULL

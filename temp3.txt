@@ -1,4 +1,4 @@
-    def visitMethodDefinition(self, ctx: ChronoParser.MethodDefinitionContext):
+    def visitMethodDefinition(self, ctx: CHParser.MethodDefinitionContext):
         self._in_class_method = True
         func_name = ctx.name.text
         params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
@@ -7,16 +7,16 @@
         body_code = "".join(self.visit(s) for s in statements)
         print("method body code:", body_code)
         # [修复] 从父级注入的属性中读取修饰符
-        is_static = getattr(ctx, '_chrono_static', False)
-        access = getattr(ctx, '_chrono_access', 'private')  # 默认为 private
+        is_static = getattr(ctx, '_CH_static', False)
+        access = getattr(ctx, '_CH_access', 'private')  # 默认为 private
 
         # --- (签名逻辑...) ---
         if ctx.returnType:
             return_type = ctx.returnType.text
             if return_type in ("i32", "i64", "int", "bool"):
-                cpp_return_type = self._chrono_to_cpp_type(return_type)
+                cpp_return_type = self._CH_to_cpp_type(return_type)
             else:
-                cpp_return_type = f"{self._chrono_to_cpp_type(return_type)}*"
+                cpp_return_type = f"{self._CH_to_cpp_type(return_type)}*"
             cpp_func_name = func_name
         else:
             cpp_return_type = "void"

@@ -1,7 +1,7 @@
-import "Chrono.h"
-import "ChronoObject.h"
-import "ChronoString.h"
-import "ChronoInt.h"
+import "CH.h"
+import "CHObject.h"
+import "CHString.h"
+import "CHInt.h"
 
 func main() -> int {
     // [修复] 必须使用 '$' 标记并显式调用 'String.create'
@@ -10,8 +10,8 @@ func main() -> int {
     // [修复] 必须使用 '$greeting' 访问
     var len: Int* = greeting->length();
 
-    // 打印 ChronoInt 对象
-    Chrono::log(len);
+    // 打印 CHInt 对象
+    CH::log(len);
 
     // [修复] 必须释放所有 MRC 对象
     greeting->release();

@@ -5,7 +5,7 @@
 // 3. 验证 隐式 'break' (没有 "掉落")
 // 4. 验证 'typemap' 常量在 case 中
 
-import "runtime/ChronoObject.h" // (用于 main)
+import "runtime/CHObject.h" // (用于 main)
 import <iostream>
 
 // (用于测试 'typemap' 代换)

@@ -1,4 +1,4 @@
-# Generated from src/parser/ChronoLexer.g4 by ANTLR 4.13.2
+# Generated from src/parser/CHLexer.g4 by ANTLR 4.13.2
 from antlr4 import *
 from io import StringIO
 import sys
@@ -312,7 +312,7 @@ def serializedATN():
         780,789,797,806,814,820,823,3,5,1,0,6,0,0,4,0,0
     ]
 
-class ChronoLexer(Lexer):
+class CHLexer(Lexer):
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
@@ -492,7 +492,7 @@ class ChronoLexer(Lexer):
                   "CHAR_LITERAL", "CPP_DIRECTIVE", "LINE_COMMENT", "WHITESPACE", 
                   "NEWLINE", "AT_END", "CPP_BODY" ]
 
-    grammarFileName = "ChronoLexer.g4"
+    grammarFileName = "CHLexer.g4"
 
     def __init__(self, input=None, output:TextIO = sys.stdout):
         super().__init__(input, output)

@@ -46,7 +46,7 @@ class Widget {
 
     // --- [新增] 受保护的辅助函数 ---
     // 子类调用它来创建真实的 Win32 窗口
-    // className: 窗口类名 (e.g. L"ChronoButton")
+    // className: 窗口类名 (e.g. L"CHButton")
     // cursor: 光标资源 (e.g. IDC_HAND)
     // style: 窗口样式 (e.g. WS_CHILD | WS_VISIBLE)
     public func createStandardWindow(parent: HWND, className: LPCWSTR, cursor: LPCWSTR, style: DWORD);

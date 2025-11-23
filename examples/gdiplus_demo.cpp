@@ -83,7 +83,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
   }
   // Line 101
   HWND hWnd = CreateWindowEx(WS_EX_CLIENTEDGE, L"GDIPlusDemoWindow",
-                             L"纯 Chrono GDI+ 演示 (翻译版)",
+                             L"纯 CH GDI+ 演示 (翻译版)",
                              WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
                              640, 480, NULL, NULL, hInstance, NULL);
   if (hWnd == NULL) {

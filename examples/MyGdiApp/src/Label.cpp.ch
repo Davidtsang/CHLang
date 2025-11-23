@@ -68,12 +68,12 @@ implement Label {
         this->m_id = id;
 
         // 调用基类辅助函数
-        // 1. 类名: L"ChronoLabel"
+        // 1. 类名: L"CHLabel"
         // 2. 光标: IDC_ARROW (箭头)
         // 3. 样式: WS_CHILD | WS_VISIBLE
         this->createStandardWindow(
             parent,
-            L"ChronoLabel",
+            L"CHLabel",
             IDC_ARROW,
             WS_CHILD | WS_VISIBLE
         );

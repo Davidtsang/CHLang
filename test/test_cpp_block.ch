@@ -1,4 +1,4 @@
-import "ChronoObject.h"
+import "CHObject.h"
 import <iostream> // 用于 std::cout
 
 func main() -> int {
