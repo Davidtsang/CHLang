@@ -254,6 +254,11 @@ class CHParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by CHParser#forRangeDeclaration.
+    def visitForRangeDeclaration(self, ctx:CHParser.ForRangeDeclarationContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by CHParser#forStatement.
     def visitForStatement(self, ctx:CHParser.ForStatementContext):
         return self.visitChildren(ctx)

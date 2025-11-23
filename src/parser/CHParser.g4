@@ -326,11 +326,22 @@ switchStatement
 
 deleteStatement : DELETE expression SEMIC_TOKEN ;
 
+forRangeDeclaration
+    : (CONST | VAR) name=IDENTIFIER (COLON typeName=typeSpecifier)?
+    ;
+
+
+// [修改] for 语句
 forStatement
-    : FOR LPAREN init=forInit? SEMIC_TOKEN cond=expression? SEMIC_TOKEN incr=forIncrement? RPAREN
-      LBRACE
-          statement*
-      RBRACE
+    : FOR LPAREN
+      (
+        // 路径 A: Range-based (新) -> for (var x in list)
+        rangeDecl=forRangeDeclaration IN container=expression
+        |
+        // 路径 B: C-Style (旧) -> for (i=0; i<10; i++)
+        init=forInit? SEMIC_TOKEN cond=expression? SEMIC_TOKEN incr=forIncrement?
+      )
+      RPAREN statement
     ;
 
 forInit

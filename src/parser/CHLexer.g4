@@ -23,6 +23,7 @@ IF      : 'if' ;
 ELSE    : 'else' ;
 WHILE   : 'while' ;
 FOR     : 'for' ;   // <-- [新增]
+IN : 'in';
 PUBLIC  : 'public' ; // class attr access flag
 PROTECTED : 'protected' ; // [新增]
 

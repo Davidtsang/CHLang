@@ -660,58 +660,44 @@ class CHVisitor(BaseCHVisitor):
         return all_code.strip()
 
     def visitImportDirective(self, ctx: CHParser.ImportDirectiveContext):
-
         line_comment = f"\n// Line {ctx.start.line} \n"
 
-        # --- [关键修复] 路径重建逻辑 ---
         path_text = ""
         is_system_header = False
 
         if ctx.pathStr:
-            # 情况 A: import "foo.ch"
+            # 情况 A: import "foo/bar"
             path_text = ctx.pathStr.text
         else:
-            # 情况 B: import <vector> 或 import <sys/stat.h>
-            raw_seq = ctx.pathSeq.getText()  # getText() 会自动拼接子节点文本
+            # 情况 B: import <vector>
+            raw_seq = ctx.pathSeq.getText()
             path_text = f"<{raw_seq}>"
             is_system_header = True
 
-        # --- 智能导入逻辑 ---
-        # 如果是用户导入 ("...")，尝试加载它以获取 typemaps
+        # 1. 智能导入回调 (用于扫描依赖)
         if not is_system_header and self.import_loader_callback:
             raw_path = path_text[1:-1]  # 去除引号
-            # 触发回调，扫描目标文件
             self.import_loader_callback(raw_path)
-        # --------------------
 
-        base_name = os.path.basename(path_text.strip('\\\"<>'))
-        true_namespace, _ = os.path.splitext(base_name)
-
-        if ctx.alias:
-            alias_name = ctx.alias.text
-        else:
-            alias_name = true_namespace
-        if alias_name and true_namespace:
-            self._alias_to_namespace_map[alias_name] = true_namespace
-
+        # 2. 系统头文件直接返回
         if is_system_header:
             return f"#include {path_text}\n"
-        else:
-            # 用户头文件
-            path_content = path_text[1:-1]  # 去引号
 
-            # 1. 处理 runtime 路径修正 (保留现有逻辑)
-            if path_content.startswith('runtime/'):
-                path_content = path_content.replace('runtime/', '')
+        # 3. 用户头文件处理
+        path_content = path_text[1:-1]  # 去除引号 "jsonp/Json" -> jsonp/Json
 
-            # 2. [ [ [ 修复 ] ] ] 自动追加 .h 后缀
-            root, ext = os.path.splitext(path_content)
-            if not ext:
-                path_content += ".h"
+        # 修正 runtime 路径
+        if path_content.startswith('runtime/'):
+            path_content = path_content.replace('runtime/', '')
 
-            return f'{line_comment}#include "{path_content}"\n'
+        # [关键修正] 自动补全 .h 后缀
+        # 如果路径里没有后缀 (如 "jsonp/Json")，加上 .h
+        root, ext = os.path.splitext(path_content)
+        if not ext:
+            path_content += ".h"
 
-        return f"// ERROR: Invalid import path {path_text}\n"
+        # [强制] 生成 #include
+        return f'{line_comment}#include "{path_content}"\n'
 
     def visitUsingAlias(self, ctx: CHParser.UsingAliasContext):
         line_comment = f"\n// Line {ctx.start.line} \n"
@@ -1358,24 +1344,61 @@ class CHVisitor(BaseCHVisitor):
 
     def visitForStatement(self, ctx: CHParser.ForStatementContext):
         self._enter_scope()
-        init_code = self.visit(ctx.init) if ctx.init else ""
 
-        # 进入循环体 (包含条件和增量部分) -> 深度 +1
-        self._control_flow_depth += 1
+        # --- 路径 A: Range-based for (新) ---
+        if ctx.IN():
+            # 1. 解析声明部分 (var item 或 var item: string)
+            decl_ctx = ctx.rangeDecl
+            var_name = decl_ctx.name.text
+            is_const = bool(decl_ctx.CONST())
 
-        cond_code = self.visit(ctx.cond) if ctx.cond else ""
-        incr_code = self.visit(ctx.incr) if ctx.incr else ""
+            # 确定类型
+            cpp_type = "auto"
+            if decl_ctx.typeName:
+                cpp_type = self.visit(decl_ctx.typeName)
 
-        statements = self._safe_iterate_statements(ctx.statement())
-        body_code = "".join(self.visit(s) for s in statements)
+            # 在 C++ range-for 中，为了性能，通常建议 auto&
+            # 但为了语义一致性，如果用户没写类型，我们用 auto
+            # 如果用户写了 var x: string，我们生成 std::string x
+            # 这里的 cpp_decl 类似于 "auto item" 或 "std::string item"
+            cpp_decl = f"{'const ' if is_const else ''}{cpp_type} {var_name}"
 
-        self._control_flow_depth -= 1
-        self._exit_scope()
+            # 注册变量到当前作用域 (非常重要，否则循环体内无法使用)
+            self._add_variable(var_name, {
+                "cpp_name": var_name,
+                "cpp_type": cpp_type  # 或者是推导类型
+            })
 
-        code = f"{INDENT}for ({init_code}; {cond_code}; {incr_code}) {{\n"
-        code += body_code
-        code += f"{INDENT}}}\n"
-        return code
+            # 2. 解析容器表达式
+            container_code = self.visit(ctx.container)
+
+            # 3. 解析循环体
+            self._control_flow_depth += 1
+            # 注意：for 循环的 statement 可能是 Block，也可能是单行
+            # _safe_iterate_statements 会处理这个
+            statements = self._safe_iterate_statements(ctx.statement())
+            body_code = "".join(self.visit(s) for s in statements)
+            self._control_flow_depth -= 1
+
+            self._exit_scope()
+
+            # 4. 生成 C++ 代码: for ( declaration : container ) { ... }
+            return f"{INDENT}for ({cpp_decl} : {container_code}) {{\n{body_code}{INDENT}}}\n"
+
+        # --- 路径 B: C-Style for (旧) ---
+        else:
+            init_code = self.visit(ctx.init) if ctx.init else ""
+            cond_code = self.visit(ctx.cond) if ctx.cond else ""
+            incr_code = self.visit(ctx.incr) if ctx.incr else ""
+
+            self._control_flow_depth += 1
+            statements = self._safe_iterate_statements(ctx.statement())
+            body_code = "".join(self.visit(s) for s in statements)
+            self._control_flow_depth -= 1
+
+            self._exit_scope()
+
+            return f"{INDENT}for ({init_code}; {cond_code}; {incr_code}) {{\n{body_code}{INDENT}}}\n"
 
     def visitForInit(self, ctx: CHParser.ForInitContext):
         if ctx.variableDeclaration_no_semicolon():

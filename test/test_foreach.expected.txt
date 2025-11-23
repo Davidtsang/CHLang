@@ -1,0 +1,8 @@
+--- Foreach Test ---
+Vector:
+10
+20
+30
+Map:
+A -> Apple
+B -> Banana

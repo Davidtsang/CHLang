@@ -11,3 +11,4 @@ gok/
 *.ilk
 
 gen/
+build_cmake/

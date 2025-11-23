@@ -449,6 +449,15 @@ class CHParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by CHParser#forRangeDeclaration.
+    def enterForRangeDeclaration(self, ctx:CHParser.ForRangeDeclarationContext):
+        pass
+
+    # Exit a parse tree produced by CHParser#forRangeDeclaration.
+    def exitForRangeDeclaration(self, ctx:CHParser.ForRangeDeclarationContext):
+        pass
+
+
     # Enter a parse tree produced by CHParser#forStatement.
     def enterForStatement(self, ctx:CHParser.ForStatementContext):
         pass
