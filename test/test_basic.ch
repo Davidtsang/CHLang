@@ -4,6 +4,6 @@ import "CH.h"
 
 func main() -> int {
     var five: int = 5;
-    CH::log(five);
+    CH::Log(five);
     return 0;
 }

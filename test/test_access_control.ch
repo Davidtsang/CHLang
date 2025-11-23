@@ -40,7 +40,7 @@ implement AccessTest {
 
     // --- 2. 构造函数 (实现) ---
     init(v: i32, n: String*) {
-        CH::log("Init (Private)");
+        CH::Log("Init (Private)");
         this->val = v; // 'this->' 在 class 中被 Visitor 翻译为 'this->'
         this->name = n;
         this->name->retain();
@@ -48,26 +48,26 @@ implement AccessTest {
 
     // --- 3. 析构函数 (实现) ---
     deinit {
-        CH::log("Deinit (Public)");
+        CH::Log("Deinit (Public)");
         this->name->release();
     }
 
     // --- 4. 私有方法 (实现) ---
     func doInternalCalc() -> i32 {
-        CH::log("Private Method: doInternalCalc()");
+        CH::Log("Private Method: doInternalCalc()");
         return this->val * 2;
     }
 
     // --- 5. 公共方法 (实现) ---
    func getCalculatedValue() -> Int* {
-        CH::log("Public Method: getCalculatedValue()");
+        CH::Log("Public Method: getCalculatedValue()");
         var result: i32 = this->doInternalCalc();
         return Int::create(result);
     }
 
     // --- 6. 公共静态工厂 (实现) ---
     func create(v: i32, n: String*) -> AccessTest* {
-        CH::log("Public Static: create()");
+        CH::Log("Public Static: create()");
         return new AccessTest(v, n);
     }
 }
@@ -90,14 +90,14 @@ func main() -> int {
     var val_obj: Int* = obj->getCalculatedValue();
 
     // 3. 验证结果
-    CH::log("Final Value:");
-    CH::log(val_obj); // 预期: 20
+    CH::Log("Final Value:");
+    CH::Log(val_obj); // 预期: 20
 
     // 4. 释放
     s->release();
     obj->release(); // 这将触发 Deinit
     val_obj->release();
 
-    CH::log("--- Test End ---");
+    CH::Log("--- Test End ---");
     return 0; // 返回一个 C++ int 值
 }

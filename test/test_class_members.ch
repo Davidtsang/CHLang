@@ -55,8 +55,8 @@ implement MemberTest{
 
     // [关键] 必须标记为 'public' 才能被 'main' 调用
     func printAll() {
-        CH::log(this->x);
-        CH::log(this->s);  // <-- [已修复] 必须使用 $s
+        CH::Log(this->x);
+        CH::Log(this->s);  // <-- [已修复] 必须使用 $s
     }
 
     // (默认 private)

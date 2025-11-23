@@ -11,7 +11,7 @@ func main() -> int {
     var len: Int* = greeting->length();
 
     // 打印 CHInt 对象
-    CH::log(len);
+    CH::Log(len);
 
     // [修复] 必须释放所有 MRC 对象
     greeting->release();

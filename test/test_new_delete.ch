@@ -18,9 +18,9 @@ class MRCClass : CHObject {
 }
 
 implement MRCClass{
-    init() { CH::log("MRC Init"); }
+    init() { CH::Log("MRC Init"); }
 
-    deinit { CH::log("MRC Deinit"); }
+    deinit { CH::Log("MRC Deinit"); }
 
     // [更改] 返回类型必须标记为 $
     func create() -> MRCClass* {
@@ -39,7 +39,7 @@ class NativeClass {
 }
 
 implement NativeClass{
-    init() { CH::log("Native Init"); }
+    init() { CH::Log("Native Init"); }
 
     // [更改] 返回类型必须标记为 $
     func create() -> NativeClass* {
@@ -49,24 +49,24 @@ implement NativeClass{
 
 func main() -> int {
 
-    CH::log("--- Test Start ---");
+    CH::Log("--- Test Start ---");
 
     // SCENARIO A: 安全的 MRC 模式 (通过工厂调用)
     var objA: MRCClass* = MRCClass::create();
-    CH::log("A: MRC object created (Factory).");
+    CH::Log("A: MRC object created (Factory).");
     objA->release(); // 自动调用 deinit
 
     // SCENARIO B: 手动 NEW/DELETE 模式 (通过工厂调用)
 
     // [KEY TEST 1] 使用工厂方法创建对象
     var objB: NativeClass* = NativeClass::create();
-    CH::log("B: Native object created (Factory).");
+    CH::Log("B: Native object created (Factory).");
 
     // [KEY TEST 2] 使用 DELETE 关键字释放对象
     delete objB; // 手动调用 delete
-    CH::log("B: Native object deleted (explicit DELETE).");
+    CH::Log("B: Native object deleted (explicit DELETE).");
 
-    CH::log("--- Test End ---");
+    CH::Log("--- Test End ---");
 
     return 0;
 }

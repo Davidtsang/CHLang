@@ -11,7 +11,7 @@ func main() -> int {
     // --- 场景 1: 简单的 while 循环 (使用 bool) ---
     var keep_looping: bool = true;
     while (keep_looping) {
-        CH::log("Test 1: Loop executing...");
+        CH::Log("Test 1: Loop executing...");
         keep_looping = false; // 赋值
     }
 
@@ -19,18 +19,18 @@ func main() -> int {
     // [修改] 已取消注释，因为 < 和 + 运算符现在受支持
     var count: i32 = 0;
     while (count < 3) {
-        CH::log("Test 2: Count:");
-        // [修改] CH::log(i32) 是支持的，不需要 Int::create
-        CH::log(count);
+        CH::Log("Test 2: Count:");
+        // [修改] CH::Log(i32) 是支持的，不需要 Int::create
+        CH::Log(count);
         count = count + 1;
     }
 
     // --- 场景 3: 永不执行的 while 循环 ---
     while (false) {
-        CH::log("Test 3: (This should not print)");
+        CH::Log("Test 3: (This should not print)");
     }
 
-    CH::log("Test 4: Loop finished.");
+    CH::Log("Test 4: Loop finished.");
 
     return 0;
 }

@@ -9,21 +9,21 @@
 namespace CH {
 
     // --- 1. 针对已知“值类型”的函数重载 ---
-    inline void log(int32_t val) {
+    inline void Log(int32_t val) {
         std::cout << val << std::endl;
     }
 
-    inline void log(bool val) {
+    inline void Log(bool val) {
         std::cout << (val ? "true" : "false") << std::endl;
     }
 
-    inline void log(const char* s) {
+    inline void Log(const char* s) {
         std::cout << s << std::endl;
     }
 
     // --- 2. 针对“指针类型”的模板 ---
     template <typename T>
-    void log(T* ptr) {
+    void Log(T* ptr) {
         if (ptr == nullptr) {
             std::cout << "(null)" << std::endl;
             return;

@@ -20,7 +20,7 @@ import "runtime/CH.h" // <-- [新增] 'print' 需要它
 func main() -> int {
 
     // 输出 #1: 应该首先出现
-    CH::log("CH Statement 1");
+    CH::Log("CH Statement 1");
 
     // 输出 #2: C++ 块
     @cpp
@@ -32,7 +32,7 @@ func main() -> int {
     var s: String* = String::create("CH Statement 2");
 
     // 输出 #3: CH 打印
-    CH::log(s); // <-- [更改] 访问 '$s'
+    CH::Log(s); // <-- [更改] 访问 '$s'
 
     // 输出 #4: 另一个 C++ 块，
     // 它还测试它是否能 "看到" 全局 @cpp 块中声明的变量。
