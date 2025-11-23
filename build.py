@@ -8,7 +8,7 @@ import subprocess
 import argparse  # <-- [新增] 用于解析命令行参数
 
 # --- 配置 ---
-CONFIG_FILE_NAME = "CH.json"
+CONFIG_FILE_NAME = "project.json"
 PYTHON_EXE = "python3"
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 

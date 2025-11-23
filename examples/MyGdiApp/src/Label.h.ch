@@ -6,6 +6,7 @@ import "Geometry" // 引入 CG 类型
 import <string>
 import <windows.h>
 
+@dynamic
 class Label : Widget {
     // 数据
     var m_text: std::string;

@@ -12,10 +12,12 @@ import <objidl.h>
 import <gdiplus.h>
 import "Geometry"
 import "Events"
+import "runtime/CHObject.h" // 必须导入基类头文件
 
 @cpp using namespace Gdiplus; @end
 
-class Widget {
+@dynamic
+class Widget : CHObject {
     public var m_hWnd: HWND;
     public var m_id: int;
     public var m_frame: CGRect;
@@ -26,6 +28,12 @@ class Widget {
 
     public func setFrame(frame: CGRect);
     public func getFrame() -> CGRect;
+
+    // [新增] 为了方便反射调用的原子 Setter
+    public func setX(v: i32);
+    public func setY(v: i32);
+    public func setWidth(v: i32);
+    public func setHeight(v: i32);
 
     public virtual func create(parent: HWND, id: int);
     public virtual func handleMessage(uMsg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT;

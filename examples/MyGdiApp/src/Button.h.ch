@@ -10,6 +10,7 @@ import <windows.h>
 
 using ClickCallback = std::function<void()>;
 
+@dynamic
 class Button : Widget {
     var m_internalLabel: unique<Label>;
     var m_onClick: ClickCallback;

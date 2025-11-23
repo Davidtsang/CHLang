@@ -16,6 +16,7 @@ import <gdiplus.h>
 
 @cpp using namespace Gdiplus; @end
 
+@dynamic
 implement Button {
     init(text: std::string) {
         // 初始化自身样式

@@ -12,6 +12,7 @@ import <gdiplus.h>
 
 @cpp using namespace Gdiplus; @end
 
+@dynamic
 implement Widget {
     init() {
         this->m_hWnd = NULL;
@@ -86,6 +87,11 @@ implement Widget {
     func onMouseLeave() { }
     func onResize(w: int, h: int) { }
     func hitTest(x: int, y: int) -> int { return -1; }
+    // [新增] 实现
+    func setX(v: i32) { this->m_frame.origin.x = static_cast<f32>(v); }
+    func setY(v: i32) { this->m_frame.origin.y = static_cast<f32>(v); }
+    func setWidth(v: i32) { this->m_frame.size.width = static_cast<f32>(v); }
+    func setHeight(v: i32) { this->m_frame.size.height = static_cast<f32>(v); }
 
     // [关键修复] 加回 onCommand 默认实现
     func onCommand(notificationCode: int) -> bool {

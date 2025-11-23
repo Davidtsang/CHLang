@@ -94,7 +94,7 @@ topLevelStatement
 
 // [新语法] 匹配: type Child : struct;
 forwardDeclaration
-    : TYPE name=IDENTIFIER COLON (kind=CLASS | kind=STRUCT) SEMIC_TOKEN
+    : TYPEDECL name=IDENTIFIER COLON (kind=CLASS | kind=STRUCT) SEMIC_TOKEN
     ;
 
 // [修改] 支持 public 或 protected

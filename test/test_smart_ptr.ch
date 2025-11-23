@@ -80,8 +80,8 @@ func demo_shared_ptr() {
 
 
 // --- 3. 弱指针 (std::weak_ptr) ---
-type Parent : struct;
-type Child : struct;
+typedecl Parent : struct;
+typedecl Child : struct;
 
 struct Parent {
     // [修改] 使用内置类型

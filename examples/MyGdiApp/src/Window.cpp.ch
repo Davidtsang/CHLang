@@ -36,6 +36,7 @@ func GlobalWindowProc(
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
+@dynamic
 implement Window {
 
     init(title: LPCWSTR, app: Application*, width: int, height: int) {
@@ -91,15 +92,19 @@ implement Window {
         }
     }
 
-    func addChild(widget: unique<Widget>) {
+    func addChild(widget: Widget*) {
         var id: int = this->m_nextId;
         this->m_nextId = this->m_nextId + 1;
 
-        var ptr: Widget* = widget.get();
-        ptr->create(this->m_hWnd, id);
+        widget->create(this->m_hWnd, id);
+        this->m_lookup[id] = widget;
 
-        this->m_lookup[id] = ptr;
-        this->m_children.push_back(@move(widget));
+        // 这里我们需要管理生命周期。
+        // 因为 vector 存的是 unique_ptr，我们需要把裸指针包回去。
+        // 警告：这假设调用者放弃了 widget 的所有权（这在 createWidget 之后是合理的）
+        @cpp
+        this->m_children.push_back(std::unique_ptr<Widget>(widget));
+        @end
     }
 
     func handleMessage(uMsg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT {

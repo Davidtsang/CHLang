@@ -25,8 +25,8 @@ implement PropertyInjector {
         var methodName: std::string = "";
 
         // 1. 映射逻辑
-        if (key == @"text") {
-            methodName = @"setText";
+        if (key == "text") {
+            methodName = "setText";
             var sel: u64 = Reflection::getSelector(methodName);
 
             @cpp
@@ -35,8 +35,8 @@ implement PropertyInjector {
             obj->msgSend(sel, args);
             @end
         }
-        else if (key == @"color") {
-            methodName = @"setTextColor";
+        else if (key == "color") {
+            methodName = "setTextColor";
             var color = parseHex(value);
             var sel: u64 = Reflection::getSelector(methodName);
 
@@ -46,8 +46,8 @@ implement PropertyInjector {
             obj->msgSend(sel, args);
             @end
         }
-        else if (key == @"bg") {
-            methodName = @"setBackgroundColor"; // Label/Button/Window 都可能支持
+        else if (key == "bg") {
+            methodName = "setBackgroundColor"; // Label/Button/Window 都可能支持
             var color = parseHex(value);
             var sel: u64 = Reflection::getSelector(methodName);
             @cpp

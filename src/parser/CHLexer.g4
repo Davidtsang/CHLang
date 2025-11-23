@@ -41,7 +41,7 @@ SWITCH  : 'switch' ;
 CASE    : 'case' ;
 DEFAULT : 'default' ;
 
-TYPE : 'type';
+TYPEDECL : 'typedecl';
 
 DYN         : 'dyn' ;       // [新增] 动态类型关键字
 AT_DYNAMIC  : '@dynamic';   // [新增] 类注解

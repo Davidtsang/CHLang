@@ -13,6 +13,7 @@ import "Geometry" // [新增]
 
 @cpp using namespace Gdiplus; @end
 
+@dynamic
 class MyWindow : Window {
     var m_bgColor: Color;
 

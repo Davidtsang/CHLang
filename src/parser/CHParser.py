@@ -388,7 +388,7 @@ class CHParser ( Parser ):
                      "'else'", "'while'", "'for'", "'public'", "'protected'", 
                      "'interface'", "'@optional'", "'with'", "'virtual'", 
                      "'override'", "'as'", "'using'", "'namespace'", "'endnamespace'", 
-                     "'extern'", "'switch'", "'case'", "'default'", "'type'", 
+                     "'extern'", "'switch'", "'case'", "'default'", "'typedecl'", 
                      "'dyn'", "'@dynamic'", "'unique'", "'shared'", "'weak'", 
                      "'@make'", "'@make_shared'", "'@move'", "'@unsafe_move'", 
                      "'static_cast'", "'reinterpret_cast'", "'const_cast'", 
@@ -409,8 +409,8 @@ class CHParser ( Parser ):
                       "THIS", "STATIC", "IF", "ELSE", "WHILE", "FOR", "PUBLIC", 
                       "PROTECTED", "INTERFACE", "AT_OPTIONAL", "IMPL", "VIRTUAL", 
                       "OVERRIDE", "AS", "USING", "NAMESPACE", "END_NAMESPACE", 
-                      "EXTERN", "SWITCH", "CASE", "DEFAULT", "TYPE", "DYN", 
-                      "AT_DYNAMIC", "UNIQUE_KW", "SHARED_KW", "WEAK_KW", 
+                      "EXTERN", "SWITCH", "CASE", "DEFAULT", "TYPEDECL", 
+                      "DYN", "AT_DYNAMIC", "UNIQUE_KW", "SHARED_KW", "WEAK_KW", 
                       "AT_MAKE_UNIQUE", "AT_MAKE_SHARED", "AT_MOVE", "AT_UNSAFE_MOVE", 
                       "STATIC_CAST", "REINTERPRET_CAST", "CONST_CAST", "TILDE_ARROW", 
                       "BOOL_LITERAL", "NEW", "DELETE", "AT_CPP", "EQ", "NEQ", 
@@ -549,7 +549,7 @@ class CHParser ( Parser ):
     SWITCH=30
     CASE=31
     DEFAULT=32
-    TYPE=33
+    TYPEDECL=33
     DYN=34
     AT_DYNAMIC=35
     UNIQUE_KW=36
@@ -1708,8 +1708,8 @@ class CHParser ( Parser ):
             self.name = None # Token
             self.kind = None # Token
 
-        def TYPE(self):
-            return self.getToken(CHParser.TYPE, 0)
+        def TYPEDECL(self):
+            return self.getToken(CHParser.TYPEDECL, 0)
 
         def COLON(self):
             return self.getToken(CHParser.COLON, 0)
@@ -1753,7 +1753,7 @@ class CHParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 273
-            self.match(CHParser.TYPE)
+            self.match(CHParser.TYPEDECL)
             self.state = 274
             localctx.name = self.match(CHParser.IDENTIFIER)
             self.state = 275

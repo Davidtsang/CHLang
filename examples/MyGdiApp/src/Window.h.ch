@@ -19,6 +19,7 @@ extern func GlobalWindowProc(
 ) -> C_LRESULT_CALLBACK;
 
 // [修复 1] 继承 Widget
+@dynamic
 class Window : Widget {
     // [修复 2] 删除重复的 m_hWnd (使用 Widget 的)
     // public var m_hWnd: HWND; <--- 删除这行
@@ -32,7 +33,7 @@ class Window : Widget {
     public deinit;
     public func show();
 
-    public func addChild(widget: unique<Widget>);
+    public func addChild(widget: Widget*);
 
     // 重写基类虚函数
     public func handleMessage(

@@ -7,6 +7,7 @@
 import "MyWindow"
 import <iostream>
 
+@dynamic
 implement MyWindow {
 
     init(app: Application*, w: int, h: int) : Window(L"CH Showcase", app, w, h) {

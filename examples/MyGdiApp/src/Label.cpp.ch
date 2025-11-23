@@ -16,6 +16,7 @@ import <gdiplus.h>
 
 @cpp using namespace Gdiplus; @end
 
+@dynamic
 implement Label {
     init(text: std::string) {
         this->m_text = text;
