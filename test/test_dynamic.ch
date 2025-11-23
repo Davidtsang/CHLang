@@ -30,7 +30,7 @@ func main() -> int {
     //var d: dyn = t;
 
     // 2. 动态调用
-    d~>say("Hello World");
+    d~>say(@"Hello World");
     d~>add(10, 20);
 
     // 3. 调用不存在的方法 (应该安全失败)

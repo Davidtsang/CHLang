@@ -1183,8 +1183,8 @@ class CHVisitor(BaseCHVisitor):
                             val = self.visit(expr)
                             # 字符串字面量处理: "abc" -> std::string("abc")
                             # 否则 std::any 会存 const char*，导致解包 std::string 失败
-                            if val.startswith('"') and val.endswith('"'):
-                                val = f"std::string({val})"
+                            # if val.startswith('"') and val.endswith('"'):
+                            #     val = f"std::string({val})"
                             boxed_args.append(val)
                         args_code = ", ".join(boxed_args)
                         i += 1
@@ -1570,6 +1570,13 @@ class CHVisitor(BaseCHVisitor):
             return ctx.BOOL_LITERAL().getText()
         if ctx.CHAR_LITERAL():
             return ctx.CHAR_LITERAL().getText()
+        # [新增] 处理 @"..." -> std::string("...")
+        if ctx.AT_STRING_LITERAL():
+            raw_text = ctx.AT_STRING_LITERAL().getText()
+            # raw_text 是 @"hello"
+            # 我们去掉 @，变成 "hello"
+            cpp_string_literal = raw_text[1:]
+            return f"std::string({cpp_string_literal})"
         if ctx.BYTE_LITERAL():
             raw_text = ctx.BYTE_LITERAL().getText()
             char_part = raw_text[1:]

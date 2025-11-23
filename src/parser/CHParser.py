@@ -10,7 +10,7 @@ else:
 
 def serializedATN():
     return [
-        4,1,107,937,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,
+        4,1,108,937,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,
         7,6,2,7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,
         13,2,14,7,14,2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,
         20,7,20,2,21,7,21,2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,2,26,7,
@@ -97,7 +97,7 @@ def serializedATN():
         1,0,3,4,1,0,18,19,5,0,61,62,64,64,87,87,93,93,99,99,2,0,66,70,86,
         86,4,0,51,54,57,65,71,72,74,76,3,0,61,62,73,73,77,77,2,0,55,56,87,
         87,1,0,39,40,2,0,39,40,43,45,2,0,41,42,99,99,3,0,47,47,89,98,100,
-        101,1047,0,182,1,0,0,0,2,196,1,0,0,0,4,198,1,0,0,0,6,207,1,0,0,0,
+        102,1047,0,182,1,0,0,0,2,196,1,0,0,0,4,198,1,0,0,0,6,207,1,0,0,0,
         8,223,1,0,0,0,10,225,1,0,0,0,12,233,1,0,0,0,14,240,1,0,0,0,16,256,
         1,0,0,0,18,271,1,0,0,0,20,273,1,0,0,0,22,282,1,0,0,0,24,284,1,0,
         0,0,26,287,1,0,0,0,28,293,1,0,0,0,30,332,1,0,0,0,32,335,1,0,0,0,
@@ -149,11 +149,11 @@ def serializedATN():
         3,12,6,0,244,243,1,0,0,0,244,245,1,0,0,0,245,249,1,0,0,0,246,248,
         3,18,9,0,247,246,1,0,0,0,248,251,1,0,0,0,249,247,1,0,0,0,249,250,
         1,0,0,0,250,252,1,0,0,0,251,249,1,0,0,0,252,253,5,0,0,1,253,15,1,
-        0,0,0,254,257,3,56,28,0,255,257,5,102,0,0,256,254,1,0,0,0,256,255,
+        0,0,0,254,257,3,56,28,0,255,257,5,103,0,0,256,254,1,0,0,0,256,255,
         1,0,0,0,257,17,1,0,0,0,258,272,3,66,33,0,259,272,3,32,16,0,260,272,
         3,36,18,0,261,272,3,60,30,0,262,272,3,40,20,0,263,272,3,46,23,0,
         264,272,3,34,17,0,265,272,3,106,53,0,266,272,3,58,29,0,267,272,3,
-        6,3,0,268,272,3,20,10,0,269,272,5,102,0,0,270,272,3,24,12,0,271,
+        6,3,0,268,272,3,20,10,0,269,272,5,103,0,0,270,272,3,24,12,0,271,
         258,1,0,0,0,271,259,1,0,0,0,271,260,1,0,0,0,271,261,1,0,0,0,271,
         262,1,0,0,0,271,263,1,0,0,0,271,264,1,0,0,0,271,265,1,0,0,0,271,
         266,1,0,0,0,271,267,1,0,0,0,271,268,1,0,0,0,271,269,1,0,0,0,271,
@@ -174,7 +174,7 @@ def serializedATN():
         321,3,22,11,0,320,319,1,0,0,0,320,321,1,0,0,0,321,322,1,0,0,0,322,
         333,3,26,13,0,323,325,3,22,11,0,324,323,1,0,0,0,324,325,1,0,0,0,
         325,326,1,0,0,0,326,333,3,28,14,0,327,333,3,46,23,0,328,333,3,26,
-        13,0,329,333,3,28,14,0,330,333,3,66,33,0,331,333,5,102,0,0,332,297,
+        13,0,329,333,3,28,14,0,330,333,3,66,33,0,331,333,5,103,0,0,332,297,
         1,0,0,0,332,301,1,0,0,0,332,316,1,0,0,0,332,320,1,0,0,0,332,324,
         1,0,0,0,332,327,1,0,0,0,332,328,1,0,0,0,332,329,1,0,0,0,332,330,
         1,0,0,0,332,331,1,0,0,0,333,31,1,0,0,0,334,336,5,35,0,0,335,334,
@@ -199,7 +199,7 @@ def serializedATN():
         0,395,397,3,22,11,0,396,395,1,0,0,0,396,397,1,0,0,0,397,398,1,0,
         0,0,398,409,3,26,13,0,399,401,3,22,11,0,400,399,1,0,0,0,400,401,
         1,0,0,0,401,402,1,0,0,0,402,409,3,28,14,0,403,409,3,46,23,0,404,
-        409,3,26,13,0,405,409,3,28,14,0,406,409,3,66,33,0,407,409,5,102,
+        409,3,26,13,0,405,409,3,28,14,0,406,409,3,66,33,0,407,409,5,103,
         0,0,408,384,1,0,0,0,408,388,1,0,0,0,408,392,1,0,0,0,408,396,1,0,
         0,0,408,400,1,0,0,0,408,403,1,0,0,0,408,404,1,0,0,0,408,405,1,0,
         0,0,408,406,1,0,0,0,408,407,1,0,0,0,409,39,1,0,0,0,410,412,5,9,0,
@@ -234,7 +234,7 @@ def serializedATN():
         505,508,1,0,0,0,506,504,1,0,0,0,506,507,1,0,0,0,507,509,1,0,0,0,
         508,506,1,0,0,0,509,510,5,82,0,0,510,53,1,0,0,0,511,513,7,4,0,0,
         512,511,1,0,0,0,513,514,1,0,0,0,514,512,1,0,0,0,514,515,1,0,0,0,
-        515,55,1,0,0,0,516,522,5,1,0,0,517,523,5,100,0,0,518,519,5,71,0,
+        515,55,1,0,0,0,516,522,5,1,0,0,517,523,5,101,0,0,518,519,5,71,0,
         0,519,520,3,54,27,0,520,521,5,72,0,0,521,523,1,0,0,0,522,517,1,0,
         0,0,522,518,1,0,0,0,523,526,1,0,0,0,524,525,5,25,0,0,525,527,5,99,
         0,0,526,524,1,0,0,0,526,527,1,0,0,0,527,57,1,0,0,0,528,529,5,26,
@@ -250,9 +250,9 @@ def serializedATN():
         3,64,32,0,561,559,1,0,0,0,562,565,1,0,0,0,563,561,1,0,0,0,563,564,
         1,0,0,0,564,567,1,0,0,0,565,563,1,0,0,0,566,558,1,0,0,0,566,567,
         1,0,0,0,567,63,1,0,0,0,568,569,5,99,0,0,569,570,5,85,0,0,570,571,
-        3,0,0,0,571,65,1,0,0,0,572,576,5,50,0,0,573,575,5,107,0,0,574,573,
+        3,0,0,0,571,65,1,0,0,0,572,576,5,50,0,0,573,575,5,108,0,0,574,573,
         1,0,0,0,575,578,1,0,0,0,576,574,1,0,0,0,576,577,1,0,0,0,577,579,
-        1,0,0,0,578,576,1,0,0,0,579,580,5,106,0,0,580,67,1,0,0,0,581,583,
+        1,0,0,0,578,576,1,0,0,0,579,580,5,107,0,0,580,67,1,0,0,0,581,583,
         5,5,0,0,582,584,3,114,57,0,583,582,1,0,0,0,583,584,1,0,0,0,584,585,
         1,0,0,0,585,586,5,78,0,0,586,69,1,0,0,0,587,588,7,5,0,0,588,71,1,
         0,0,0,589,590,3,74,37,0,590,591,3,70,35,0,591,592,3,114,57,0,592,
@@ -281,7 +281,7 @@ def serializedATN():
         680,3,6,3,0,666,680,3,72,36,0,667,680,3,68,34,0,668,669,3,114,57,
         0,669,670,5,78,0,0,670,680,1,0,0,0,671,680,3,66,33,0,672,680,3,78,
         39,0,673,680,3,84,42,0,674,680,3,96,48,0,675,680,3,98,49,0,676,680,
-        3,88,44,0,677,680,3,94,47,0,678,680,5,102,0,0,679,665,1,0,0,0,679,
+        3,88,44,0,677,680,3,94,47,0,678,680,5,103,0,0,679,665,1,0,0,0,679,
         666,1,0,0,0,679,667,1,0,0,0,679,668,1,0,0,0,679,671,1,0,0,0,679,
         672,1,0,0,0,679,673,1,0,0,0,679,674,1,0,0,0,679,675,1,0,0,0,679,
         676,1,0,0,0,679,677,1,0,0,0,679,678,1,0,0,0,680,87,1,0,0,0,681,685,
@@ -402,7 +402,7 @@ class CHParser ( Parser ):
                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                     "<INVALID>", "'@end'" ]
+                     "<INVALID>", "<INVALID>", "'@end'" ]
 
     symbolicNames = [ "<INVALID>", "IMPORT", "FUNC", "VAR", "CONST", "RETURN", 
                       "CLASS", "IMPLEMENT", "STRUCT", "ENUM", "INIT", "DEINIT", 
@@ -424,9 +424,9 @@ class CHParser ( Parser ):
                       "BINARY_LITERAL", "OCTAL_LITERAL", "FLOAT_LITERAL", 
                       "DECIMAL_LITERAL", "BYTE_LITERAL", "U8_STRING_LITERAL", 
                       "U_STRING_LITERAL", "U_STRING_LITERAL_CAP", "L_STRING_LITERAL_CAP", 
-                      "IDENTIFIER", "STRING_LITERAL", "CHAR_LITERAL", "CPP_DIRECTIVE", 
-                      "LINE_COMMENT", "WHITESPACE", "NEWLINE", "AT_END", 
-                      "CPP_BODY" ]
+                      "IDENTIFIER", "AT_STRING_LITERAL", "STRING_LITERAL", 
+                      "CHAR_LITERAL", "CPP_DIRECTIVE", "LINE_COMMENT", "WHITESPACE", 
+                      "NEWLINE", "AT_END", "CPP_BODY" ]
 
     RULE_typeSpecifier = 0
     RULE_baseType = 1
@@ -616,14 +616,15 @@ class CHParser ( Parser ):
     U_STRING_LITERAL_CAP=97
     L_STRING_LITERAL_CAP=98
     IDENTIFIER=99
-    STRING_LITERAL=100
-    CHAR_LITERAL=101
-    CPP_DIRECTIVE=102
-    LINE_COMMENT=103
-    WHITESPACE=104
-    NEWLINE=105
-    AT_END=106
-    CPP_BODY=107
+    AT_STRING_LITERAL=100
+    STRING_LITERAL=101
+    CHAR_LITERAL=102
+    CPP_DIRECTIVE=103
+    LINE_COMMENT=104
+    WHITESPACE=105
+    NEWLINE=106
+    AT_END=107
+    CPP_BODY=108
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -782,7 +783,7 @@ class CHParser ( Parser ):
                     self.state = 153
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    if (((_la) & ~0x3f) == 0 and ((1 << _la) & 141235704561664) != 0) or ((((_la - 79)) & ~0x3f) == 0 and ((1 << (_la - 79)) & 8387601) != 0):
+                    if (((_la) & ~0x3f) == 0 and ((1 << _la) & 141235704561664) != 0) or ((((_la - 79)) & ~0x3f) == 0 and ((1 << (_la - 79)) & 16776209) != 0):
                         self.state = 152
                         self.typeList()
 
@@ -819,7 +820,7 @@ class CHParser ( Parser ):
                     self.state = 166
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    if (((_la) & ~0x3f) == 0 and ((1 << _la) & 141235704561664) != 0) or ((((_la - 79)) & ~0x3f) == 0 and ((1 << (_la - 79)) & 8387601) != 0):
+                    if (((_la) & ~0x3f) == 0 and ((1 << _la) & 141235704561664) != 0) or ((((_la - 79)) & ~0x3f) == 0 and ((1 << (_la - 79)) & 16776209) != 0):
                         self.state = 165
                         localctx.params = self.typeList()
 
@@ -1220,7 +1221,7 @@ class CHParser ( Parser ):
                 self.state = 221
                 self.typeSpecifier()
                 pass
-            elif token in [47, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 100, 101]:
+            elif token in [47, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 100, 101, 102]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 222
                 self.literal()
@@ -1442,7 +1443,7 @@ class CHParser ( Parser ):
             self.state = 249
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 1125943755154396) != 0) or _la==102:
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 1125943755154396) != 0) or _la==103:
                 self.state = 246
                 self.topLevelStatement()
                 self.state = 251
@@ -1507,7 +1508,7 @@ class CHParser ( Parser ):
                 self.state = 254
                 self.importDirective()
                 pass
-            elif token in [102]:
+            elif token in [103]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 255
                 self.match(CHParser.CPP_DIRECTIVE)
@@ -2333,7 +2334,7 @@ class CHParser ( Parser ):
             self.state = 351
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 1125900469677596) != 0) or _la==102:
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 1125900469677596) != 0) or _la==103:
                 self.state = 348
                 self.classBodyStatement()
                 self.state = 353
@@ -2536,7 +2537,7 @@ class CHParser ( Parser ):
             self.state = 378
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 1125900469677596) != 0) or _la==102:
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 1125900469677596) != 0) or _la==103:
                 self.state = 375
                 self.structBodyStatement()
                 self.state = 380
@@ -3225,7 +3226,7 @@ class CHParser ( Parser ):
             self.state = 479
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 2147418451) != 0):
                 self.state = 476
                 self.statement()
                 self.state = 481
@@ -3334,7 +3335,7 @@ class CHParser ( Parser ):
             self.state = 496
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 2147418451) != 0):
                 self.state = 493
                 self.statement()
                 self.state = 498
@@ -3409,7 +3410,7 @@ class CHParser ( Parser ):
             self.state = 506
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 2147418451) != 0):
                 self.state = 503
                 self.statement()
                 self.state = 508
@@ -3587,7 +3588,7 @@ class CHParser ( Parser ):
             self.state = 522
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [100]:
+            if token in [101]:
                 self.state = 517
                 localctx.pathStr = self.match(CHParser.STRING_LITERAL)
                 pass
@@ -3810,7 +3811,7 @@ class CHParser ( Parser ):
             self.state = 553
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 2147418451) != 0):
                 self.state = 550
                 self.statement()
                 self.state = 555
@@ -4015,7 +4016,7 @@ class CHParser ( Parser ):
             self.state = 576
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==107:
+            while _la==108:
                 self.state = 573
                 self.match(CHParser.CPP_BODY)
                 self.state = 578
@@ -4082,7 +4083,7 @@ class CHParser ( Parser ):
             self.state = 583
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 536805715) != 0):
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
                 self.state = 582
                 self.expression()
 
@@ -4627,7 +4628,7 @@ class CHParser ( Parser ):
             self.state = 638
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 2147418451) != 0):
                 self.state = 635
                 self.statement()
                 self.state = 640
@@ -4697,7 +4698,7 @@ class CHParser ( Parser ):
             self.state = 647
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 2147418451) != 0):
                 self.state = 644
                 self.statement()
                 self.state = 649
@@ -4788,7 +4789,7 @@ class CHParser ( Parser ):
             self.state = 660
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 2147418451) != 0):
                 self.state = 657
                 self.statement()
                 self.state = 662
@@ -5027,7 +5028,7 @@ class CHParser ( Parser ):
             self.state = 685
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 2147418451) != 0):
                 self.state = 682
                 self.statement()
                 self.state = 687
@@ -5108,7 +5109,7 @@ class CHParser ( Parser ):
             self.state = 696
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 2147418451) != 0):
                 self.state = 693
                 self.statement()
                 self.state = 698
@@ -5183,7 +5184,7 @@ class CHParser ( Parser ):
             self.state = 706
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 2147418451) != 0):
                 self.state = 703
                 self.statement()
                 self.state = 708
@@ -5456,7 +5457,7 @@ class CHParser ( Parser ):
             self.state = 738
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 536805715) != 0):
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
                 self.state = 737
                 localctx.cond = self.expression()
 
@@ -5466,7 +5467,7 @@ class CHParser ( Parser ):
             self.state = 742
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 536805715) != 0):
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
                 self.state = 741
                 localctx.incr = self.forIncrement()
 
@@ -5478,7 +5479,7 @@ class CHParser ( Parser ):
             self.state = 749
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & -2303662126289170376) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 2147418451) != 0):
                 self.state = 746
                 self.statement()
                 self.state = 751
@@ -6066,7 +6067,7 @@ class CHParser ( Parser ):
             self.state = 811
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 536805715) != 0):
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
                 self.state = 810
                 localctx.args = self.expressionList()
 
@@ -6347,7 +6348,7 @@ class CHParser ( Parser ):
                 self.state = 828
                 self.unaryExpression()
                 pass
-            elif token in [12, 39, 40, 41, 42, 43, 44, 45, 47, 48, 79, 81, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101]:
+            elif token in [12, 39, 40, 41, 42, 43, 44, 45, 47, 48, 79, 81, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 829
                 self.castExpression()
@@ -6620,7 +6621,7 @@ class CHParser ( Parser ):
                         self.state = 854
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)
-                        if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 536805715) != 0):
+                        if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
                             self.state = 853
                             self.expressionList()
 
@@ -6648,7 +6649,7 @@ class CHParser ( Parser ):
                     self.state = 867
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 536805715) != 0):
+                    if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
                         self.state = 866
                         self.expressionList()
 
@@ -6779,7 +6780,7 @@ class CHParser ( Parser ):
                 self.state = 879
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 536805715) != 0):
+                if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
                     self.state = 878
                     self.expressionList()
 
@@ -6808,7 +6809,7 @@ class CHParser ( Parser ):
                 self.state = 889
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 536805715) != 0):
+                if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
                     self.state = 888
                     self.expressionList()
 
@@ -6837,7 +6838,7 @@ class CHParser ( Parser ):
                 self.state = 899
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 536805715) != 0):
+                if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
                     self.state = 898
                     self.expressionList()
 
@@ -6939,7 +6940,7 @@ class CHParser ( Parser ):
             self.state = 915
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 536805715) != 0):
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
                 self.state = 914
                 self.expressionList()
 
@@ -7022,7 +7023,7 @@ class CHParser ( Parser ):
             self.state = 922
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 536805715) != 0):
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & -2305350977760260096) != 0) or ((((_la - 73)) & ~0x3f) == 0 and ((1 << (_la - 73)) & 1073676627) != 0):
                 self.state = 921
                 self.expressionList()
 
@@ -7136,6 +7137,9 @@ class CHParser ( Parser ):
         def STRING_LITERAL(self):
             return self.getToken(CHParser.STRING_LITERAL, 0)
 
+        def AT_STRING_LITERAL(self):
+            return self.getToken(CHParser.AT_STRING_LITERAL, 0)
+
         def BOOL_LITERAL(self):
             return self.getToken(CHParser.BOOL_LITERAL, 0)
 
@@ -7183,7 +7187,7 @@ class CHParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 934
             _la = self._input.LA(1)
-            if not(((((_la - 47)) & ~0x3f) == 0 and ((1 << (_la - 47)) & 31520799345082369) != 0)):
+            if not(((((_la - 47)) & ~0x3f) == 0 and ((1 << (_la - 47)) & 67549596364046337) != 0)):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)
