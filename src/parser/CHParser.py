@@ -424,7 +424,7 @@ class CHParser ( Parser ):
                       "BINARY_LITERAL", "OCTAL_LITERAL", "FLOAT_LITERAL", 
                       "DECIMAL_LITERAL", "BYTE_LITERAL", "U8_STRING_LITERAL", 
                       "U_STRING_LITERAL", "U_STRING_LITERAL_CAP", "L_STRING_LITERAL_CAP", 
-                      "IDENTIFIER", "AT_STRING_LITERAL", "STRING_LITERAL", 
+                      "IDENTIFIER", "C_STRING_LITERAL", "STRING_LITERAL", 
                       "CHAR_LITERAL", "CPP_DIRECTIVE", "LINE_COMMENT", "WHITESPACE", 
                       "NEWLINE", "AT_END", "CPP_BODY" ]
 
@@ -616,7 +616,7 @@ class CHParser ( Parser ):
     U_STRING_LITERAL_CAP=97
     L_STRING_LITERAL_CAP=98
     IDENTIFIER=99
-    AT_STRING_LITERAL=100
+    C_STRING_LITERAL=100
     STRING_LITERAL=101
     CHAR_LITERAL=102
     CPP_DIRECTIVE=103
@@ -7137,8 +7137,8 @@ class CHParser ( Parser ):
         def STRING_LITERAL(self):
             return self.getToken(CHParser.STRING_LITERAL, 0)
 
-        def AT_STRING_LITERAL(self):
-            return self.getToken(CHParser.AT_STRING_LITERAL, 0)
+        def C_STRING_LITERAL(self):
+            return self.getToken(CHParser.C_STRING_LITERAL, 0)
 
         def BOOL_LITERAL(self):
             return self.getToken(CHParser.BOOL_LITERAL, 0)

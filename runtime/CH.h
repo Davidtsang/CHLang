@@ -21,6 +21,11 @@ namespace CH {
         std::cout << s << std::endl;
     }
 
+    // [新增] 必须添加 std::string 的重载
+    inline void Log(const std::string& s) {
+        std::cout << s << std::endl;
+    }
+
     // --- 2. 针对“指针类型”的模板 ---
     template <typename T>
     void Log(T* ptr) {

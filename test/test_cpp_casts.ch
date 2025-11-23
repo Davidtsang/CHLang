@@ -22,7 +22,7 @@ func main() -> int {
     var f = static_cast<f32>(10);
 
     std::cout << "Test 1 (static_cast[f32]): " << f << std::endl;
-    static_assert(std::is_same_v<decltype(f), float>, "static_cast[f32] failed");
+    static_assert(std::is_same_v<decltype(f), float>, c"static_cast[f32] failed");
 
 
     // --- Test 2: reinterpret_cast (不安全) ---
@@ -37,7 +37,7 @@ func main() -> int {
         // (我们仍然可以称之为 "Test 2" 用于 expected.txt)
     std::cout << "Test 2 (static_cast[C_HBRUSH]): (Compiled)" << std::endl;
     // (在 @cpp 中我们仍然使用 HBRUSH 来验证类型)
-    static_assert(std::is_same_v<decltype(h), HBRUSH>, "reinterpret_cast<C_HBRUSH> failed");
+    static_assert(std::is_same_v<decltype(h), HBRUSH>, c"reinterpret_cast<C_HBRUSH> failed");
 
 
     // --- Test 3: reinterpret_cast (指针) ---

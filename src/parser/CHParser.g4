@@ -450,7 +450,7 @@ literal
     | FLOAT_LITERAL
     | BYTE_LITERAL
     | STRING_LITERAL
-    | AT_STRING_LITERAL   // [新增] std::string 对象
+    | C_STRING_LITERAL    // [新增] 代表 const char*
     | BOOL_LITERAL
     | CHAR_LITERAL
     | U8_STRING_LITERAL

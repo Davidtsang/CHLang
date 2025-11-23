@@ -160,10 +160,8 @@ L_STRING_LITERAL_CAP : 'L'  '"' ( ~["\\] | '\\' . )* '"' ;
 
 // --- 通用规则 (必须在最后) ---
 IDENTIFIER : [a-zA-Z_] [a-zA-Z0-9_]* ;
-//INTEGER_LITERAL : [0-9]+ ;
-// [新增] Objective-C 风格字符串 @"..."
-// 注意：要把这个放在 AT_OP ('@') 之前，或者确保它优先匹配
-AT_STRING_LITERAL : '@' '"' ( ~["\\] | '\\' . )* '"' ;
+
+C_STRING_LITERAL : 'c' '"' ( ~["\\] | '\\' . )* '"' ;
 
 STRING_LITERAL  : '"' ( ~["\\] | '\\' . )* '"' ; 
 CHAR_LITERAL    : '\'' ( ~['\\] | '\\' . ) '\'' ; // 匹配单引号字符 (例如 'a', '\n')

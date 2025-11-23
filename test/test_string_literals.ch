@@ -64,10 +64,22 @@ func main() -> int {
         static_assert(std::is_same_v<decltype(utf32_str), const char32_t*>, "U\"...\" failed");
 
         // Test 5: "..." -> const char*
-        static_assert(std::is_same_v<decltype(std_str), const char*>, "\"...\" failed");
+        // [修改] 断言它是 std::string，而不是 const char*
+        static_assert(std::is_same_v<decltype(std_str), std::string>, "\"...\" should be std::string");
 
     @end
 
-    @cpp std::cout << "--- Test Passed ---" << std::endl; @end
+    // --- Test 6: c"..." (C-Style String) ---
+    // 预期: auto c_str = "Hello C";
+    var c_str = c"Hello C";
+
+    // ... 在 @cpp 块中 ...
+
+    // [验证] 断言它是 const char*
+    @cpp
+    static_assert(std::is_same_v<decltype(c_str), const char*>, "c\"...\" should be const char*");
+    @end
+
+    std::cout << "--- Test Passed ---" << std::endl;
     return 0;
 }

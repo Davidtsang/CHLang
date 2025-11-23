@@ -83,12 +83,12 @@ func main() -> int {
 
     @cpp std::cout << "2. Dynamic Call (Optional on Full):" << std::endl; @end
     // FullWorker 实现了，应该成功
-    dyn1~>doOptional(@"Hello World");
+    dyn1~>doOptional("Hello World");
 
     @cpp std::cout << "3. Dynamic Call (Optional on Lazy):" << std::endl; @end
     // LazyWorker 没实现。
     // 预期行为：运行时安全失败 (打印 Selector not found)，但程序不会崩溃
-    dyn2~>doOptional(@"Should not crash");
+    dyn2~>doOptional("Should not crash");
 
     full->release();
     lazy->release();

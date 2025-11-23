@@ -1570,13 +1570,22 @@ class CHVisitor(BaseCHVisitor):
             return ctx.BOOL_LITERAL().getText()
         if ctx.CHAR_LITERAL():
             return ctx.CHAR_LITERAL().getText()
-        # [新增] 处理 @"..." -> std::string("...")
-        if ctx.AT_STRING_LITERAL():
-            raw_text = ctx.AT_STRING_LITERAL().getText()
-            # raw_text 是 @"hello"
-            # 我们去掉 @，变成 "hello"
-            cpp_string_literal = raw_text[1:]
-            return f"std::string({cpp_string_literal})"
+
+        # 1. 处理 c"..." -> const char* (C++ 原生字符串)
+        if ctx.C_STRING_LITERAL():
+            raw_text = ctx.C_STRING_LITERAL().getText()
+            # raw_text 是 c"hello"
+            # 我们去掉前缀 c，保留引号，直接返回 "hello"
+            return raw_text[1:]
+
+            # 2. 处理 "..." -> std::string
+        if ctx.STRING_LITERAL():
+            raw_text = ctx.STRING_LITERAL().getText()
+            # raw_text 是 "hello"
+            # 我们要把它包装成 std::string("hello")
+            # 注意：C++14 支持 "hello"s 字面量，但为了兼容 C++17 且不依赖 using namespace，显式构造最稳妥
+            return f"std::string({raw_text})"
+
         if ctx.BYTE_LITERAL():
             raw_text = ctx.BYTE_LITERAL().getText()
             char_part = raw_text[1:]
