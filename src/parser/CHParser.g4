@@ -302,6 +302,7 @@ statement : variableDeclaration
           | forStatement
           | blockStatement  // <-- [新增]
           | switchStatement
+          | AT_CODEGEN_INJECTOR SEMIC_TOKEN
           | CPP_DIRECTIVE
           ;
 blockStatement : LBRACE statement* RBRACE ;  // <-- [新增]

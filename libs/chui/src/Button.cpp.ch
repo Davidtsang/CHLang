@@ -4,10 +4,10 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 
-import "Button"
-import "Window"
-import "Geometry"
-import "Events"
+import "chui/Button"
+import "chui/Window"
+import "chui/Geometry"
+import "chui/Events"
 import <algorithm>
 
 // [重要] 必须先导入 objidl.h，再导入 gdiplus.h

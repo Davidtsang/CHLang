@@ -56,6 +56,8 @@ AT_MAKE_SHARED : '@make_shared' ; // [新增] 对应 @make_shared[T] (修正了�
 AT_MOVE        : '@move' ;       // [新增] 对应 @move(a)
 AT_UNSAFE_MOVE : '@unsafe_move' ;
 
+AT_CODEGEN_INJECTOR : '@codegen_property_injector';
+
 STATIC_CAST      : 'static_cast' ;
 REINTERPRET_CAST : 'reinterpret_cast' ;
 CONST_CAST       : 'const_cast' ;

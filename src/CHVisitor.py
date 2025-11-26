@@ -1,7 +1,6 @@
 ﻿# src/CHVisitor.py
 import os
-from CompileContext import CompileContext
-
+from CompileContext import CompileContext, ClassInfo, MethodInfo, FieldInfo, ArgInfo
 from parser.CHParser import CHParser
 from parser.CHParserVisitor import CHParserVisitor as BaseCHVisitor
 from antlr4.tree.Tree import TerminalNodeImpl  # 导入 TerminalNodeImpl
@@ -14,11 +13,11 @@ class CHVisitor(BaseCHVisitor):
     def __init__(self, context: CompileContext = None, import_loader_callback=None):
         super().__init__()
 
-        # 上下文与回调 (用于智能导入)
+        # 强引用 Context
         self.context = context if context else CompileContext()
         self.import_loader_callback = import_loader_callback
 
-        # (我们回到了您最初的简单 Visitor)
+        # 状态变量
         self._in_class_method = False
         self._in_class = False
         self._in_struct = False
@@ -27,21 +26,14 @@ class CHVisitor(BaseCHVisitor):
         self._alias_to_namespace_map = {}
         self._scope_stack = [{}]
         self._namespace_is_open = False
-
-        # 这个新状态用于跟踪我们是否在 'implement' 块中
         self._in_implementation_block = False
-        self._current_namespace_str = ""  # 用于 C++ 作用域
+        self._current_namespace_str = ""
         self._current_class_members = {}
-
-        # [新增] 控制流深度 (0=线性/顶层, >0=条件或循环内)
         self._control_flow_depth = 0
 
-        self._current_impl_methods = []  # [新增]用于存储当前 implement 块中的方法信息
-
-        self._current_base_name = None  # [新增]
-
-        # [新增] 记录继承关系: {"Dog": "Animal", "Cat": "Animal"}
-        self._inheritance_map = {}
+        # [变更] 这个列表仅用于当前 .cpp 文件的 implement 块内的方法收集
+        # 真正的全局类信息现在存在 self.context 中
+        self._current_impl_methods = []
 
     def _collect_suffixes(self, ctx):
         """
@@ -170,6 +162,51 @@ class CHVisitor(BaseCHVisitor):
 
         return f"\n{closing_braces} // namespace {comment_name}\n\n"
 
+    def _get_source_type_string(self, type_ctx):
+        """
+        这是一个需要注意的地方。
+        self.visit(type_ctx) 返回的是翻译后的 C++ 类型 (int32_t)。
+        如果符号表想要存原始 CH 类型 (i32)，我们需要用 ctx.getText()。
+        通常为了做反射，存 C++ 类型 (self.visit 的结果) 更实用。
+        """
+        if not type_ctx: return "void"
+        return self.visit(type_ctx)  # 存储 std::string, int32_t 等
+
+    def _extract_class_member_info(self, ctx, class_info: ClassInfo):
+        """辅助函数：分析 AST 节点并填充 class_info"""
+
+        # 处理变量声明
+        if ctx.variableDeclaration():
+            var_ctx = ctx.variableDeclaration()
+            name = var_ctx.name.text
+            # 获取类型 (需要处理复杂的 TypeSpecifier)
+            type_str = self._get_source_type_string(var_ctx.typeName)
+            access = self._get_access_level(ctx)
+
+            class_info.fields[name] = FieldInfo(name, type_str, access)
+
+        # 处理方法声明 (FunctionSignature)
+        elif ctx.functionSignature():
+            func_ctx = ctx.functionSignature()
+            name = func_ctx.name.text
+            return_type = self._get_source_type_string(func_ctx.returnType) if func_ctx.returnType else "void"
+            access = self._get_access_level(ctx)
+            is_static = bool(func_ctx.STATIC())
+            is_virtual = bool(func_ctx.VIRTUAL())
+            is_override = bool(func_ctx.OVERRIDE())
+
+            # 提取参数
+            args = []
+            if func_ctx.parameters():
+                for p in func_ctx.parameters().parameter():
+                    p_name = p.name.text
+                    p_type = self._get_source_type_string(p.typeName)
+                    args.append(ArgInfo(p_name, p_type))
+
+            class_info.methods[name] = MethodInfo(
+                name, return_type, args, access, is_static, is_virtual, is_override
+            )
+
     def visitImplementationBlock(self, ctx: CHParser.ImplementationBlockContext):
         self._in_implementation_block = True
         self._current_class_name = ctx.name.text
@@ -201,57 +238,169 @@ class CHVisitor(BaseCHVisitor):
         return body_code
 
     def visitMethodDefinition(self, ctx: CHParser.MethodDefinitionContext):
+        line_comment = f"\n// Line {ctx.start.line} (method {ctx.name.text})\n"
         self._in_class_method = True
         self._enter_scope()
-        self._add_variable("this", {"cpp_name": "this", "cpp_type": f"{self._current_class_name}*"})
 
-        # [新增] 获取返回类型
-        return_type = "void"
-        if ctx.returnType:
-            return_type = self.visit(ctx.returnType)  # e.g., "int32_t", "std::string"
+        # 1. Setup 'this'
+        cpp_type = f"{self._current_class_name}*"
+        self._add_variable("this", {
+            "cpp_name": "this",
+            "cpp_type": cpp_type
+        })
 
-        # [关键] 收集方法信息
-        if self._in_implementation_block:
-            func_name = ctx.name.text
-            params = []
-            if ctx.parameters():
-                for p in ctx.parameters().parameter():
-                    p_type = self.visit(p.typeName)
-                    params.append(p_type)
-
-            # [修改] 存入三元组: (函数名, 参数列表, 返回类型)
-            self._current_impl_methods.append((func_name, params, return_type))
+        # 2. Setup members
+        for member_name, metadata in self._current_class_members.items():
+            self._add_variable(member_name, metadata)
 
         func_name = ctx.name.text
+
+        # ============================================================
+        # [核心修复] 收集方法信息用于动态反射
+        # ============================================================
+        if self._in_implementation_block:
+            # 获取返回类型 (用于生成 return 语句)
+            return_type = "void"
+            if ctx.returnType:
+                return_type = self.visit(ctx.returnType)
+
+            param_types = []
+            # 手动遍历参数列表，提取参数的 C++ 类型
+            if ctx.parameters():
+                for p in ctx.parameters().parameter():
+                    # visit(p.typeName) 会触发类型映射
+                    p_type = self.visit(p.typeName)
+                    param_types.append(p_type)
+
+            # [DEBUG] 您可以在这里打印一下，看看编译时是否收集到了 setX
+            # print(f"Collecting dynamic method: {self._current_class_name}::{func_name}")
+
+            self._current_impl_methods.append((func_name, param_types, return_type))
+        # ============================================================
+
         params_code = self.visit(ctx.parameters()) if ctx.parameters() else ""
         body_code = "".join(self.visit(s) for s in self._safe_iterate_statements(ctx.statement()))
 
-        # 注意：这里的 return_type 变量上面已经计算过了
+        # 注意：visit(returnType) 上面已经调过了，这里为了生成 C++ 代码再调一次也无妨
+        # 但为了变量复用，直接使用 return_type 变量
+        cpp_return_type = "void"
+        if ctx.returnType:
+            cpp_return_type = self.visit(ctx.returnType)
 
         self._exit_scope()
         self._in_class_method = False
 
+        # 生成 C++ 代码
         if self._in_implementation_block:
-            return f"\n{return_type} {self._current_class_name}::{func_name}({params_code}) {{\n{body_code}{INDENT}}}\n"
+            cpp_func_name = f"{self._current_class_name}::{func_name}"
+            return (
+                f"{line_comment}"
+                f"\n{cpp_return_type} {cpp_func_name}({params_code}) {{\n"
+                f"{body_code}"
+                f"{INDENT}// --- Method End ---\n"
+                f"{INDENT}}}\n"
+            )
         else:
-            # 内联
+            # 内联/类定义
             access = getattr(ctx, '_CH_access', 'public')
-            self._class_sections[
-                access] += f"\n{INDENT}{return_type} {func_name}({params_code}) {{\n{body_code}{INDENT}}}\n"
+            self._class_sections[access] += (
+                f"{line_comment}"
+                f"\n{INDENT}{cpp_return_type} {func_name}({params_code}) {{\n"
+                f"{body_code}"
+                f"{INDENT}\n"
+                f"{INDENT}}}\n"
+            )
             return ""
+
+        # src/CHVisitor.py 补充
+
+    def visitCodegenInjectorStatement(self, ctx):
+        """
+        遇到 @codegen_property_injector; 时调用。
+        根据符号表生成通用的属性注入逻辑。
+        """
+        # 我们将生成一个基于 key 的巨大 switch/if-else 块
+        # 目标 C++ 逻辑:
+        # if (key == "text") {
+        #     obj->msgSend(_SEL("setText"), { value });
+        # } else if (key == "width") {
+        #     int32_t v = std::stoi(value);
+        #     obj->msgSend(_SEL("setWidth"), { v });
+        # }
+
+        # 1. 收集所有 Setter
+        # 结构: { "property_name": { "method": "setMethod", "type": "arg_type" } }
+        prop_map = {}
+
+        for class_name, info in self.context.symbols.items():
+            # 统一处理 info 是 dict 还是 ClassInfo 对象的情况
+            methods = info.get("methods", {}) if isinstance(info, dict) else info.methods
+
+            for method_name, method_info in methods.items():
+                # 再次统一处理 MethodInfo 对象或 dict
+                m_name = method_info.name if hasattr(method_info, 'name') else method_info['name']
+                m_args = method_info.args if hasattr(method_info, 'args') else method_info['args']
+
+                # 筛选逻辑: 必须是以 set 开头，且只有一个参数
+                if m_name.startswith("set") and len(m_name) > 3 and len(m_args) == 1:
+                    # 提取属性名: setText -> text, setWidth -> width
+                    raw_prop = m_name[3:]
+                    # 转小写首字母: Text -> text
+                    prop_name = raw_prop[0].lower() + raw_prop[1:]
+
+                    arg_type = m_args[0].type if hasattr(m_args[0], 'type') else m_args[0]['type']
+
+                    # 记录下来 (简单的冲突解决：后来的覆盖前面的，或者假设同一属性名类型相同)
+                    prop_map[prop_name] = {
+                        "method": m_name,
+                        "type": arg_type
+                    }
+
+        # 2. 生成代码
+        code = f"{INDENT}// --- Auto-Generated Property Injector ---\n"
+
+        for prop, meta in prop_map.items():
+            method_name = meta['method']
+            arg_type = meta['type']
+
+            code += f"{INDENT}if (key == \"{prop}\") {{\n"
+
+            # 根据类型生成转换代码
+            # 假设 value 始终是 std::string (从 JSON 读取)
+            val_expr = ""
+            if arg_type == "std::string":
+                val_expr = "value"  # 已经是 string
+            elif arg_type in ["int", "int32_t", "i32"]:
+                val_expr = "std::stoi(value)"
+            elif arg_type in ["float", "f32"]:
+                val_expr = "std::stof(value)"
+            else:
+                # 未知类型，暂时跳过或当作 string
+                code += f"{INDENT}{INDENT}// Warning: Unsupported type {arg_type} for {prop}\n"
+                code += f"{INDENT}}}\n"
+                continue
+
+            # 生成动态调用
+            # obj->msgSend(_SEL("setText"), { val_expr });
+            code += f"{INDENT}{INDENT}obj->msgSend(_SEL(\"{method_name}\"), {{ {val_expr} }});\n"
+            code += f"{INDENT}{INDENT}return;\n"
+            code += f"{INDENT}}}\n"
+
+        code += f"{INDENT}// --- End Auto-Gen ---\n"
+        return code
 
     def _generate_dynamic_glue_code(self):
         class_name = self._current_class_name
+
+        # 生成胶水代码头部
         code = f"\n// --- CH Runtime Glue Code for {class_name} ---\n"
         code += f"CHObject::MethodTrampoline {class_name}::findMethodImpl(SelectorID sel) {{\n"
 
+        # 遍历当前文件实现的方法 (self._current_impl_methods 由 visitMethodDefinition 填充)
         for func_name, param_types, ret_type in self._current_impl_methods:
             code += f"{INDENT}if (sel == _SEL(\"{func_name}\")) {{\n"
             code += f"{INDENT}{INDENT}return [this](void* inst, std::vector<std::any>& args) -> std::any {{\n"
             code += f"{INDENT}{INDENT}{INDENT}{class_name}* self = static_cast<{class_name}*>(inst);\n"
-
-            # 检查参数数量 (可选，这里暂时注释掉以防变参数)
-            # code += f"{INDENT}{INDENT}{INDENT}if (args.size() < {len(param_types)}) return {{}};\n"
 
             call_args = []
             for i, p_type in enumerate(param_types):
@@ -269,8 +418,13 @@ class CHVisitor(BaseCHVisitor):
             code += f"{INDENT}{INDENT}}};\n"
             code += f"{INDENT}}}\n"
 
-        # [修复 2/2] 使用记录的基类，而不是硬编码 CHObject
-        parent_class = self._inheritance_map.get(class_name, "CHObject")
+        # [关键] 使用 Context 查询父类
+        # 即使父类定义在另一个 Lib 中，只要 symbols.json 加载了，这里就能查到
+        parent_class = self.context.get_parent_class(class_name)
+
+        # Debug output to console
+        print(f"  [Glue] Generated reflection for {class_name}. Parent: {parent_class}")
+
         code += f"{INDENT}return {parent_class}::findMethodImpl(sel);\n"
         code += "}\n"
         return code
@@ -345,7 +499,6 @@ class CHVisitor(BaseCHVisitor):
 
         return f"{cpp_final_type} {cpp_name}"
 
-
     def visitFunctionCallExpression(self, ctx: CHParser.FunctionCallExpressionContext):
         name_token = ctx.funcName
 
@@ -383,7 +536,6 @@ class CHVisitor(BaseCHVisitor):
                 args_list.append(self.visit(arg_expr))
         args_code = ", ".join(args_list)
         return f"{cpp_func_name}({args_code})"
-
 
     def _translate_variable_declaration(self, ctx):
         """
@@ -690,13 +842,24 @@ class CHVisitor(BaseCHVisitor):
         if path_content.startswith('runtime/'):
             path_content = path_content.replace('runtime/', '')
 
-        # [关键修正] 自动补全 .h 后缀
-        # 如果路径里没有后缀 (如 "jsonp/Json")，加上 .h
+        # 自动补全 .h 后缀
         root, ext = os.path.splitext(path_content)
         if not ext:
             path_content += ".h"
 
-        # [强制] 生成 #include
+        # [核心修复] 处理 'as Alias'
+        # 逻辑：假设文件名就是命名空间名 (e.g. "lib/MyMath.h" -> 命名空间 "MyMath")
+        if ctx.alias:
+            alias_name = ctx.alias.text  # "Math"
+
+            # 从路径提取文件名 (MyMath)
+            target_namespace = os.path.basename(root)
+
+            # 注册到映射表: {"Math": "MyMath"}
+            # 这样后续遇到 Math::func 时，visitSimpleExpression/visitPrimary 会将其替换为 MyMath::func
+            self._alias_to_namespace_map[alias_name] = target_namespace
+
+        # 生成 #include
         return f'{line_comment}#include "{path_content}"\n'
 
     def visitUsingAlias(self, ctx: CHParser.UsingAliasContext):
@@ -751,29 +914,61 @@ class CHVisitor(BaseCHVisitor):
         return f"{INDENT}virtual {cpp_return_type} {cpp_func_name}({params_code}) = 0;\n"
 
     def visitInterfaceDefinition(self, ctx: CHParser.InterfaceDefinitionContext):
-        interface_name = ctx.name.text
+        iface_name = ctx.name.text
+
+        # --- 1. 符号采集 (保持不变) ---
+        class_info = ClassInfo(
+            name=iface_name,
+            kind="interface",
+            file=self.context.current_file_processing
+        )
+
+        # 预扫描方法签名
+        for child in ctx.children:
+            if isinstance(child, CHParser.MethodSignatureContext):
+                func_name = child.name.text
+                ret_type = self.visit(child.returnType) if child.returnType else "void"
+                is_optional = bool(child.AT_OPTIONAL())
+
+                args = []
+                if child.parameters():
+                    for p in child.parameters().parameter():
+                        args.append(ArgInfo(p.name.text, self.visit(p.typeName)))
+
+                class_info.methods[func_name] = MethodInfo(
+                    name=func_name, return_type=ret_type, args=args, access="public", is_optional=is_optional
+                )
+
+        self.context.register_class(class_info)
+
+        # --- 2. C++ 代码生成 (核心修复) ---
         body_code = ""
 
-        # 遍历子节点
+        # 遍历子节点生成 C++ 纯虚函数
         for child in ctx.children:
             if isinstance(child, CHParser.MethodSignatureContext):
                 # [核心逻辑] 检查是否有 @optional
                 is_optional = bool(child.AT_OPTIONAL())
 
                 if is_optional:
-                    # 如果是可选的，生成注释，或者完全不生成 C++ 代码
-                    # 这样 C++ 编译器就不会因为没实现它而报错
+                    # 如果是可选的，生成注释，C++ 编译器不强制实现
                     func_name = child.name.text
                     body_code += f"{INDENT}// virtual void {func_name}(...) // @optional in CH\n"
                 else:
-                    # 必须实现的，生成纯虚函数
+                    # 必须实现的，生成纯虚函数 (virtual void foo() = 0;)
+                    # visitMethodSignature 已经实现了这个格式
                     body_code += self.visit(child)
 
-        code = f"\nclass {interface_name} {{\n"
+            elif isinstance(child, CHParser.CppBlockContext):
+                body_code += self.visit(child)
+
+        code = f"\nclass {iface_name} {{\n"
         code += "public:\n"
-        code += f"{INDENT}virtual ~{interface_name}() {{}} \n"
+        # 生成虚析构函数，这是接口的最佳实践
+        code += f"{INDENT}virtual ~{iface_name}() {{}}\n"
         code += body_code
         code += "};\n"
+
         return code
 
     def visitFunctionSignature(self, ctx: CHParser.FunctionSignatureContext):
@@ -870,55 +1065,159 @@ class CHVisitor(BaseCHVisitor):
 
         return code
 
-
     def visitClassDefinition(self, ctx: CHParser.ClassDefinitionContext):
+        class_name = ctx.name.text
+        self._current_class_name = class_name  # 暂时设置，供后续逻辑使用
         self._current_class_members = {}
         self._in_class = True
         self._in_struct = False
-        class_name = ctx.name.text
 
-        # [修复 1/2] 记录继承关系
+        # 1. 确定基类
         base_name = "CHObject"
         if ctx.base:
             base_name = ctx.base.text
-        self._inheritance_map[class_name] = base_name
 
-        inheritance_list = []
-        if ctx.base: inheritance_list.append(f"public {ctx.base.text}")
+        # 2. 确定 Interfaces
+
+        interfaces_list = []
         if ctx.interfaces:
-            for name in self.visit(ctx.interfaces).split(','):
-                inheritance_list.append(f"public {name.strip()}")
-        inheritance_str = (" : " + ", ".join(inheritance_list)) if inheritance_list else ""
+            interfaces_str = self.visit(ctx.interfaces)
+            if interfaces_str:
+                interfaces_list = [x.strip() for x in interfaces_str.split(',') if x.strip()]
 
-        self._current_class_name = class_name
-        self._class_sections = {"private": "", "public": "", "protected": ""}
+        # 3. 确定动态属性
         is_dynamic = bool(ctx.AT_DYNAMIC())
 
+        # 4. [关键] 构建 ClassInfo 并采集成员
+        # 我们需要创建一个 ClassInfo 对象
+        class_info = ClassInfo(
+            name=class_name,
+            kind="class",
+            file=self.context.current_file_processing,
+            parent=base_name,
+            is_dynamic=is_dynamic,
+            interfaces=interfaces_list
+        )
+
+        # [扫描成员] 遍历 classBodyStatement 提取字段和方法签名
+        if hasattr(ctx, 'classBodyStatement'):
+            for body_stmt in ctx.classBodyStatement():
+                self._extract_member_info(body_stmt, class_info)
+
+        # 5. 注册到全局 Context
+        self.context.register_class(class_info)
+
+        # --- 以下是生成 C++ 代码的逻辑 (基本保持不变) ---
+
+        # 生成继承字符串
+        inheritance_list = []
+        if ctx.base: inheritance_list.append(f"public {ctx.base.text}")
+        # 接口也是基类
+        for iface in interfaces_list:
+            inheritance_list.append(f"public {iface}")
+
+        inheritance_str = (" : " + ", ".join(inheritance_list)) if inheritance_list else ""
+
+        self._class_sections = {"private": "", "public": "", "protected": ""}
+
+        # 真正生成 C++ 代码的遍历
         if hasattr(ctx, 'classBodyStatement'):
             for child in ctx.classBodyStatement():
                 self.visit(child)
 
+        # 动态类必须实现 findMethodImpl
         if is_dynamic:
             self._class_sections[
                 "public"] += f"{INDENT}virtual MethodTrampoline findMethodImpl(SelectorID sel) override;\n"
 
         final_body = ""
-        # [修改] 按 C++ 习惯顺序组装: public -> protected -> private
         if self._class_sections["public"]:
             final_body += f"\npublic:\n{self._class_sections['public']}"
-
-        # [新增] 插入 protected 块
         if self._class_sections["protected"]:
             final_body += f"\nprotected:\n{self._class_sections['protected']}"
-
         if self._class_sections["private"]:
             final_body += f"\nprivate:\n{self._class_sections['private']}"
 
         self._in_class = False
         self._current_class_name = None
+
         return f"\nclass {class_name}{inheritance_str} {{\n{final_body.strip()}\n}};\n"
 
+    def _extract_member_info(self, ctx: CHParser.ClassBodyStatementContext, class_info: ClassInfo):
+        """
+        预扫描类体，填充 class_info 的 fields 和 methods。
+        不生成代码，只提取元数据。
+        """
+        # 1. 获取访问权限
+        access = self._get_access_level(ctx, default_level='private' if class_info.kind == 'class' else 'public')
 
+        # 2. 静态属性?
+        is_static = False
+        if ctx.STATIC(): is_static = True
+        if ctx.functionSignature() and ctx.functionSignature().STATIC(): is_static = True
+
+        # --- 变量 ---
+        if ctx.variableDeclaration():
+            var_decl = ctx.variableDeclaration()
+            var_name = var_decl.name.text
+            # 注意：这里我们需要 C++ 类型，所以调用 visit(typeName)
+            # 这可能会稍微有点风险（如果 visit 有副作用），但在 TypeSpecifier 中通常没有副作用
+            var_type = self.visit(var_decl.typeName) if var_decl.typeName else "auto"
+
+            class_info.fields[var_name] = FieldInfo(
+                name=var_name,
+                type=var_type,
+                access=access
+            )
+
+        # --- 方法 ---
+        elif ctx.functionSignature():
+            sig = ctx.functionSignature()
+            func_name = sig.name.text
+            ret_type = self.visit(sig.returnType) if sig.returnType else "void"
+
+            # 提取参数
+            args = []
+            if sig.parameters():
+                for p in sig.parameters().parameter():
+                    p_name = p.name.text
+                    p_type = self.visit(p.typeName)
+                    args.append(ArgInfo(p_name, p_type))
+
+            is_virtual = bool(sig.VIRTUAL())
+            is_override = bool(sig.OVERRIDE())
+
+            # 可选属性 (用于接口)
+            is_optional = bool(sig.AT_OPTIONAL()) if hasattr(sig, 'AT_OPTIONAL') else False
+
+            class_info.methods[func_name] = MethodInfo(
+                name=func_name,
+                return_type=ret_type,
+                args=args,
+                access=access,
+                is_static=is_static,
+                is_virtual=is_virtual,
+                is_override=is_override,
+                is_optional=is_optional
+            )
+
+        # --- Init ---
+        elif ctx.initSignature():
+            sig = ctx.initSignature()
+            # 构造函数作为特殊方法记录
+            args = []
+            if sig.parameters():
+                for p in sig.parameters().parameter():
+                    p_name = p.name.text
+                    p_type = self.visit(p.typeName)
+                    args.append(ArgInfo(p_name, p_type))
+
+            class_info.methods["init"] = MethodInfo(
+                name="init",
+                return_type="void",  # 构造函数无返回
+                args=args,
+                access=access
+            )
 
     def visitClassBodyStatement(self, ctx: CHParser.ClassBodyStatementContext):
         # [ [ [ 关键修复 ] ] ]
@@ -1230,6 +1529,7 @@ class CHVisitor(BaseCHVisitor):
         if ctx.THIS(): return "this"
         if ctx.LPAREN(): return f"({self.visit(ctx.expression())})"
         return ""
+
     def visitStatement(self, ctx: CHParser.StatementContext):
         if ctx.variableDeclaration():
             return self.visit(ctx.variableDeclaration())
@@ -1675,37 +1975,76 @@ class CHVisitor(BaseCHVisitor):
 
     def visitStructDefinition(self, ctx: CHParser.StructDefinitionContext):
         struct_name = ctx.name.text
-        # [ [ [ 修复 B-2: 添加 struct 的成员字典重置 ] ] ]
-        self._current_class_members = {}
-        self._in_class = False
-        self._in_struct = True
         self._current_class_name = struct_name
-        self._class_sections = {"private": "", "public": "", "protected": ""}
+        self._current_class_members = {}
+        self._in_struct = True
+        self._in_class = False
 
+        # 构建 StructInfo (复用 ClassInfo)
+        class_info = ClassInfo(
+            name=struct_name,
+            kind="struct",
+            file=self.context.current_file_processing,
+            parent=None,  # struct 通常不继承
+            is_dynamic=False
+        )
+
+        # 预扫描成员
+        if hasattr(ctx, 'structBodyStatement'):
+            for body_stmt in ctx.structBodyStatement():
+                # structBodyStatement 的结构和 classBodyStatement 很像，
+                # 但我们需要一个适配器或者稍微修改 _extract_member_info 接收通用类型
+                # 这里为了简单，假设 _extract_member_info 能处理共有字段
+                # 实际上在 g4 中，它们包含的子规则几乎一样。
+                # 我们在这里手动提取一下，避免类型断言错误
+                self._extract_struct_member_info(body_stmt, class_info)
+
+        self.context.register_class(class_info)
+
+        # C++ 生成逻辑
+        self._class_sections = {"private": "", "public": "", "protected": ""}
         if hasattr(ctx, 'structBodyStatement'):
             for child in ctx.structBodyStatement():
                 self.visit(child)
-        self._in_struct = False
-        self._current_class_name = None
-        # [ [ [ 修复 B-2: 添加 struct 的成员字典重置 ] ] ]
-        self._current_class_members = {}
-        final_struct_body = ""
 
+        final_struct_body = ""
         if self._class_sections["public"]:
             final_struct_body += f"\npublic:\n{self._class_sections['public']}"
-
-        # [新增]
         if self._class_sections["protected"]:
             final_struct_body += f"\nprotected:\n{self._class_sections['protected']}"
-
         if self._class_sections["private"]:
             final_struct_body += f"\nprivate:\n{self._class_sections['private']}"
 
-        return (
-            f"\nstruct {struct_name} {{\n"
-            f"{final_struct_body.strip()}\n"
-            f"}};\n"
-        )
+        self._in_struct = False
+        self._current_class_name = None
+
+        return f"\nstruct {struct_name} {{\n{final_struct_body.strip()}\n}};\n"
+
+    def _extract_struct_member_info(self, ctx: CHParser.StructBodyStatementContext, class_info: ClassInfo):
+        # Struct 默认 public
+        access = self._get_access_level(ctx, default_level='public')
+
+        if ctx.variableDeclaration():
+            var_decl = ctx.variableDeclaration()
+            var_name = var_decl.name.text
+            var_type = self.visit(var_decl.typeName) if var_decl.typeName else "auto"
+            class_info.fields[var_name] = FieldInfo(var_name, var_type, access)
+
+        elif ctx.functionSignature():
+            # ... (同 class 方法提取逻辑) ...
+            sig = ctx.functionSignature()
+            func_name = sig.name.text
+            ret_type = self.visit(sig.returnType) if sig.returnType else "void"
+            args = []
+            if sig.parameters():
+                for p in sig.parameters().parameter():
+                    args.append(ArgInfo(p.name.text, self.visit(p.typeName)))
+
+            is_static = bool(sig.STATIC())  # Struct 可能有 static 方法
+
+            class_info.methods[func_name] = MethodInfo(
+                name=func_name, return_type=ret_type, args=args, access=access, is_static=is_static
+            )
 
     def visitVariableDeclaration(self, ctx: CHParser.VariableDeclarationContext):
         line_comment = f"{INDENT}// Line {ctx.start.line}\n"

@@ -4,9 +4,9 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 
-import "Window"
+import "chui/Window"
 import <iostream>
-import "resource.h"
+
 // 全局窗口过程
 func GlobalWindowProc(
     hWnd: HWND, uMsg: UINT, wParam: WPARAM, lParam: LPARAM
@@ -49,8 +49,10 @@ implement Window {
         wc.lpfnWndProc = GlobalWindowProc;
         wc.hInstance = app->getHInstance();
 
-        wc.hIcon = LoadIcon(app->getHInstance(), MAKEINTRESOURCE(IDI_MAIN_ICON));
-        wc.hIconSm = LoadIcon(app->getHInstance(), MAKEINTRESOURCE(IDI_MAIN_ICON));
+        //wc.hIcon = LoadIcon(app->getHInstance(), MAKEINTRESOURCE(IDI_MAIN_ICON));
+        //wc.hIconSm = LoadIcon(app->getHInstance(), MAKEINTRESOURCE(IDI_MAIN_ICON));
+        wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+        wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 
         wc.hCursor = LoadCursor(NULL, IDC_ARROW);
         wc.lpszClassName = L"CHWindowClass";

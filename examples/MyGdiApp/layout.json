@@ -1,0 +1,23 @@
+[
+    {
+        "type": "Label",
+        "text": "Hello from JSON File!",
+        "color": "#0000FF",
+        "bg": "#00000000",
+        "x": 20, "y": 20, "width": 200, "height": 30
+    },
+    {
+        "type": "Button",
+        "text": "Click Me (J-SON)",
+        "color": "#000000",
+        "bg": "#DDDDDD",
+        "x": 20, "y": 70, "width": 200, "height": 50
+    },
+    {
+        "type": "Label",
+        "text": "Dynamic Architecture Works!",
+        "color": "#008800",
+        "bg": "#00000000",
+        "x": 20, "y": 140, "width": 200, "height": 30
+    }
+]

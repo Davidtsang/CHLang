@@ -1,10 +1,9 @@
-// file: framework/Widget.cpp.ch
 #define UNICODE
 #define _UNICODE
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 
-import "Widget"
+import "chui/Widget"
 import <iostream>
 import <algorithm>
 import <objidl.h>
@@ -12,12 +11,13 @@ import <gdiplus.h>
 
 @cpp using namespace Gdiplus; @end
 
+// [关键] 必须标记 @dynamic，否则 setX/setY 不会进入反射表
 @dynamic
 implement Widget {
     init() {
         this->m_hWnd = NULL;
         this->m_id = 0;
-        this->m_frame = CGRect(0.0, 0.0, 100.0, 30.0);
+        this->m_frame = CGRect(0.0, 0.0, 100.0, 30.0); // 默认值
         this->m_isMouseOver = false;
     }
 
@@ -35,50 +35,50 @@ implement Widget {
     }
 
     func getFrame() -> CGRect { return this->m_frame; }
+
+    // [关键] 必须实现这些 Setter，以便 PropertyInjector 调用
+    func setX(v: i32) {
+        this->m_frame.origin.x = static_cast<f32>(v);
+        // 如果窗口已创建，实时更新位置 (可选)
+    }
+    func setY(v: i32) { this->m_frame.origin.y = static_cast<f32>(v); }
+    func setWidth(v: i32) { this->m_frame.size.width = static_cast<f32>(v); }
+    func setHeight(v: i32) { this->m_frame.size.height = static_cast<f32>(v); }
+
+    // [关键] 通用 setText 接口 (虽然 Widget 没有 text 成员，但这里提供虚函数入口)
+    func setText(t: std::string) { }
+    func setBackgroundColor(c: CGColor) { }
+
     func create(parent: HWND, id: int) { }
 
-    // --- [核心] 封装 Win32 创建逻辑 ---
     func createStandardWindow(parent: HWND, className: LPCWSTR, cursor: LPCWSTR, style: DWORD) {
-
         @cpp extern HINSTANCE g_hInstance; @end
         @cpp extern LRESULT CALLBACK GlobalWindowProc(HWND, UINT, WPARAM, LPARAM); @end
 
-        // 1. 注册窗口类 (如果尚未注册)
-        // 使用 GetClassInfoEx 检查，避免重复注册失败
         var wcCheck: WNDCLASSEX;
         if (!GetClassInfoEx(g_hInstance, className, &wcCheck)) {
             var wc: WNDCLASSEX = {};
             wc.cbSize = sizeof(WNDCLASSEX);
-            wc.style = 0; // 默认样式
+            wc.style = 0;
             wc.lpfnWndProc = GlobalWindowProc;
             wc.hInstance = g_hInstance;
-            wc.hCursor = LoadCursor(NULL, cursor); // 使用传入的光标
-            wc.lpszClassName = className;          // 使用传入的类名
-            wc.hbrBackground = NULL;               // 自绘背景
-
+            wc.hCursor = LoadCursor(NULL, cursor);
+            wc.lpszClassName = className;
+            wc.hbrBackground = NULL;
             RegisterClassEx(&wc);
         }
 
-        // 2. 创建窗口
         var f = this->m_frame;
-
         this->m_hWnd = CreateWindowExW(
-            0,
-            className,
-            NULL,
-            style, // 使用传入的样式
-            static_cast<int>(f.getMinX()),
-            static_cast<int>(f.getMinY()),
-            static_cast<int>(f.getWidth()),
-            static_cast<int>(f.getHeight()),
-            parent,
-            reinterpret_cast<HMENU>(static_cast<int64_t>(this->m_id)),
-            g_hInstance,
-            this // 传入 this 指针，供 GlobalWindowProc 绑定
+            0, className, NULL, style,
+            static_cast<int>(f.getMinX()), static_cast<int>(f.getMinY()),
+            static_cast<int>(f.getWidth()), static_cast<int>(f.getHeight()),
+            parent, reinterpret_cast<HMENU>(static_cast<int64_t>(this->m_id)),
+            g_hInstance, this
         );
     }
 
-    // --- 默认实现 ---
+    // 默认实现
     func onPaint(g: Graphics*) { }
     func onMouseDown(e: MouseEvent) { }
     func onMouseUp(e: MouseEvent) { }
@@ -87,19 +87,11 @@ implement Widget {
     func onMouseLeave() { }
     func onResize(w: int, h: int) { }
     func hitTest(x: int, y: int) -> int { return -1; }
-    // [新增] 实现
-    func setX(v: i32) { this->m_frame.origin.x = static_cast<f32>(v); }
-    func setY(v: i32) { this->m_frame.origin.y = static_cast<f32>(v); }
-    func setWidth(v: i32) { this->m_frame.size.width = static_cast<f32>(v); }
-    func setHeight(v: i32) { this->m_frame.size.height = static_cast<f32>(v); }
+    func onCommand(n: int) -> bool { return false; }
 
-    // [关键修复] 加回 onCommand 默认实现
-    func onCommand(notificationCode: int) -> bool {
-        return false;
-    }
-
-    // --- 消息分发 ---
     func handleMessage(uMsg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT {
+        // ... (这里保持原来的 handleMessage 逻辑，太长省略，不要改动它) ...
+        // (请保留您之前已经写好的完整 handleMessage Switch 块)
         switch (uMsg) {
             case WM_PAINT {
                 var ps: PAINTSTRUCT;
@@ -156,8 +148,8 @@ implement Widget {
             }
             case WM_NCHITTEST {
                 var res = this->hitTest(0, 0);
-                if (res == 0) { return (-1); } // HTTRANSPARENT
-                if (res == 1) { return 1; }    // HTCLIENT
+                if (res == 0) { return (-1); }
+                if (res == 1) { return 1; }
             }
         }
         return DefWindowProc(this->m_hWnd, uMsg, wParam, lParam);

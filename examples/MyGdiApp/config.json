@@ -1,5 +1,18 @@
 {
-    "src_dir": "src",
-    "out_dir": "build/src",
-    "transpiler_script": "src/transpiler.py"
+    "package_name": "MyGdiApp",
+    "version": "1.0.0",
+    "transpiler_script": "../../src/transpiler.py",
+
+    "dependencies": {
+        "jsonp": { "path": "../../libs/jsonp" },
+        "chui":  { "path": "../../libs/chui" }
+    },
+
+    "build_rules": [
+        {
+            "source_dir": "src",
+            "output_dir": "build/dist/src",
+            "note": "App Source"
+        }
+    ]
 }

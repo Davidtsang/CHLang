@@ -1,5 +1,5 @@
 // file: framework/Geometry.cpp.ch
-import "Geometry"
+import "chui/Geometry"
 
 // --- CGPoint 实现 ---
 implement CGPoint {

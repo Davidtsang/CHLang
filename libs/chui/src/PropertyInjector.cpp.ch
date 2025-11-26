@@ -1,6 +1,6 @@
-import "PropertyInjector"
-import "Reflection"
-import "Geometry"
+import "chui/PropertyInjector"
+import "chui/Reflection"
+import "chui/Geometry"
 import <string>
 import <vector>
 import <any>

@@ -8,6 +8,7 @@ import argparse
 # ==========================================
 # 1. 通用配置模板 (config.json)
 # ==========================================
+# 保持与 build.py 的 Phase 1/2 逻辑一致：include 目录被识别为头文件
 TEMPLATE_CONFIG = """{{
     "package_name": "{name}",
     "version": "0.1.0",
@@ -16,12 +17,12 @@ TEMPLATE_CONFIG = """{{
         {{
             "source_dir": "include",
             "output_dir": "build/dist/include",
-            "note": "Public Headers"
+            "note": "Public Headers (Phase 1)"
         }},
         {{
             "source_dir": "src",
             "output_dir": "build/dist/src",
-            "note": "Source Files"
+            "note": "Source Files (Phase 2)"
         }},
         {{
             "source_dir": "test",
@@ -33,7 +34,7 @@ TEMPLATE_CONFIG = """{{
 """
 
 # ==========================================
-# 2. CMake 模板 (区分 App 和 Lib)
+# 2. CMake 模板 (关键升级)
 # ==========================================
 
 # 模板 A: 库模式 (好公民模式)
@@ -43,25 +44,40 @@ project({name})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# --- Path Setup ---
+# --- 1. Path Setup ---
 set(RUNTIME_REL_PATH "{runtime_path}")
 get_filename_component(RUNTIME_DIR "${{CMAKE_CURRENT_SOURCE_DIR}}/${{RUNTIME_REL_PATH}}" ABSOLUTE)
 set(DIST_DIR "${{CMAKE_CURRENT_SOURCE_DIR}}/build/dist")
 
 if(NOT EXISTS "${{DIST_DIR}}")
-    message(FATAL_ERROR "Build artifacts not found. Run 'python build.py transpile' first.")
+    message(FATAL_ERROR "Build artifacts not found. Run 'python build.py transpile -d .' first.")
 endif()
 
-# --- Library Target ---
+# --- 2. Dependency Loading (Sync with build.py) ---
+# build.py 会自动生成 cmake_deps.cmake，包含 add_subdirectory 指令
+set(DEPS_FILE "${{CMAKE_CURRENT_SOURCE_DIR}}/build/cmake_deps.cmake")
+if(EXISTS "${{DEPS_FILE}}")
+    message(STATUS "[{name}] Loading dependencies from ${{DEPS_FILE}}")
+    include("${{DEPS_FILE}}")
+endif()
+
+# --- 3. Library Target ---
 file(GLOB LIB_SOURCES "${{DIST_DIR}}/src/*.cpp")
+
 add_library({name} STATIC ${{LIB_SOURCES}})
 
+# 让使用者能找到头文件 (PUBLIC)
 target_include_directories({name} PUBLIC 
     "${{DIST_DIR}}/include"
-    ${{RUNTIME_DIR}}
+    "${{RUNTIME_DIR}}"
 )
 
-# --- Test Target (Standalone Only) ---
+# 链接 build.py 识别到的其他依赖库 (如果有)
+if(DEFINED CHRONO_LIBS)
+    target_link_libraries({name} PRIVATE ${{CHRONO_LIBS}})
+endif()
+
+# --- 4. Test Target (Standalone Only) ---
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     message(STATUS "[{name}] Building Tests (Standalone Mode)")
     file(GLOB TEST_SOURCES "${{DIST_DIR}}/test/*.cpp")
@@ -70,7 +86,10 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
         ${{TEST_SOURCES}}
         "${{RUNTIME_DIR}}/CHString.cpp"
     )
+
+    # 链接自身 + 依赖
     target_link_libraries({name}_test PRIVATE {name})
+
     set_target_properties({name}_test PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${{CMAKE_CURRENT_SOURCE_DIR}}")
 endif()
 """
@@ -82,19 +101,29 @@ project({name})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# --- Path Setup ---
+# --- 1. Path Setup ---
 set(RUNTIME_REL_PATH "{runtime_path}")
 get_filename_component(RUNTIME_DIR "${{CMAKE_CURRENT_SOURCE_DIR}}/${{RUNTIME_REL_PATH}}" ABSOLUTE)
 set(DIST_DIR "${{CMAKE_CURRENT_SOURCE_DIR}}/build/dist")
 
 if(NOT EXISTS "${{DIST_DIR}}")
-    message(FATAL_ERROR "Build artifacts not found. Run 'python build.py transpile' first.")
+    message(FATAL_ERROR "Build artifacts not found. Run 'python build.py transpile -d .' first.")
 endif()
 
-# --- Executable Target ---
-# App 模式下，src 包含 main 函数，test 目录通常为空或作为辅助
+# --- 2. Dependency Loading (Sync with build.py) ---
+# 关键：加载由 build.py 生成的依赖描述文件
+set(DEPS_FILE "${{CMAKE_CURRENT_SOURCE_DIR}}/build/cmake_deps.cmake")
+if(EXISTS "${{DEPS_FILE}}")
+    message(STATUS "[{name}] Loading dependencies from ${{DEPS_FILE}}")
+    include("${{DEPS_FILE}}")
+else()
+    message(STATUS "[{name}] No external dependencies found (build/cmake_deps.cmake missing)")
+endif()
+
+# --- 3. Executable Target ---
 file(GLOB APP_SOURCES "${{DIST_DIR}}/src/*.cpp")
 
+# Win32 应用通常需要 WIN32 标志，如果是控制台应用去掉 WIN32
 add_executable({name} 
     ${{APP_SOURCES}}
     "${{RUNTIME_DIR}}/CHString.cpp" # 链接运行时
@@ -103,17 +132,24 @@ add_executable({name}
 # 包含路径
 target_include_directories({name} PRIVATE 
     "${{DIST_DIR}}/include"
-    ${{RUNTIME_DIR}}
+    "${{RUNTIME_DIR}}"
 )
 
-# 链接其他库 (示例)
-# target_link_libraries({name} PRIVATE some_lib)
+# --- 4. Linking ---
+# 链接系统库
+target_link_libraries({name} PRIVATE gdi32 user32 gdiplus)
+
+# 链接 Chrono 依赖库 (由 build.py 计算并存入 CHRONO_LIBS)
+if(DEFINED CHRONO_LIBS)
+    message(STATUS "[{name}] Linking with: ${{CHRONO_LIBS}}")
+    target_link_libraries({name} PRIVATE ${{CHRONO_LIBS}})
+endif()
 
 set_target_properties({name} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${{CMAKE_CURRENT_SOURCE_DIR}}")
 """
 
 # ==========================================
-# 3. 源码模板
+# 3. 源码模板 (适配新的 Symbol Table 风格)
 # ==========================================
 
 # Lib: Header
@@ -124,8 +160,11 @@ import <string>
 @dynamic
 class {class_name} : CHObject {{
     var m_name: std::string;
+
     public init(name: std::string);
     public func greet();
+
+    // 你可以在这里添加更多方法，build.py 会自动收集它们到 symbols.json
 }}
 """
 
@@ -138,6 +177,7 @@ implement {class_name} {{
     init(name: std::string) {{
         this->m_name = name;
     }}
+
     func greet() {{
         CH::Log(std::string("Hello library world from ") + this->m_name);
     }}
@@ -150,18 +190,23 @@ import "runtime/CH.h"
 
 func main() -> int {{
     CH::Log("--- Testing Library {name} ---");
+
     var obj: {class_name}* = new {class_name}("Chrono");
     obj->greet();
+
+    // 动态调用测试 (验证反射表是否生成成功)
+    // obj~>greet(); 
+
     obj->release();
     return 0;
 }}
 """
 
-# App: Main (直接在 src 里写 main)
+# App: Main
 TEMPLATE_APP_MAIN = """import "runtime/CH.h"
 import <string>
 
-// 简单的入口类
+// 简单的应用入口类
 @dynamic
 class App : CHObject {{
     public static func run();
@@ -171,6 +216,7 @@ class App : CHObject {{
 implement App {{
     func run() {{
         CH::Log(std::string("Hello Application World!"));
+        CH::Log(std::string("Symbols and Reflection are working!"));
     }}
 }}
 
@@ -214,7 +260,7 @@ def create_project(target_path, project_type):
     print(f"正在创建 [{project_type.upper()}]: {package_name}")
     print(f"  位置: {full_path}")
 
-    # 创建目录
+    # 创建目录 (符合 build.py 的 include/src 分离规范)
     dirs = [f"include/{package_name}", "src", "test"]
     for d in dirs:
         os.makedirs(os.path.join(full_path, d))
@@ -244,7 +290,6 @@ def create_project(target_path, project_type):
     else:
         # 应用模式：主程序入口
         files.append((f"src/main.cpp.ch", TEMPLATE_APP_MAIN.format(name=package_name)))
-        # App 模式下 include 和 test 可以留空或放辅助文件
 
     # 写入文件
     for path, content in files:
@@ -254,12 +299,11 @@ def create_project(target_path, project_type):
         print(f"  [+] {path}")
 
     print(f"\n=== {project_type.upper()} '{package_name}' 创建成功！ ===")
-    print(f"1. 转译: python build.py transpile -d {target_path}")
-    print(f"2. 构建: cd {target_path} && mkdir build_cmake && cd build_cmake && cmake ..")
-    if project_type == "lib":
-        print(f"3. 运行: cmake --build . && Debug\\{package_name}_test.exe")
-    else:
-        print(f"3. 运行: cmake --build . && Debug\\{package_name}.exe")
+    print("下一步操作：")
+    print(f"  1. 转译代码: python build.py transpile -d {target_path}")
+    print(f"  2. 生成工程: cd {target_path} && mkdir build_cmake && cd build_cmake")
+    print(f"  3. 编译运行: cmake -G Ninja .. && cmake --build .")
+    print(f"     (或者直接使用: python make.py {target_path} --run)")
 
     return True
 

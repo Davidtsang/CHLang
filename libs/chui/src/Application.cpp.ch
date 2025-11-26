@@ -1,6 +1,6 @@
 // file: framework/Application.cpp.ch
-import "Application"
-import "WinMain" // 导入 g_hInstance 和 g_nCmdShow
+import "chui/Application"
+import "chui/WinMain" // 导入 g_hInstance 和 g_nCmdShow
 
 implement Application {
 

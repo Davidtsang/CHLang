@@ -4,7 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 
-import "MyWindow"
+import "chui/MyWindow"
 import <iostream>
 
 @dynamic

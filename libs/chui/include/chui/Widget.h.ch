@@ -35,8 +35,13 @@ class Widget : CHObject {
     public func setWidth(v: i32);
     public func setHeight(v: i32);
 
+// [建议声明] 让基类也能响应这些通用属性
+    public virtual func setText(t: std::string);
+    public virtual func setBackgroundColor(c: CGColor);
+
     public virtual func create(parent: HWND, id: int);
     public virtual func handleMessage(uMsg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT;
+
 
     // --- 事件接口 ---
     public virtual func onPaint(g: Graphics*);

@@ -2,6 +2,7 @@
 import sys
 import os
 import subprocess
+import argparse
 import traceback
 from antlr4 import *
 from antlr4.error.ErrorListener import ErrorListener
@@ -10,9 +11,8 @@ from antlr4.error.ErrorListener import ErrorListener
 from parser.CHLexer import CHLexer
 from parser.CHParser import CHParser
 
-# 导入我们的新组件
+# 导入核心组件
 from CHVisitor import CHVisitor
-# from TypemapScanner import TypemapScanner
 from CompileContext import CompileContext
 
 # 全局上下文 (在单次 transpiler 运行期间保持活跃)
@@ -85,9 +85,21 @@ def resolve_and_load_import(import_path, current_file_dir):
         pass
 
 
-def translate(input_file, output_file):
+def translate(input_file, output_file, current_symbol_path=None, dep_symbol_paths=None):
     try:
-        # 1. 读取主文件
+        # 1. 初始化全局编译上下文
+        # current_symbol_path: 当前项目要写入/更新的符号表路径
+        # dep_symbol_paths: 依赖项目的符号表路径列表 (只读)
+        ctx = CompileContext(current_symbol_path, dep_symbol_paths)
+
+        # 设置当前正在处理的文件名 (用于 ClassInfo.file 字段)
+        # 转换为相对路径以保持整洁，如果失败则使用绝对路径
+        try:
+            ctx.set_current_file(os.path.relpath(input_file))
+        except:
+            ctx.set_current_file(input_file)
+
+        # 2. 读取源代码
         with open(input_file, 'r', encoding='utf-8-sig') as f:
             data = f.read()
 
@@ -95,23 +107,23 @@ def translate(input_file, output_file):
         lexer = CHLexer(input_stream)
         stream = CommonTokenStream(lexer)
         parser = CHParser(stream)
+
+        # 注册错误监听器
         parser.removeErrorListeners()
         parser.addErrorListener(CHErrorListener())
 
+        # 解析语法树
         tree = parser.program()
 
-        # 2. 准备 Import 回调
-        current_dir = os.path.dirname(os.path.abspath(input_file))
-
+        # Import 回调 (预留给未来递归扫描 import 语句用，目前由 build.py 处理依赖)
         def import_callback(path):
             pass
 
-        # 3. 运行主 Visitor
-        # 传入 global_context (可能已包含之前扫描的内容) 和 回调
-        visitor = CHVisitor(global_context, import_callback)
+        # 3. 运行 Visitor (传入上下文)
+        visitor = CHVisitor(ctx, import_callback)
         final_cpp_code = visitor.visit(tree)
 
-        # 4. 输出
+        # 4. 写入输出文件
         output_dir = os.path.dirname(output_file)
         if output_dir:
             os.makedirs(output_dir, exist_ok=True)
@@ -119,28 +131,38 @@ def translate(input_file, output_file):
         with open(output_file, "w", encoding='utf-8-sig') as f:
             f.write(final_cpp_code)
 
-        # 5. 格式化 (可选)
+        # 5. 调用 clang-format 进行格式化 (如果系统中有)
         try:
-            style_override = "{BasedOnStyle: LLVM, SortIncludes: false}"
+            style_override = "{BasedOnStyle: LLVM, SortIncludes: false, ColumnLimit: 0}"
             format_cmd = ["clang-format", "-i", f"-style={style_override}", output_file]
             subprocess.run(format_cmd, check=True, capture_output=True, text=True)
             print(f"OK! Transpiled: {input_file}")
         except (subprocess.CalledProcessError, FileNotFoundError):
+            # 如果没有 clang-format，也不报错，只是不格式化
             print(f"OK! Transpiled (unformatted): {input_file}")
 
     except Exception as e:
         print(f"NO OK! Translation failed for {input_file}")
         print(f"Error Details: {e}")
-        # traceback.print_exc()
+        # traceback.print_exc() # 调试时可取消注释
         sys.exit(1)
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("Usage: python src/transpiler.py <input.ch> [output.cpp]")
-        sys.exit(1)
+    # 使用 argparse 处理命令行参数
+    parser = argparse.ArgumentParser(description="Chrono Transpiler")
 
-    in_file = sys.argv[1]
-    out_file = sys.argv[2] if len(sys.argv) > 2 else "build/main.cpp"
+    # 必选参数
+    parser.add_argument("input", help="Input .ch source file")
+    parser.add_argument("output", help="Output .cpp file")
 
-    translate(in_file, out_file)
+    # 可选参数：当前项目的符号表路径 (读+写)
+    parser.add_argument("--symbols", help="Path to current project's symbols.json", default=None)
+
+    # 可选参数：依赖项目的符号表路径列表 (只读)
+    parser.add_argument("--deps", help="Paths to dependency symbol files", nargs='*', default=[])
+
+    args = parser.parse_args()
+
+    # 执行转换
+    translate(args.input, args.output, args.symbols, args.deps)

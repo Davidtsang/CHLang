@@ -1,6 +1,6 @@
-import "UIFactory"
-import "Button"
-import "Label"
+import "chui/UIFactory"
+import "chui/Button"
+import "chui/Label"
 import "runtime/CH.h"
 
 implement UIFactory {

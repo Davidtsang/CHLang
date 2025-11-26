@@ -1,0 +1,22 @@
+{
+    "package_name": "GdiDemo",
+    "version": "0.1.0",
+    "transpiler_script": "../../src/transpiler.py",
+    "build_rules": [
+        {
+            "source_dir": "include",
+            "output_dir": "build/dist/include",
+            "note": "Public Headers"
+        },
+        {
+            "source_dir": "src",
+            "output_dir": "build/dist/src",
+            "note": "Source Files"
+        },
+        {
+            "source_dir": "test",
+            "output_dir": "build/dist/test",
+            "note": "Tests"
+        }
+    ]
+}

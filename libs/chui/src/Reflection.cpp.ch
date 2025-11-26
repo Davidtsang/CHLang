@@ -1,5 +1,5 @@
-import "Reflection"
-import "CHSelector.h" // 引用运行时哈希宏
+import "chui/Reflection"
+import "runtime/CHSelector.h" // 引用运行时哈希宏
 
 implement Reflection {
     func getSelector(name: std::string) -> u64 {

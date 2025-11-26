@@ -41,6 +41,12 @@ func WinMain(
     nCmdShow: C_IN_INT
 ) -> C_INT_WINAPI
 {
+    @cpp
+    AllocConsole();
+    freopen("CONOUT$", "w", stdout);
+    freopen("CONOUT$", "w", stderr);
+    @end
+
     g_hInstance = hInstance;
     g_nCmdShow = nCmdShow;
 

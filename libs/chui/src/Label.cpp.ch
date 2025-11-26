@@ -4,10 +4,10 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 
-import "Label"
-import "Window"
-import "Geometry"
-import "Events"
+import "chui/Label"
+import "chui/Window"
+import "chui/Geometry"
+import "chui/Events"
 import <algorithm>
 
 // [关键] 必须先导入 objidl.h
