@@ -7,9 +7,9 @@ import <objidl.h>
 import <windows.h>
 import <gdiplus.h>
 
-import "Window"
-import "Application"
-import "Geometry" // [新增]
+import "chui/Window"
+import "chui/Application"
+import "chui/Geometry" // [新增]
 
 @cpp using namespace Gdiplus; @end
 

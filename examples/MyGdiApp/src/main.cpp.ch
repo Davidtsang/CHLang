@@ -1,5 +1,5 @@
 import "chui/Application"
-import "chui/MyWindow"
+import "MyWindow"
 import "chui/UIFactory"
 import "chui/PropertyInjector"
 import "chui/Geometry"

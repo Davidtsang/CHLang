@@ -314,79 +314,100 @@ class CHVisitor(BaseCHVisitor):
 
         # src/CHVisitor.py 补充
 
+        # src/CHVisitor.py
+
     def visitCodegenInjectorStatement(self, ctx):
         """
-        遇到 @codegen_property_injector; 时调用。
-        根据符号表生成通用的属性注入逻辑。
+        处理 @codegen_property_injector;
+        功能：遍历符号表，为所有 Setter 方法生成 C++ 分发代码。
         """
-        # 我们将生成一个基于 key 的巨大 switch/if-else 块
-        # 目标 C++ 逻辑:
-        # if (key == "text") {
-        #     obj->msgSend(_SEL("setText"), { value });
-        # } else if (key == "width") {
-        #     int32_t v = std::stoi(value);
-        #     obj->msgSend(_SEL("setWidth"), { v });
-        # }
 
         # 1. 收集所有 Setter
-        # 结构: { "property_name": { "method": "setMethod", "type": "arg_type" } }
+        # 我们使用字典来去重。如果 Button 和 Label 都有 setText，我们只需要生成一次 'text' 的判断。
+        # Map 结构: "prop_name" -> { "method": "setMethodName", "type": "ArgType" }
         prop_map = {}
 
-        for class_name, info in self.context.symbols.items():
-            # 统一处理 info 是 dict 还是 ClassInfo 对象的情况
-            methods = info.get("methods", {}) if isinstance(info, dict) else info.methods
+        # 遍历上下文中的所有符号
+        for name, symbol in self.context.symbols.items():
+            # 统一处理：symbol 可能是 ClassInfo 对象，也可能是 dict (从依赖加载)
+
+            # 获取 kind (class/struct/interface)
+            kind = symbol.kind if hasattr(symbol, 'kind') else symbol.get('kind')
+            if kind not in ['class', 'struct']:
+                continue
+
+            # 获取 methods
+            methods = symbol.methods if hasattr(symbol, 'methods') else symbol.get('methods', {})
 
             for method_name, method_info in methods.items():
-                # 再次统一处理 MethodInfo 对象或 dict
-                m_name = method_info.name if hasattr(method_info, 'name') else method_info['name']
-                m_args = method_info.args if hasattr(method_info, 'args') else method_info['args']
+                # 获取方法详情
+                if hasattr(method_info, 'name'):
+                    m_name = method_info.name
+                    m_args = method_info.args
+                    m_access = method_info.access
+                else:
+                    m_name = method_info.get('name')
+                    m_args = method_info.get('args', [])
+                    m_access = method_info.get('access', 'private')
 
-                # 筛选逻辑: 必须是以 set 开头，且只有一个参数
-                if m_name.startswith("set") and len(m_name) > 3 and len(m_args) == 1:
-                    # 提取属性名: setText -> text, setWidth -> width
+                # 筛选条件：
+                # 1. Public 方法
+                # 2. 以 "set" 开头，长度 > 3
+                # 3. 只有一个参数
+                if m_access == 'public' and m_name.startswith("set") and len(m_name) > 3 and len(m_args) == 1:
+                    # 提取属性名: "setText" -> "Text" -> "text"
                     raw_prop = m_name[3:]
-                    # 转小写首字母: Text -> text
                     prop_name = raw_prop[0].lower() + raw_prop[1:]
 
-                    arg_type = m_args[0].type if hasattr(m_args[0], 'type') else m_args[0]['type']
+                    # 获取参数类型
+                    arg = m_args[0]
+                    arg_type = arg.type if hasattr(arg, 'type') else arg.get('type')
 
-                    # 记录下来 (简单的冲突解决：后来的覆盖前面的，或者假设同一属性名类型相同)
+                    # 存入 map
+                    # 注意：这里有一个潜在冲突点。如果 Button.setWidth 接受 int，
+                    # 而 Other.setWidth 接受 string，后遍历的会覆盖前面的。
+                    # 在成熟的系统中，我们需要生成 if (type == "Button") ...
+                    # 但为了简化，我们假设整个框架内同名属性的类型是一致的。
                     prop_map[prop_name] = {
                         "method": m_name,
                         "type": arg_type
                     }
 
-        # 2. 生成代码
-        code = f"{INDENT}// --- Auto-Generated Property Injector ---\n"
+        # 2. 生成 C++ 代码
+        code = f"{INDENT}// --- Auto-Generated Property Injector (Start) ---\n"
 
         for prop, meta in prop_map.items():
             method_name = meta['method']
             arg_type = meta['type']
 
+            # 生成代码块
             code += f"{INDENT}if (key == \"{prop}\") {{\n"
 
-            # 根据类型生成转换代码
-            # 假设 value 始终是 std::string (从 JSON 读取)
-            val_expr = ""
-            if arg_type == "std::string":
-                val_expr = "value"  # 已经是 string
-            elif arg_type in ["int", "int32_t", "i32"]:
-                val_expr = "std::stoi(value)"
-            elif arg_type in ["float", "f32"]:
-                val_expr = "std::stof(value)"
-            else:
-                # 未知类型，暂时跳过或当作 string
-                code += f"{INDENT}{INDENT}// Warning: Unsupported type {arg_type} for {prop}\n"
-                code += f"{INDENT}}}\n"
-                continue
+            # [关键技术] 使用 C++17 if constexpr 进行编译期检查
+            # 如果 CH::Converter<T> 没有被特化 (is_implemented == false)，
+            # 那么内部的 msgSend 代码根本不会被编译。这防止了报错。
 
-            # 生成动态调用
-            # obj->msgSend(_SEL("setText"), { val_expr });
-            code += f"{INDENT}{INDENT}obj->msgSend(_SEL(\"{method_name}\"), {{ {val_expr} }});\n"
-            code += f"{INDENT}{INDENT}return;\n"
-            code += f"{INDENT}}}\n"
+            code += f"{INDENT}{INDENT}using TargetType = {arg_type};\n"
+            code += f"{INDENT}{INDENT}if constexpr (CH::Converter<TargetType>::is_implemented) {{\n"
 
-        code += f"{INDENT}// --- End Auto-Gen ---\n"
+            # 转换值
+            code += f"{INDENT}{INDENT}{INDENT}auto val = CH::Converter<TargetType>::fromString(value);\n"
+
+            # 发送消息 (动态调用)
+            # 注意：这里生成的 value 是具体的 C++ 类型 (如 int, CGColor)，
+            # msgSend 内部会将它包装进 std::any，再传给 findMethodImpl 生成的 lambda
+            code += f"{INDENT}{INDENT}{INDENT}obj->msgSend(_SEL(\"{method_name}\"), {{ val }});\n"
+            code += f"{INDENT}{INDENT}{INDENT}return;\n"
+
+            code += f"{INDENT}{INDENT}}} else {{\n"
+            # 如果没有转换器，运行时打印一条友好的警告
+            code += f"{INDENT}{INDENT}{INDENT}std::cerr << \"[Injector] Warning: No converter defined for type '{arg_type}' (prop: {prop})\" << std::endl;\n"
+            code += f"{INDENT}{INDENT}{INDENT}return;\n"
+            code += f"{INDENT}{INDENT}}}\n"
+
+            code += f"{INDENT}}}\n"  # End if key == ...
+
+        code += f"{INDENT}// --- Auto-Generated Property Injector (End) ---\n"
         return code
 
     def _generate_dynamic_glue_code(self):
@@ -1553,6 +1574,9 @@ class CHVisitor(BaseCHVisitor):
             return self.visit(ctx.forStatement())
         if ctx.switchStatement():
             return self.visit(ctx.switchStatement())
+        # 添加这一段，连接生成器逻辑
+        if ctx.AT_CODEGEN_INJECTOR():
+            return self.visitCodegenInjectorStatement(ctx)
         if ctx.blockStatement():
             return self.visit(ctx.blockStatement())
         return ""

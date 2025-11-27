@@ -10,6 +10,11 @@
 
     "build_rules": [
         {
+            "source_dir": "include",
+            "output_dir": "build/dist/include",
+            "note": "Public Headers"
+        },
+        {
             "source_dir": "src",
             "output_dir": "build/dist/src",
             "note": "App Source"

@@ -261,7 +261,9 @@ def create_project(target_path, project_type):
     print(f"  位置: {full_path}")
 
     # 创建目录 (符合 build.py 的 include/src 分离规范)
-    dirs = [f"include/{package_name}", "src", "test"]
+    include_dir = f"include/{package_name}" if project_type == "lib" else "include"
+
+    dirs = [include_dir, "src", "test"]
     for d in dirs:
         os.makedirs(os.path.join(full_path, d))
 

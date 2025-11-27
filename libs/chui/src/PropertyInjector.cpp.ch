@@ -1,77 +1,33 @@
 import "chui/PropertyInjector"
-import "chui/Reflection"
-import "chui/Geometry"
-import <string>
-import <vector>
-import <any>
-import <iostream>
-
-// Hex 解析助手
-func parseHex(hex: std::string) -> CGColor {
-    @cpp
-    if (hex.size() < 7) return CGColor::black();
-    try {
-        int r = std::stoi(hex.substr(1, 2), nullptr, 16);
-        int g = std::stoi(hex.substr(3, 2), nullptr, 16);
-        int b = std::stoi(hex.substr(5, 2), nullptr, 16);
-        return CGColor((uint8_t)r, (uint8_t)g, (uint8_t)b, 255);
-    } catch (...) { return CGColor::black(); }
-    @end
-}
+import "chui/Geometry" // 包含 CGColor 的转换器特化
+import "runtime/CH.h"
+import "runtime/TypeConverters.h" // 包含基础模板
+// [修复] 引入 Button 以识别 ClickCallback 类型
+import "chui/Button"
 
 implement PropertyInjector {
-
     func inject(obj: dyn, key: std::string, value: std::string) {
-        var methodName: std::string = "";
 
-        // 1. 映射逻辑
-        if (key == "text") {
-            methodName = "setText";
-            var sel: u64 = Reflection::getSelector(methodName);
+        // [用户介入] 处理特殊字段 (可选)
+        if (key == "visible") {
+            // 手动处理...
+            return;
+        }
 
-            @cpp
-            // 动态调用: setText(string)
-            std::vector<std::any> args = { value };
-            obj->msgSend(sel, args);
-            @end
-        }
-        else if (key == "color") {
-            methodName = "setTextColor";
-            var color = parseHex(value);
-            var sel: u64 = Reflection::getSelector(methodName);
+        // [自动化] 编译器会在这里展开所有 Setter 的调用代码
+        @codegen_property_injector;
 
-            @cpp
-            // 动态调用: setTextColor(CGColor)
-            std::vector<std::any> args = { color };
-            obj->msgSend(sel, args);
-            @end
-        }
-        else if (key == "bg") {
-            methodName = "setBackgroundColor"; // Label/Button/Window 都可能支持
-            var color = parseHex(value);
-            var sel: u64 = Reflection::getSelector(methodName);
-            @cpp
-            std::vector<std::any> args = { color };
-            obj->msgSend(sel, args);
-            @end
-        }
+        CH::Log("Warning: Unknown property: " + key);
     }
 
+    // (injectInt 暂时也可以保留，或者用同样的方式自动化，
+    // 但上面的自动化逻辑是基于 string value 的。
+    // 如果 layout.json 解析出来已经是 int，C++ 代码里需要 Converter<int>::fromInt?
+    // 通常为了简单，JSON 库出来的都是 string 或 variant，这里假设输入是 string)
     func injectInt(obj: dyn, key: std::string, value: i32) {
-        // 映射 x, y, width, height -> setX, setY...
-        var first: std::string = key.substr(0, 1);
-        @cpp
-        char c = first[0];
-        if(c >= 'a' && c <= 'z') c -= 32;
-        first = std::string(1, c);
-        @end
-
-        var methodName: std::string = "set" + first + key.substr(1);
-        var sel: u64 = Reflection::getSelector(methodName);
-
-        @cpp
-        std::vector<std::any> args = { value };
-        obj->msgSend(sel, args);
-        @end
+         if (key == "x") { obj~>setX(value); return; }
+         if (key == "y") { obj~>setY(value); return; }
+         if (key == "width") { obj~>setWidth(value); return; }
+         if (key == "height") { obj~>setHeight(value); return; }
     }
 }
