@@ -4,6 +4,8 @@ import "runtime/CH.h"
 import "runtime/TypeConverters.h" // 包含基础模板
 // [修复] 引入 Button 以识别 ClickCallback 类型
 import "chui/Button"
+// [修改] 引入新的 C++ 头文件
+import "runtime/Reflection.h"
 
 implement PropertyInjector {
     func inject(obj: dyn, key: std::string, value: std::string) {

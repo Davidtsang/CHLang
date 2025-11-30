@@ -67,9 +67,10 @@ implement JArray {
     func get(index: i32) -> dyn {
         if (index >= 0) {
             // @cpp hack: vector.size() 返回 size_t，需要强转比较
-            @cpp
-            if (index < this->m_list.size()) return this->m_list[index];
-            @end
+            //@cpp
+            if (index < this->m_list.size())
+             {return this->m_list[index];}
+            //@end
         }
         return nullptr;
     }

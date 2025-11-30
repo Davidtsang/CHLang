@@ -18,5 +18,8 @@
             "output_dir": "build/dist/test",
             "note": "Tests"
         }
+    ],
+     "resources": [
+        { "path": "layout.json" }
     ]
 }

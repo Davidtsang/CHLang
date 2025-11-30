@@ -19,5 +19,8 @@
             "output_dir": "build/dist/src",
             "note": "App Source"
         }
+    ],
+    "resources": [
+        { "path": "layout.json" }
     ]
 }

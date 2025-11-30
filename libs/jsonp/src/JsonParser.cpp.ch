@@ -168,7 +168,7 @@ implement JsonParser {
         // 截取字符串
         var len = this->m_pos - start;
         var s: std::string;
-        @cpp s = this->m_input.substr(start, len); @end
+        s = this->m_input.substr(start, len);
 
         this->match('"'); // 吃掉右引号
 
@@ -182,7 +182,7 @@ implement JsonParser {
         while (this->m_pos < this->m_length) {
             var c = this->peek();
             var is_d: bool;
-            @cpp is_d = std::isdigit(c) || c == '-'; @end
+            is_d = std::isdigit(c) || c == '-';
 
             if (!is_d) {break;}
             this->m_pos = this->m_pos + 1;
@@ -190,7 +190,7 @@ implement JsonParser {
 
         var len = this->m_pos - start;
         var s: std::string;
-        @cpp s = this->m_input.substr(start, len); @end
+        s = this->m_input.substr(start, len);
 
         // 转为 int
         var val: i32 = 0;
