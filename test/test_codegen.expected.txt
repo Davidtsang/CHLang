@@ -1,0 +1,4 @@
+--- Codegen Test ---
+MagicGen is running!
+Magic Number is:
+777

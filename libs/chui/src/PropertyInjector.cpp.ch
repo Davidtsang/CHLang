@@ -4,6 +4,7 @@ import "runtime/CH.h"
 import "runtime/TypeConverters.h" // 包含基础模板
 // [修复] 引入 Button 以识别 ClickCallback 类型
 import "chui/Button"
+import "chui/Menu"   // [新增] 必须引入 Menu，否则无法处理 setMenuBar
 // [修改] 引入新的 C++ 头文件
 import "runtime/Reflection.h"
 
@@ -17,7 +18,7 @@ implement PropertyInjector {
         }
 
         // [自动化] 编译器会在这里展开所有 Setter 的调用代码
-        @codegen_property_injector;
+        @codegen("PropertyInjector");
 
         CH::Log("Warning: Unknown property: " + key);
     }

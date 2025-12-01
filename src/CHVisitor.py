@@ -4,6 +4,10 @@ from CompileContext import CompileContext, ClassInfo, MethodInfo, FieldInfo, Arg
 from parser.CHParser import CHParser
 from parser.CHParserVisitor import CHParserVisitor as BaseCHVisitor
 from antlr4.tree.Tree import TerminalNodeImpl  # 导入 TerminalNodeImpl
+# 记得在文件顶部导入
+import importlib.util
+import sys
+import traceback
 
 INDENT = "    "
 
@@ -312,103 +316,6 @@ class CHVisitor(BaseCHVisitor):
             )
             return ""
 
-        # src/CHVisitor.py 补充
-
-        # src/CHVisitor.py
-
-    def visitCodegenInjectorStatement(self, ctx):
-        """
-        处理 @codegen_property_injector;
-        功能：遍历符号表，为所有 Setter 方法生成 C++ 分发代码。
-        """
-
-        # 1. 收集所有 Setter
-        # 我们使用字典来去重。如果 Button 和 Label 都有 setText，我们只需要生成一次 'text' 的判断。
-        # Map 结构: "prop_name" -> { "method": "setMethodName", "type": "ArgType" }
-        prop_map = {}
-
-        # 遍历上下文中的所有符号
-        for name, symbol in self.context.symbols.items():
-            # 统一处理：symbol 可能是 ClassInfo 对象，也可能是 dict (从依赖加载)
-
-            # 获取 kind (class/struct/interface)
-            kind = symbol.kind if hasattr(symbol, 'kind') else symbol.get('kind')
-            if kind not in ['class', 'struct']:
-                continue
-
-            # 获取 methods
-            methods = symbol.methods if hasattr(symbol, 'methods') else symbol.get('methods', {})
-
-            for method_name, method_info in methods.items():
-                # 获取方法详情
-                if hasattr(method_info, 'name'):
-                    m_name = method_info.name
-                    m_args = method_info.args
-                    m_access = method_info.access
-                else:
-                    m_name = method_info.get('name')
-                    m_args = method_info.get('args', [])
-                    m_access = method_info.get('access', 'private')
-
-                # 筛选条件：
-                # 1. Public 方法
-                # 2. 以 "set" 开头，长度 > 3
-                # 3. 只有一个参数
-                if m_access == 'public' and m_name.startswith("set") and len(m_name) > 3 and len(m_args) == 1:
-                    # 提取属性名: "setText" -> "Text" -> "text"
-                    raw_prop = m_name[3:]
-                    prop_name = raw_prop[0].lower() + raw_prop[1:]
-
-                    # 获取参数类型
-                    arg = m_args[0]
-                    arg_type = arg.type if hasattr(arg, 'type') else arg.get('type')
-
-                    # 存入 map
-                    # 注意：这里有一个潜在冲突点。如果 Button.setWidth 接受 int，
-                    # 而 Other.setWidth 接受 string，后遍历的会覆盖前面的。
-                    # 在成熟的系统中，我们需要生成 if (type == "Button") ...
-                    # 但为了简化，我们假设整个框架内同名属性的类型是一致的。
-                    prop_map[prop_name] = {
-                        "method": m_name,
-                        "type": arg_type
-                    }
-
-        # 2. 生成 C++ 代码
-        code = f"{INDENT}// --- Auto-Generated Property Injector (Start) ---\n"
-
-        for prop, meta in prop_map.items():
-            method_name = meta['method']
-            arg_type = meta['type']
-
-            # 生成代码块
-            code += f"{INDENT}if (key == \"{prop}\") {{\n"
-
-            # [关键技术] 使用 C++17 if constexpr 进行编译期检查
-            # 如果 CH::Converter<T> 没有被特化 (is_implemented == false)，
-            # 那么内部的 msgSend 代码根本不会被编译。这防止了报错。
-
-            code += f"{INDENT}{INDENT}using TargetType = {arg_type};\n"
-            code += f"{INDENT}{INDENT}if constexpr (CH::Converter<TargetType>::is_implemented) {{\n"
-
-            # 转换值
-            code += f"{INDENT}{INDENT}{INDENT}auto val = CH::Converter<TargetType>::fromString(value);\n"
-
-            # 发送消息 (动态调用)
-            # 注意：这里生成的 value 是具体的 C++ 类型 (如 int, CGColor)，
-            # msgSend 内部会将它包装进 std::any，再传给 findMethodImpl 生成的 lambda
-            code += f"{INDENT}{INDENT}{INDENT}obj->msgSend(_SEL(\"{method_name}\"), {{ val }});\n"
-            code += f"{INDENT}{INDENT}{INDENT}return;\n"
-
-            code += f"{INDENT}{INDENT}}} else {{\n"
-            # 如果没有转换器，运行时打印一条友好的警告
-            code += f"{INDENT}{INDENT}{INDENT}std::cerr << \"[Injector] Warning: No converter defined for type '{arg_type}' (prop: {prop})\" << std::endl;\n"
-            code += f"{INDENT}{INDENT}{INDENT}return;\n"
-            code += f"{INDENT}{INDENT}}}\n"
-
-            code += f"{INDENT}}}\n"  # End if key == ...
-
-        code += f"{INDENT}// --- Auto-Generated Property Injector (End) ---\n"
-        return code
 
     def _generate_dynamic_glue_code(self):
         class_name = self._current_class_name
@@ -555,6 +462,14 @@ class CHVisitor(BaseCHVisitor):
         if ctx.expressionList():
             for arg_expr in ctx.expressionList().expression():
                 args_list.append(self.visit(arg_expr))
+
+        # [新增] 处理尾随闭包
+        if ctx.trailingClosure:
+            # 访问闭包节点，生成 lambda 字符串
+            lambda_code = self.visit(ctx.trailingClosure)
+            # 将其作为最后一个参数添加到参数列表中
+            args_list.append(lambda_code)
+
         args_code = ", ".join(args_list)
         return f"{cpp_func_name}({args_code})"
 
@@ -1546,7 +1461,8 @@ class CHVisitor(BaseCHVisitor):
             # [新增] 类型映射 (e.g. string::npos -> std::string::npos)
             mapped = self._CH_to_cpp_type(text)
             return mapped
-
+        if ctx.closureExpression():
+            return self.visit(ctx.closureExpression())
         if ctx.THIS(): return "this"
         if ctx.LPAREN(): return f"({self.visit(ctx.expression())})"
         return ""
@@ -1574,9 +1490,9 @@ class CHVisitor(BaseCHVisitor):
             return self.visit(ctx.forStatement())
         if ctx.switchStatement():
             return self.visit(ctx.switchStatement())
-        # 添加这一段，连接生成器逻辑
-        if ctx.AT_CODEGEN_INJECTOR():
-            return self.visitCodegenInjectorStatement(ctx)
+        # [新增]
+        if ctx.codegenStatement():
+            return self.visit(ctx.codegenStatement())
         if ctx.blockStatement():
             return self.visit(ctx.blockStatement())
         return ""
@@ -2280,3 +2196,114 @@ class CHVisitor(BaseCHVisitor):
             val = self.visit(ctx.expression())
             return f"{name} = {val}"
         return name
+
+
+
+
+
+    def visitCodegenStatement(self, ctx):
+        """
+        处理语法: @codegen("PluginName");
+        """
+        # 1. 获取插件名 (去掉引号)
+        # 例如: '"PropertyInjector"' -> 'PropertyInjector'
+        strategy_name = ctx.name.text.strip('"')
+
+        # 2. 动态加载插件
+        generator_class = self._load_generator_plugin(strategy_name)
+
+        if not generator_class:
+            print(f"[CodeGen] Error: Plugin '{strategy_name}' not found.")
+            return f"// [Error] Generator '{strategy_name}' not found\n"
+
+        # 3. 执行插件逻辑
+        try:
+            # 实例化插件
+            instance = generator_class()
+            # 调用 generate 方法，传入当前的上下文 (Context)
+            # 插件会读取 Context 里的 symbols，返回 C++ 代码字符串
+            return instance.generate(self.context)
+
+        except Exception as e:
+            print(f"[CodeGen] Error executing '{strategy_name}': {e}")
+            traceback.print_exc()  # 打印详细堆栈，方便调试插件
+            return f"// [Error] Executing '{strategy_name}': {e}\n"
+
+
+    def _load_generator_plugin(self, name):
+        """
+        双路径加载机制：
+        1. 优先查找: 用户项目根目录/generators/{name}.py
+        2. 兜底查找: 编译器源码目录/generators/{name}.py
+        """
+
+        # 路径 A: 系统内置 (src/generators)
+        compiler_root = os.path.dirname(os.path.abspath(__file__))
+        sys_gen_path = os.path.join(compiler_root, "generators", f"{name}.py")
+
+        # 路径 B: 用户项目 (从 Context 获取项目根路径)
+        user_gen_path = None
+        if hasattr(self.context, 'project_root') and self.context.project_root:
+            user_gen_path = os.path.join(self.context.project_root, "generators", f"{name}.py")
+
+        target_file = None
+
+        # 优先级规则：用户覆盖系统
+        if user_gen_path and os.path.exists(user_gen_path):
+            target_file = user_gen_path
+        elif os.path.exists(sys_gen_path):
+            target_file = sys_gen_path
+
+        if target_file:
+            return self._import_module_from_file(name, target_file)
+
+        return None
+
+    def _import_module_from_file(self, module_name, file_path):
+        try:
+            # [核心修复] 将插件所在目录加入 sys.path
+            # 这样插件里的 "import Base" 才能找到同级目录下的 Base.py
+            plugin_dir = os.path.dirname(file_path)
+            if plugin_dir not in sys.path:
+                sys.path.insert(0, plugin_dir)
+
+            spec = importlib.util.spec_from_file_location(module_name, file_path)
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[module_name] = module
+            spec.loader.exec_module(module)
+
+            if hasattr(module, "Generator"):
+                return module.Generator
+            else:
+                print(f"  [CodeGen] Error: {file_path} must contain class 'Generator'")
+                return None
+        except Exception as e:
+            # [建议] 这里打印得明显一点，方便调试
+            print(f"  [CodeGen] CRITICAL FAIL loading {file_path}: {e}")
+            # import traceback; traceback.print_exc() # 调试时打开这个很有用
+            return None
+
+    def visitClosureExpression(self, ctx):
+        # 1. 确定参数
+        params_code = ""
+        if ctx.parameters():
+            params_code = self.visit(ctx.parameters())
+
+        # 2. 确定函数体
+        body_code = ""
+        if ctx.blockStatement():
+            # 这是一个 { ... } 块
+            # 我们需要去掉 visitBlockStatement 生成的最外层大括号，因为 lambda 自己有
+            raw_block = self.visit(ctx.blockStatement())
+            # 去掉首尾的大括号和缩进 (简单的字符串处理)
+            body_code = raw_block.strip()[1:-1]
+        elif ctx.expression():
+            # 这是一个单行表达式 (x) => x * x
+            # 翻译为 { return x * x; }
+            expr_code = self.visit(ctx.expression())
+            body_code = f" return {expr_code}; "
+
+        # 3. 生成 C++ Lambda
+        # [=] : 按值捕获所有外部变量 (包括 this)
+        # mutable : 允许修改拷贝进来的变量 (可选，但加上更灵活)
+        return f"[=]({params_code}) mutable {{{body_code}}}"

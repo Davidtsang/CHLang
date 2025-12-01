@@ -234,6 +234,11 @@ class CHParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by CHParser#codegenStatement.
+    def visitCodegenStatement(self, ctx:CHParser.CodegenStatementContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by CHParser#caseBlock.
     def visitCaseBlock(self, ctx:CHParser.CaseBlockContext):
         return self.visitChildren(ctx)
@@ -321,6 +326,11 @@ class CHParserVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by CHParser#primary.
     def visitPrimary(self, ctx:CHParser.PrimaryContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CHParser#closureExpression.
+    def visitClosureExpression(self, ctx:CHParser.ClosureExpressionContext):
         return self.visitChildren(ctx)
 
 

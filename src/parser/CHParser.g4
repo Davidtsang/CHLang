@@ -90,6 +90,7 @@ topLevelStatement
     | forwardDeclaration // [新增]
     | CPP_DIRECTIVE
     | endNamespaceStatement
+    | codegenStatement  // <--- [新增] 允许在全局使用 @codegen
     ;
 
 // [新语法] 匹配: type Child : struct;
@@ -302,10 +303,15 @@ statement : variableDeclaration
           | forStatement
           | blockStatement  // <-- [新增]
           | switchStatement
-          | AT_CODEGEN_INJECTOR SEMIC_TOKEN
+          | codegenStatement
           | CPP_DIRECTIVE
           ;
 blockStatement : LBRACE statement* RBRACE ;  // <-- [新增]
+
+// 语法规则: @codegen("PluginName");
+codegenStatement
+    : AT_CODEGEN LPAREN name=STRING_LITERAL RPAREN SEMIC_TOKEN
+    ;
 
 // 匹配: case 1 { ... }
 caseBlock
@@ -440,16 +446,30 @@ primary
     | IDENTIFIER
     | THIS
     | LPAREN expression RPAREN
+    | closureExpression // [新增]
     ;
+
+// 2. 定义闭包表达式
+// 形式 A: (params) => { block }
+// 形式 B: (params) => expression (单行隐式返回)
+// 形式 C: { block } (简写，无参或尾随)
+closureExpression
+    : LPAREN parameters RPAREN ARROW_FUNC (blockStatement | expression)
+    | blockStatement
+    ;
+
 
 initializerList
     : LBRACE expressionList? RBRACE
     ;
 
-// (在 CHParser.g4 中替换 functionCallExpression)
+// 3. 修改函数调用，支持尾随闭包
+// 原来: funcName LPAREN expressionList? RPAREN
+// 现在: funcName LPAREN expressionList? RPAREN (closureExpression)?
 functionCallExpression
     : funcName=(IDENTIFIER | AT_MOVE | AT_UNSAFE_MOVE)
       LPAREN expressionList? RPAREN
+      (trailingClosure=closureExpression)? // [新增] 尾随闭包
     ;
 
 expressionList : expression (COMMA expression)* ;

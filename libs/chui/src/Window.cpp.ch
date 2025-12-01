@@ -109,22 +109,44 @@ implement Window {
         @end
     }
 
+    func setMenuBar(menu: Menu*) {
+        //@cpp
+        SetMenu(this->m_hWnd, menu->m_hMenu);
+        DrawMenuBar(this->m_hWnd);
+        //@end
+    }
+
+    func bindMenuAction(id: i32, cb: std::function<void()>) {
+        this->m_menuCallbacks[id] = cb;
+    }
+
     func handleMessage(uMsg: UINT, wParam: WPARAM, lParam: LPARAM) -> LRESULT {
         switch (uMsg) {
             case WM_COMMAND {
-                var id: int = LOWORD(wParam);
-                var code: int = HIWORD(wParam);
+                var id = LOWORD(wParam);
+                var code = HIWORD(wParam);
+                var hControl = lParam; // 控件句柄
+
+                // 1. 检查是否是菜单消息 (lParam == 0 表示不是控件发的)
+                if (hControl == 0 && code == 0) {
+                    // 查找回调
+                    if (this->m_menuCallbacks.count(id) > 0) {
+                        var cb = this->m_menuCallbacks[id];
+                        if (cb) { cb(); }
+                    }
+                    return 0;
+                }
+
+                // 2. 否则是控件消息 (交给 Widget 处理)
                 if (this->m_lookup.count(id) > 0) {
                     var widget: Widget* = this->m_lookup[id];
                     widget->onCommand(code);
                 }
                 return 0;
             }
-            case WM_DESTROY {
-                PostQuitMessage(0);
-                return 0;
-            }
+            // ... 其他 case ...
         }
         return DefWindowProc(this->m_hWnd, uMsg, wParam, lParam);
     }
+
 }

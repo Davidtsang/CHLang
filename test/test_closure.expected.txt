@@ -1,0 +1,12 @@
+--- Closure Test Start ---
+  [1] Simple arrow function executed.
+  [2] Sum (Explicit Return): 30
+  [3] Product (Implicit Return): 30
+Task: Trailing Test
+  [4] This is a trailing closure block.
+Task: Capture Test
+  [5] Captured value is: 999
+Task: Mutable Check
+  [6] Inside lambda, clickCount modified to: 1
+  [6] Outer clickCount remains: 0
+--- Closure Test End ---

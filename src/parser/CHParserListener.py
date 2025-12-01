@@ -413,6 +413,15 @@ class CHParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by CHParser#codegenStatement.
+    def enterCodegenStatement(self, ctx:CHParser.CodegenStatementContext):
+        pass
+
+    # Exit a parse tree produced by CHParser#codegenStatement.
+    def exitCodegenStatement(self, ctx:CHParser.CodegenStatementContext):
+        pass
+
+
     # Enter a parse tree produced by CHParser#caseBlock.
     def enterCaseBlock(self, ctx:CHParser.CaseBlockContext):
         pass
@@ -572,6 +581,15 @@ class CHParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by CHParser#primary.
     def exitPrimary(self, ctx:CHParser.PrimaryContext):
+        pass
+
+
+    # Enter a parse tree produced by CHParser#closureExpression.
+    def enterClosureExpression(self, ctx:CHParser.ClosureExpressionContext):
+        pass
+
+    # Exit a parse tree produced by CHParser#closureExpression.
+    def exitClosureExpression(self, ctx:CHParser.ClosureExpressionContext):
         pass
 
 
