@@ -378,9 +378,14 @@ class CHVisitor(BaseCHVisitor):
         is_static = bool(ctx.STATIC())
         static_prefix = "static " if is_static else ""
 
+        # [新增] 处理 inline
+        is_inline = bool(ctx.INLINE())
+        inline_prefix = "inline " if is_inline else ""
+
         func_def_code = (
             f"{line_comment}"
-            f"{static_prefix}{return_type} {cpp_func_name}({params_code}) {{\n"
+            # [修改] 插入 inline_prefix
+            f"{static_prefix}{inline_prefix}{return_type} {cpp_func_name}({params_code}) {{\n"
             f"{body_code}"
             f"{INDENT}// --- Function End ---\n"
             f"}}\n"
@@ -943,16 +948,25 @@ class CHVisitor(BaseCHVisitor):
                 raise Exception(
                     f"Error (Line {ctx.start.line}): Function '{func_name}' cannot be both static and virtual/override.")
 
-            decl = f"{line_comment}{INDENT}{virtual_prefix}{static_prefix}{return_type} {func_name}({params_code}){override_suffix};\n"
+            # [新增] 处理 inline
+            is_inline = bool(ctx.INLINE())
+            inline_prefix = "inline " if is_inline else ""
+
+            # [修改] 插入 inline_prefix
+            decl = f"{line_comment}{INDENT}{virtual_prefix}{static_prefix}{inline_prefix}{return_type} {func_name}({params_code}){override_suffix};\n"
             self._class_sections[access] += decl
             return ""
         else:
             # 全局函数... (保持不变)
             is_extern = bool(ctx.EXTERN())
             is_static = bool(ctx.STATIC())
+            is_inline = bool(ctx.INLINE())
+
             static_prefix = "static " if is_static else ""
             extern_prefix = "extern " if is_extern else ""
-            return f"{line_comment}{extern_prefix}{static_prefix}{return_type} {self._current_namespace_str}{func_name}({params_code});\n"
+            # [新增]
+            inline_prefix = "inline " if is_inline else ""
+            return f"{line_comment}{extern_prefix}{static_prefix}{inline_prefix}{return_type} {self._current_namespace_str}{func_name}({params_code});\n"
 
     def visitInitSignature(self, ctx: CHParser.InitSignatureContext):
         line_comment = f"\n// Line {ctx.start.line} \n"
@@ -977,27 +991,37 @@ class CHVisitor(BaseCHVisitor):
         return ""
 
     def visitCastExpression(self, ctx: CHParser.CastExpressionContext):
-        # 1. 获取左侧表达式 (simpleExpression)
+        # 1. 获取左侧表达式
         code = self.visit(ctx.simpleExpression())
 
-        # 2. 如果没有 AS 关键字，直接返回左侧代码 (透传)
         if not ctx.AS():
             return code
 
-        # 3. 处理 AS 转换
-        # 遍历所有的 typeSpecifier (处理 obj as A as B 的情况)
+        # 2. 遍历转换链
         for type_ctx in ctx.typeSpecifier():
-            target_type = self.visit(type_ctx)
+            target_type_cpp = self.visit(type_ctx)
 
-            # [智能修正]
-            # 如果用户写 "as Button"，生成 "dynamic_cast<Button*>"
-            # 如果用户写 "as Button*"，生成 "dynamic_cast<Button*>"
-            # 我们默认 CH 的类转换都是指针转换
-            if not target_type.endswith('*'):
-                target_type += "*"
+            # [核心修复] 智能判断转换类型
 
-            # 生成 C++ dynamic_cast
-            code = f"dynamic_cast<{target_type}>({code})"
+            # A. 基础数值类型 -> 使用 static_cast
+            # 注意：这里列出了 C++ 的类型名，因为 visit(type_ctx) 返回的是 C++ 类型
+            basic_types = [
+                "int", "int32_t", "uint32_t", "int64_t", "uint64_t",
+                "float", "double", "bool", "char", "unsigned char",
+                "int8_t", "uint8_t", "short", "long"
+            ]
+
+            if target_type_cpp in basic_types:
+                code = f"static_cast<{target_type_cpp}>({code})"
+
+            # B. 指针类型 (Explicit Pointer) -> 使用 dynamic_cast
+            elif target_type_cpp.endswith("*"):
+                code = f"dynamic_cast<{target_type_cpp}>({code})"
+
+            # C. 类名 (Implicit Pointer) -> 补全星号并使用 dynamic_cast
+            # Chrono 的语义中，对象变量通常是指针
+            else:
+                code = f"dynamic_cast<{target_type_cpp}*>({code})"
 
         return code
 
@@ -1992,6 +2016,18 @@ class CHVisitor(BaseCHVisitor):
         is_extern = bool(ctx.EXTERN())
         extern_prefix = "extern " if is_extern else ""
 
+        # [新增] 处理 inline (C++17 inline variables)
+        is_inline = bool(ctx.INLINE())
+        inline_prefix = "inline " if is_inline else ""
+
+        # 获取 static 状态 (从语法树获取，或者从 classBodyStatement 传递)
+        # 注意：CHParser.g4 中 variableDeclaration 也有 STATIC token
+        is_static = bool(ctx.STATIC())
+        static_prefix = "static " if is_static else ""
+
+        # 注意：_translate_variable_declaration 可能会重复处理 static/const
+        # 我们需要确认 _translate_variable_declaration 只返回核心定义部分
+        # 现在的 _translate_variable_declaration 返回的是 "const int x = 1" 这样的字符串
         core_cpp, is_member_variable, access, cpp_final_type, cpp_name = self._translate_variable_declaration(ctx)
 
         if is_member_variable:
@@ -2003,11 +2039,20 @@ class CHVisitor(BaseCHVisitor):
             if var_info:
                 self._current_class_members[cpp_name] = var_info
 
-            declaration_line = f"{line_comment}{INDENT}{core_cpp};\n"
+            # declaration_line = f"{line_comment}{INDENT}{core_cpp};\n"
+            # self._class_sections[access] += declaration_line
+            # return ""
+            prefix = ""
+            if is_static: prefix += "static "
+            if is_inline: prefix += "inline "
+
+            # 这里的 core_cpp 是 "const int x = 1"
+            declaration_line = f"{line_comment}{INDENT}{prefix}{core_cpp};\n"
             self._class_sections[access] += declaration_line
             return ""
+
         else:
-            return f"{line_comment}{INDENT}{extern_prefix}{core_cpp};\n"
+            return f"{line_comment}{INDENT}{extern_prefix}{static_prefix}{inline_prefix}{core_cpp};\n"
 
     def visitVariableDeclaration_no_semicolon(self, ctx: CHParser.VariableDeclaration_no_semicolonContext):
         core_cpp, _, _, _, _ = self._translate_variable_declaration(ctx)

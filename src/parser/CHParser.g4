@@ -45,10 +45,11 @@ typeList
     : templateArgument (COMMA templateArgument)*
     ;
 
+// 1. 变量声明 (支持 inline var/const)
 variableDeclaration
-    : (EXTERN)? (CONST | VAR) name=IDENTIFIER       // 必须以 'const' 或 'var' 开头
-      (COLON typeName=typeSpecifier)? // [修改] 类型 (e.g., : i32) 现在是可选的
-      (ASSIGN expression)?            // [修改] 赋值 (e.g., = 10) 也是可选的
+    : (EXTERN)? (STATIC)? (INLINE)? (CONST | VAR) name=IDENTIFIER
+      (COLON typeName=typeSpecifier)?
+      (ASSIGN expression)?
       SEMIC_TOKEN
     ;
 
@@ -191,9 +192,9 @@ enumItem
     : name=IDENTIFIER (ASSIGN expression)?
     ;
 
-// [ [ [ 1. 新增：全局/类 函数声明 (用于 .h.ch) ] ] ]
+// 3. 全局/类 函数声明 (用于 .h.ch)
 functionSignature
-    : (EXTERN)? (STATIC)? (VIRTUAL)? (OVERRIDE)?
+    : (EXTERN)? (STATIC)? (INLINE)? (VIRTUAL)? (OVERRIDE)?
       FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)?
       SEMIC_TOKEN
     ;
@@ -229,9 +230,10 @@ importDirective
 usingAlias
     : USING name=IDENTIFIER ASSIGN typeName=typeSpecifier SEMIC_TOKEN ;
 
+// 4. 函数定义 (用于 .cpp.ch 或头文件内联实现)
 functionDefinition
-    : (EXTERN)? (STATIC)?
-    FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)?
+    : (EXTERN)? (STATIC)? (INLINE)?
+      FUNC name=IDENTIFIER LPAREN parameters RPAREN (ARROW returnType=typeSpecifier)?
       LBRACE
           statement* RBRACE ;
 
@@ -373,8 +375,9 @@ interfaceDefinition
       RBRACE
     ;
 
+// 2. 变量声明 (无分号版，用于 for 循环等，通常不写 inline，但为了语法统一可以加上，或者忽略)
 variableDeclaration_no_semicolon
-    : (EXTERN)? (CONST | VAR) name=IDENTIFIER
+    : (EXTERN)? (STATIC)? (INLINE)? (CONST | VAR) name=IDENTIFIER
       (COLON typeName=typeSpecifier)?
       (ASSIGN expression)?
     ;

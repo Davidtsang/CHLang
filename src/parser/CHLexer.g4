@@ -58,7 +58,7 @@ AT_UNSAFE_MOVE : '@unsafe_move' ;
 
 AT_CODEGEN : '@codegen';
 ARROW_FUNC : '=>' ;
-
+INLINE : 'inline'; // [新增]
 STATIC_CAST      : 'static_cast' ;
 REINTERPRET_CAST : 'reinterpret_cast' ;
 CONST_CAST       : 'const_cast' ;
@@ -140,7 +140,7 @@ OCTAL_LITERAL   : '0' [oO] [0-7]+ ;
 
 // [新增] 2. FLOAT_LITERAL (例如 3.14)
 // 必须在 DECIMAL_LITERAL 之前
-FLOAT_LITERAL   : [0-9]+ '.' [0-9]+ ;
+FLOAT_LITERAL   : [0-9]+ '.' [0-9]+ [fF]? ;
 
 // [修改] 2. DECIMAL_LITERAL (之前是 INTEGER_LITERAL)
 // 必须在 Hex/Binary/Octal 之后

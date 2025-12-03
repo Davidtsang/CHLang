@@ -1,0 +1,5 @@
+--- Inline Keyword Test ---
+1. Global Inline Var: 100
+2. Global Inline Func: 30
+3. Static Inline Member: 50
+4. Static Inline Const: 1.5

@@ -40,6 +40,7 @@ def clean_stale_files(output_dirs, expected_files):
     if cleaned_count > 0:
         print(f"  -> Cleaned {cleaned_count} stale files.")
 
+
 def get_mtime(path):
     """获取文件修改时间，文件不存在返回 0"""
     return os.path.getmtime(path) if os.path.exists(path) else 0
@@ -92,15 +93,16 @@ def generate_cmake_deps(config, project_dir):
     print_color(f"  [CMake] Generated dependency file: build/cmake_deps.cmake", 36)
 
 
-# [关键修改点] 必须传递 dep_file
-def run_transpiler_cmd(transpiler_path, input_path, output_path, current_symbols=None, dep_symbols=None):
+# [修改 1] run_transpiler_cmd: 增加 dep_file_path 参数，并不再自动生成后缀
+def run_transpiler_cmd(transpiler_path, input_path, output_path, dep_file_path, current_symbols=None, dep_symbols=None):
+    # 确保输出目录存在
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    # [新增] 确保依赖文件目录存在 (例如 build/deps/src/...)
+    os.makedirs(os.path.dirname(dep_file_path), exist_ok=True)
 
-    # 1. 计算依赖文件路径
-    dep_file = output_path + ".dep.json"
-
-    # 2. 构造命令：增加 dep_file 参数
-    cmd = [PYTHON_EXE, transpiler_path, input_path, output_path, dep_file]
+    # 构造命令
+    # 这里的参数顺序必须与 transpiler.py 的 argparse 对应: input output dep_file
+    cmd = [PYTHON_EXE, transpiler_path, input_path, output_path, dep_file_path]
 
     if current_symbols:
         cmd.append("--symbols")
@@ -119,6 +121,7 @@ def run_transpiler_cmd(transpiler_path, input_path, output_path, current_symbols
         return False, f"STDOUT:\n{e.stdout}\nSTDERR:\n{e.stderr}"
 
 
+# [修改 2] process_project: 计算隔离的依赖路径并传递
 def process_project(project_dir, is_root=False):
     """
     递归处理项目：
@@ -178,9 +181,16 @@ def process_project(project_dir, is_root=False):
     headers_queue = []
     sources_queue = []
 
-    # [新增] 跟踪所有预期的输出文件和目录
+    # 跟踪所有预期的输出文件和目录
     expected_outputs = set()
     output_dirs_to_clean = set()
+
+    # [新增] 定义专门存放依赖文件的根目录
+    # 例如: examples/MyGdiApp/build/deps
+    deps_root_dir = os.path.join(abs_path, "build", "deps")
+
+    # 将 deps 目录也加入清理扫描列表，这样可以清理掉旧的、不再需要的依赖文件
+    output_dirs_to_clean.add(os.path.abspath(deps_root_dir))
 
     # 总是保留 symbols.json
     expected_outputs.add(os.path.abspath(current_symbol_file))
@@ -216,26 +226,31 @@ def process_project(project_dir, is_root=False):
                 elif file.endswith(".ch"):
                     out_name = file[:-3] + ".cpp"
 
-                out_file = os.path.join(abs_out, os.path.dirname(rel_path), out_name)
-                dep_file = out_file + ".dep.json"
+                # 计算相对目录结构
+                out_dir_rel = os.path.dirname(rel_path)
+                out_file = os.path.join(abs_out, out_dir_rel, out_name)
+
+                # [关键修改] 计算隔离的依赖文件路径
+                # 结构: build/deps/[src|include]/subdir/filename.json
+                rule_key = "include" if "include" in src_root else "src"
+                dep_file = os.path.join(deps_root_dir, rule_key, out_dir_rel, out_name + ".json")
 
                 # ==================================================
-                # [核心修复 1] 先加入白名单 (Expected Outputs)
+                # [核心逻辑] 加入白名单
                 # ==================================================
-                # 无论是否跳过编译，这个文件都是我们“期望存在”的
-                # 如果不加这行，clean_stale_files 会把没改动的文件删掉！
                 expected_outputs.add(os.path.abspath(out_file))
                 expected_outputs.add(os.path.abspath(dep_file))
 
                 # ==================================================
-                # [核心修复 2] 再检查是否需要跳过 (增量逻辑)
+                # [核心逻辑] 增量检查
                 # ==================================================
                 if os.path.exists(out_file) and get_mtime(in_file) <= get_mtime(out_file):
                     skipped_count += 1
-                    # 这里 continue 是安全的，因为已经加到 expected_outputs 了
                     continue
 
-                task = (in_file, out_file, rel_path)
+                # [关键修改] 将 dep_file 加入任务元组
+                task = (in_file, out_file, dep_file, rel_path)
+
                 if file.endswith(".h.ch") or "include" in src_root:
                     headers_queue.append(task)
                 else:
@@ -243,17 +258,18 @@ def process_project(project_dir, is_root=False):
 
                 total_files += 1
 
-    # [核心修复 3] 清理工作必须在所有规则遍历完之后进行
+    # 清理陈旧文件
     clean_stale_files(output_dirs_to_clean, expected_outputs)
-
-    # 注意：不要在这里重置 skipped_count，否则最后的统计就不对了
 
     # 5. 执行 Phase 1
     if headers_queue:
         print_color(f"  [Phase 1] Compiling {len(headers_queue)} Headers...", 36)
-        for in_file, out_file, rel_path in headers_queue:
+        # [关键修改] 解包 4 个变量
+        for in_file, out_file, dep_file, rel_path in headers_queue:
             print(f"    {rel_path}")
-            ok, msg = run_transpiler_cmd(transpiler_path, in_file, out_file, current_symbol_file, dep_symbol_files)
+            # [关键修改] 传入 dep_file
+            ok, msg = run_transpiler_cmd(transpiler_path, in_file, out_file, dep_file, current_symbol_file,
+                                         dep_symbol_files)
             if not ok:
                 print_color(f"  [FAIL] {rel_path}\n{msg}", 31)
                 return False
@@ -261,18 +277,20 @@ def process_project(project_dir, is_root=False):
     # 6. 执行 Phase 2
     if sources_queue:
         print_color(f"  [Phase 2] Compiling {len(sources_queue)} Sources...", 36)
-        for in_file, out_file, rel_path in sources_queue:
+        # [关键修改] 解包 4 个变量
+        for in_file, out_file, dep_file, rel_path in sources_queue:
             print(f"    {rel_path}")
-            ok, msg = run_transpiler_cmd(transpiler_path, in_file, out_file, current_symbol_file, dep_symbol_files)
+            # [关键修改] 传入 dep_file
+            ok, msg = run_transpiler_cmd(transpiler_path, in_file, out_file, dep_file, current_symbol_file,
+                                         dep_symbol_files)
             if not ok:
                 print_color(f"  [FAIL] {rel_path}\n{msg}", 31)
                 return False
 
-    # 统计总数 (编译的 + 跳过的)
+    # 统计总数
     total_processed = len(headers_queue) + len(sources_queue) + skipped_count
     print(f"  -> {pkg_name}: Processed {total_processed} files (Skipped {skipped_count})")
     return True
-
 
 
 def main():

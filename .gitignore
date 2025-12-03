@@ -9,6 +9,6 @@ gok/
 *.tokens
 *.pdb
 *.ilk
-
+*.dep.json
 gen/
 build_cmake/
