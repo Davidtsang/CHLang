@@ -69,6 +69,14 @@ implement Widget {
         }
 
         var f = this->m_frame;
+
+        // [修改] 创建时应用可见性样式
+        var finalStyle = style;
+        // 如果当前是隐藏状态，移除 WS_VISIBLE
+        if (!this->m_isVisible) {
+            @cpp finalStyle &= ~WS_VISIBLE; @end
+        }
+
         this->m_hWnd = CreateWindowExW(
             0, className, NULL, style,
             static_cast<int>(f.getMinX()), static_cast<int>(f.getMinY()),
@@ -76,6 +84,15 @@ implement Widget {
             parent, reinterpret_cast<HMENU>(static_cast<int64_t>(this->m_id)),
             g_hInstance, this
         );
+    }
+    // [新增]
+    func setVisible(v: bool) {
+        this->m_isVisible = v;
+        if (this->m_hWnd != NULL) {
+            var flag: i32 = 0;
+            if (v) { flag = 5; } else { flag = 0; } // SW_SHOW=5, SW_HIDE=0
+            ShowWindow(this->m_hWnd, flag);
+        }
     }
 
     // 默认实现

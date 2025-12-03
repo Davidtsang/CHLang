@@ -10,7 +10,8 @@ enum JType {
     J_OBJECT,
     J_ARRAY,
     J_STRING,
-    J_NUMBER
+    J_NUMBER,
+    J_BOOL // [新增]
 }
 
 // 基类
@@ -22,6 +23,17 @@ class JNode : CHObject {
     // 辅助转换方法
     public virtual func asString() -> std::string;
     public virtual func asInt() -> i32;
+    public virtual func asBool() -> bool; // [新增]
+}
+
+// [新增] 布尔节点
+@dynamic
+class JBool : JNode {
+    var m_val: bool;
+    public init(v: bool);
+    public override func getType() -> JType;
+    public override func asBool() -> bool;
+    public override func asString() -> std::string;
 }
 
 // 字符串节点
@@ -33,7 +45,7 @@ class JString : JNode {
     public override func asString() -> std::string;
 }
 
-// 数字节点 (简化：只支持 int)
+// 数字节点
 @dynamic
 class JNumber : JNode {
     var m_val: i32;
@@ -42,10 +54,9 @@ class JNumber : JNode {
     public override func asInt() -> i32;
 }
 
-// 对象节点 { "k": v }
+// 对象节点
 @dynamic
 class JObject : JNode {
-    // 使用 dyn 存储值，实现多态
     var m_map: std::map<std::string, dyn>;
 
     public init();
@@ -53,12 +64,10 @@ class JObject : JNode {
 
     public func put(key: std::string, val: dyn);
     public func get(key: std::string) -> dyn;
-
-    // 获取所有 Key (用于 for-in 遍历)
     public func getKeys() -> std::vector<std::string>;
 }
 
-// 数组节点 [ v1, v2 ]
+// 数组节点
 @dynamic
 class JArray : JNode {
     var m_list: std::vector<dyn>;

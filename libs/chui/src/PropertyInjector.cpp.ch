@@ -33,4 +33,13 @@ implement PropertyInjector {
          if (key == "width") { obj~>setWidth(value); return; }
          if (key == "height") { obj~>setHeight(value); return; }
     }
+
+    // [新增]
+    func injectBool(obj: dyn, key: std::string, value: bool) {
+        if (key == "visible") {
+            obj~>setVisible(value);
+            return;
+        }
+    }
+
 }

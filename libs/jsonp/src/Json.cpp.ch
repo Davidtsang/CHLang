@@ -5,8 +5,22 @@ import "jsonp/Json"
 implement JNode {
     init() {}
     func getType() -> JType { return JType::J_NULL; }
-    func asString() -> std::string { return ""; }
+    func asString() -> std::string { return "null"; }
     func asInt() -> i32 { return 0; }
+    func asBool() -> bool { return false; } // [新增]
+}
+
+// --- JBool [新增] ---
+@dynamic
+implement JBool {
+    init(v: bool) { this->m_val = v; }
+    func getType() -> JType { return JType::J_BOOL; }
+    func asBool() -> bool { return this->m_val; }
+
+    func asString() -> std::string {
+        if (this->m_val) { return "true"; }
+        return "false";
+    }
 }
 
 // --- JString ---
@@ -32,7 +46,6 @@ implement JObject {
     func getType() -> JType { return JType::J_OBJECT; }
 
     func put(key: std::string, val: dyn) {
-        // 引用计数接管：Map 存入 dyn (CHObject*)
         if (val) { val->retain(); }
         this->m_map[key] = val;
     }
@@ -66,11 +79,10 @@ implement JArray {
 
     func get(index: i32) -> dyn {
         if (index >= 0) {
-            // @cpp hack: vector.size() 返回 size_t，需要强转比较
-            //@cpp
+            @cpp
             if (index < this->m_list.size())
              {return this->m_list[index];}
-            //@end
+            @end
         }
         return nullptr;
     }

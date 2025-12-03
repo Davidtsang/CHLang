@@ -16,12 +16,16 @@ class JsonParser : CHObject {
     public func parse(json: std::string) -> dyn;
 
     // --- 内部递归方法 (protected/private) ---
-    // 即使是 private，在动态类里也可以通过方法名反射调用，方便单元测试
     func parseValue() -> dyn;
     func parseObject() -> dyn;
     func parseArray() -> dyn;
     func parseString() -> dyn;
     func parseNumber() -> dyn;
+
+    // [修复] 必须在这里声明新添加的方法
+    func parseTrue() -> dyn;
+    func parseFalse() -> dyn;
+    func parseNull() -> dyn;
 
     // 辅助
     func skipWhitespace();

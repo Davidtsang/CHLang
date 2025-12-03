@@ -22,6 +22,7 @@ class Widget : CHObject {
     public var m_id: int;
     public var m_frame: CGRect;
     public var m_isMouseOver: bool;
+    public var m_isVisible: bool; // [新增]
 
     public init();
     public deinit;
@@ -34,7 +35,7 @@ class Widget : CHObject {
     public func setY(v: i32);
     public func setWidth(v: i32);
     public func setHeight(v: i32);
-
+    public func setVisible(v: bool);
 // [建议声明] 让基类也能响应这些通用属性
     public virtual func setText(t: std::string);
     public virtual func setBackgroundColor(c: CGColor);
