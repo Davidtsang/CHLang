@@ -1,23 +1,17 @@
 [
     {
-        "type": "Label",
-        "text": "Hello from Clean JSON!",
-        "textColor": "#0000FF",
-        "backgroundColor": "#00000000",
-        "x": 20, "y": 20, "width": 200, "height": 30
-    },
-    {
-        "type": "Button",
-        "text": "Auto-Magic Button",
-        "textColor": "#FFFFFF",
-        "backgroundColor": "#008000",
-        "x": 20, "y": 70, "width": 200, "height": 50
-    },
-    {
-        "type": "Label",
-        "text": "It just works!",
-        "textColor": "#008800",
-        "backgroundColor": "#00000000",
-        "x": 20, "y": 140, "width": 200, "height": 30
+        "type": "HBox",
+        "backgroundColor": "#f0f0f0",
+        "x": 0, "y": 0, "width": 600, "height": 60,
+
+        "borderTopWidth": 1,
+        "borderTopColor": "#a0a0a0",
+
+        "children": [
+            { "type": "Button", "text": "Top Border (Blue)", "width": 120, "height": 30 ,
+              "iconData": "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAABnklEQVRIicXVPW8TQRAG4MdUtnBji4qkT8J/4LNMJENHixDwF0D5SVTgEoJESAWk5SNBosEKHUmUHlPsbG5tTrmLAfFKq9HNzb4zNzv7Hv8YnYb3Q9zBCKtYDv8EnzHGM/w4b+IeNnGMacM6itheW/Jl7BYEL/AAK7gYaxUP8bKI28VSG/JJbNjDtRYFXcd+7JmclaRXVP4agxbkGQNsx9536NYFbaoqPw95xhBfguNJ3ct8oGVbOtiI1Wnhv6E6+Jki76sOtMSG6hDXW/hhK/z34EI4R2Gfzn/aAsgco9K5F1lX5oI7UeG631tU5yeN8FS6iKc4CWd/8cJP0Q+uE6oW/U1kzp/lw0HYxpvYApfDfi8TfAx7dS54R7MW7cztyWP+oUwwDnv3j2qf5RiXzqF0OaaStiyKW8FxqEYNslR8xaUFyEupeFwX0MX7CNiuq6CB/I0GsSNNUZbrfUlbmnBTVfk3LSZxKarIU7KFR1iTLlEfV8L3qoh724Y8oytJbj74s9ah1PPatjT99Ae4LQnXmtmf/idpFJ9Hkv+DX/6lgIRA+y3RAAAAAElFTkSuQmCC"
+            },
+            { "type": "Button", "text": "Bottom Border (Red)", "width": 140, "height": 30 }
+        ]
     }
 ]

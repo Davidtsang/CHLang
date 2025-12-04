@@ -3,13 +3,14 @@
 
 import <string>
 import <windows.h>
-import "chui/Button" // 为了使用 ClickCallback 类型
+import "chui/Button"
+import "chui/Widget" // [新增]
+import "jsonp/Json"  // [新增] 需要 JObject
 
 class LayoutLoader {
-    // 定义为一个静态工具方法
-    // 参数:
-    // path: json 文件路径
-    // parent: 父窗口句柄 (用于挂载控件)
-    // exitCb: 退出回调 (专门为了给 Button 绑定事件用)
+    // [新增] 声明为 static private (或 public，这里无所谓)
+    // 注意：需要导入 chui/Widget 和 jsonp/Json 才能识别类型
+    public static func parseWidget(parent: HWND, itemObj: JObject*, id: int, exitCb: ClickCallback) -> Widget*;
+
     public static func load(path: std::string, parent: HWND, exitCb: ClickCallback) -> bool;
 }

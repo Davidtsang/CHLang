@@ -26,7 +26,7 @@ implement Label {
         this->m_textColor = CGColor::black();
 
         this->m_fontName = L"Segoe UI";
-        this->m_fontSize = 12.0;
+        this->m_fontSize = 8.0;
 
         this->m_alignH = 1; // Center
         this->m_alignV = 1; // Center
